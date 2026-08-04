@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-bg-soft text-text-main;
+    }
+}
+
+/*
+ * Styles the sanitized Article body HTML. Scoped narrowly to exactly the
+ * tags HtmlSanitizerService allows through (p, h2-h4, ul/ol/li, strong,
+ * em, a, img, blockquote) rather than pulling in @tailwindcss/typography
+ * for a handful of elements.
+ */
+@layer components {
+    .article-body p {
+        @apply mb-4;
+    }
+
+    .article-body h2 {
+        @apply mb-4 mt-8 text-2xl font-bold text-text-main;
+    }
+
+    .article-body h3 {
+        @apply mb-3 mt-6 text-xl font-bold text-text-main;
+    }
+
+    .article-body h4 {
+        @apply mb-3 mt-6 text-lg font-semibold text-text-main;
+    }
+
+    .article-body ul {
+        @apply mb-4 list-disc ps-6;
+    }
+
+    .article-body ol {
+        @apply mb-4 list-decimal ps-6;
+    }
+
+    .article-body li {
+        @apply mb-1;
+    }
+
+    .article-body strong {
+        @apply font-semibold text-text-main;
+    }
+
+    .article-body a {
+        @apply text-primary-green underline hover:text-primary-green/80;
+    }
+
+    .article-body img {
+        @apply my-6 rounded-lg;
+    }
+
+    .article-body blockquote {
+        @apply my-6 border-s-4 border-luxury-gold bg-bg-soft py-3 ps-4 text-text-secondary;
+    }
+}
