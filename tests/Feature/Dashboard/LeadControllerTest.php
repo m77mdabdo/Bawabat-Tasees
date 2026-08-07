@@ -191,4 +191,63 @@ class LeadControllerTest extends TestCase
 
         $response->assertDontSee($lead->full_name);
     }
+
+    /**
+     * A lead is a historical record — soft-deleting a service must not
+     * erase which service an existing lead asked about. Without
+     * withTrashed() on the relationship this resolves to null and the
+     * dashboard renders a blank service.
+     */
+    public function test_requested_service_still_resolves_after_the_service_is_soft_deleted(): void
+    {
+        $service = Service::create([
+            'slug' => 'company-formation',
+            'name' => ['ar' => 'تأسيس الشركات'],
+            'summary' => ['ar' => 'x'], 'body' => ['ar' => 'x'], 'requirements' => ['ar' => 'x'], 'process' => ['ar' => 'x'],
+            'is_active' => true,
+        ]);
+        $lead = $this->makeLead(['requested_service_id' => $service->id]);
+
+        $service->delete();
+        $this->assertSoftDeleted($service);
+
+        $this->assertNotNull($lead->fresh()->requestedService);
+        $this->assertSame('company-formation', $lead->fresh()->requestedService->slug);
+    }
+
+    public function test_leads_index_still_shows_the_service_name_after_it_is_soft_deleted(): void
+    {
+        $admin = $this->makeAdmin();
+        $service = Service::create([
+            'slug' => 'company-formation',
+            'name' => ['ar' => 'تأسيس الشركات'],
+            'summary' => ['ar' => 'x'], 'body' => ['ar' => 'x'], 'requirements' => ['ar' => 'x'], 'process' => ['ar' => 'x'],
+            'is_active' => true,
+        ]);
+        $this->makeLead(['requested_service_id' => $service->id]);
+        $service->delete();
+
+        $this->actingAs($admin)
+            ->get(route('dashboard.leads.index'))
+            ->assertOk()
+            ->assertSee('تأسيس الشركات', escape: false);
+    }
+
+    public function test_lead_show_still_displays_the_service_after_it_is_soft_deleted(): void
+    {
+        $admin = $this->makeAdmin();
+        $service = Service::create([
+            'slug' => 'company-formation',
+            'name' => ['ar' => 'تأسيس الشركات'],
+            'summary' => ['ar' => 'x'], 'body' => ['ar' => 'x'], 'requirements' => ['ar' => 'x'], 'process' => ['ar' => 'x'],
+            'is_active' => true,
+        ]);
+        $lead = $this->makeLead(['requested_service_id' => $service->id]);
+        $service->delete();
+
+        $this->actingAs($admin)
+            ->get(route('dashboard.leads.show', $lead))
+            ->assertOk()
+            ->assertSee('تأسيس الشركات', escape: false);
+    }
 }
