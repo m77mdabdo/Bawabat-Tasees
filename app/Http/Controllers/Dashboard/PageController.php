@@ -16,8 +16,10 @@ class PageController extends Controller
     ) {}
 
     /**
-     * Only index/edit/update — the four pages this project needs are
-     * fixed and seeded via PageContentSeeder, not admin-creatable in v1.
+     * Only index/edit/update — the fixed set of pages this project
+     * needs (About, Why Invest, Formation Process, Requirements,
+     * Privacy Policy, Terms and Conditions) are seeded via
+     * PageContentSeeder, not admin-creatable in v1.
      */
     public function index(): View
     {
@@ -37,7 +39,7 @@ class PageController extends Controller
 
         return redirect()
             ->route('dashboard.pages.edit', $page)
-            ->with('status', 'Page updated.');
+            ->with('status', __('dashboard.flash.page_updated'));
     }
 
     /**

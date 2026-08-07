@@ -29,7 +29,7 @@ class FaqController extends Controller
 
         return redirect()
             ->route('dashboard.faqs.index')
-            ->with('status', 'FAQ created.');
+            ->with('status', __('dashboard.flash.faq_created'));
     }
 
     public function edit(Faq $faq): View
@@ -43,7 +43,7 @@ class FaqController extends Controller
 
         return redirect()
             ->route('dashboard.faqs.index')
-            ->with('status', 'FAQ updated.');
+            ->with('status', __('dashboard.flash.faq_updated'));
     }
 
     public function destroy(Faq $faq): RedirectResponse
@@ -52,6 +52,6 @@ class FaqController extends Controller
 
         return redirect()
             ->route('dashboard.faqs.index')
-            ->with('status', 'FAQ deleted.');
+            ->with('status', __('dashboard.flash.faq_deleted'));
     }
 }

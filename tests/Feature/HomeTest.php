@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Article;
+use App\Models\Country;
+use App\Models\Faq;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\Service;
@@ -40,7 +42,10 @@ class HomeTest extends TestCase
         $response->assertDontSee('لماذا تستثمر في السعودية');
         $response->assertDontSee('رحلتك نحو تأسيس شركتك');
         $response->assertDontSee('ماذا يقول عملاؤنا');
+        $response->assertDontSee('الدول التي ندعمها');
+        $response->assertDontSee('أسئلة قد تخطر ببالك');
         $response->assertDontSee('أحدث المقالات');
+        $response->assertDontSee('شريكك الموثوق لتأسيس الأعمال');
         $response->assertSee('جاهز لتأسيس شركتك في السعودية؟');
     }
 
@@ -119,6 +124,69 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertSee('أحدث المقالات');
         $response->assertSee('دليل التأسيس');
+    }
+
+    public function test_home_page_shows_about_teaser_when_about_page_exists(): void
+    {
+        Page::create([
+            'slug' => 'about', 'is_published' => true,
+            'title' => ['ar' => 'من نحن'],
+            'body' => ['ar' => '<p>الفقرة الأولى من نبذة عنا.</p><p>الفقرة الثانية التي لا يجب أن تظهر في المقتطف.</p>'],
+            'meta_title' => ['ar' => 'x'], 'meta_description' => ['ar' => 'x'],
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('شريكك الموثوق لتأسيس الأعمال');
+        $response->assertSee('الفقرة الأولى من نبذة عنا.');
+        $response->assertDontSee('الفقرة الثانية التي لا يجب أن تظهر في المقتطف.');
+    }
+
+    public function test_home_page_shows_countries_when_active_countries_exist(): void
+    {
+        Country::create([
+            'slug' => 'egypt', 'name' => ['ar' => 'مصر'], 'is_active' => true, 'sort_order' => 1,
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('الدول التي ندعمها');
+        $response->assertSee('مصر');
+    }
+
+    public function test_home_page_shows_faqs_when_active_faqs_exist(): void
+    {
+        Faq::create([
+            'question' => ['ar' => 'كيف أبدأ؟'], 'answer' => ['ar' => 'اتبع الخطوات التالية'],
+            'is_active' => true, 'sort_order' => 1,
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('أسئلة قد تخطر ببالك');
+        $response->assertSee('كيف أبدأ؟');
+        $response->assertSee('اتبع الخطوات التالية');
+    }
+
+    /**
+     * Regression guard: the WhatsApp floating button and the two hero/
+     * final-CTA WhatsApp buttons must render the real WhatsApp glyph
+     * (x-icons.whatsapp, sourced from the simple-icons package), not
+     * the old placeholder rect+triangle shape.
+     */
+    public function test_whatsapp_buttons_use_the_real_whatsapp_icon(): void
+    {
+        \App\Models\Setting::create(['key' => 'contact_whatsapp', 'value' => '+966500000000', 'group' => 'contact']);
+
+        $response = $this->get('/');
+        $html = $response->getContent();
+
+        $response->assertOk();
+        $this->assertStringContainsString('M17.472 14.382', $html);
+        $this->assertStringNotContainsString('<rect x="3" y="4" width="18" height="12" rx="2" />', $html);
     }
 
     public function test_navbar_has_services_dropdown_countries_and_blog_label(): void

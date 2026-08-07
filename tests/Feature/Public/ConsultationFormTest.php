@@ -188,6 +188,20 @@ class ConsultationFormTest extends TestCase
         $this->assertNull($lead->latest_touch);
     }
 
+    /**
+     * Regression guard: see the same test/note in ContactFormTest.
+     */
+    public function test_honeypot_is_hidden_from_screen_readers_not_just_visually(): void
+    {
+        $html = $this->get(route('consultation'))->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/<div[^>]*aria-hidden="true"[^>]*tabindex="-1"[^>]*>\s*<label for="website_url"/',
+            $html
+        );
+        $this->assertDoesNotMatchRegularExpression('/class="sr-only"[^>]*>\s*<label for="website_url"/', $html);
+    }
+
     public function test_honeypot_filled_does_not_create_a_lead_but_still_shows_success(): void
     {
         $service = $this->makeService();

@@ -43,7 +43,7 @@ class TestimonialController extends Controller
 
         return redirect()
             ->route('dashboard.testimonials.index')
-            ->with('status', 'Testimonial created.');
+            ->with('status', __('dashboard.flash.testimonial_created'));
     }
 
     public function edit(Testimonial $testimonial): View
@@ -67,7 +67,7 @@ class TestimonialController extends Controller
 
         return redirect()
             ->route('dashboard.testimonials.index')
-            ->with('status', 'Testimonial updated.');
+            ->with('status', __('dashboard.flash.testimonial_updated'));
     }
 
     public function destroy(Testimonial $testimonial): RedirectResponse
@@ -76,6 +76,6 @@ class TestimonialController extends Controller
 
         return redirect()
             ->route('dashboard.testimonials.index')
-            ->with('status', 'Testimonial deleted.');
+            ->with('status', __('dashboard.flash.testimonial_deleted'));
     }
 }

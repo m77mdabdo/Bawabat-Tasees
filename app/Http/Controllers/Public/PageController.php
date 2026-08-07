@@ -52,6 +52,22 @@ class PageController extends Controller
         ]);
     }
 
+    /**
+     * Privacy Policy and Terms and Conditions are both intro-only prose
+     * (no sections) — unlike the four pages above, they share the exact
+     * same visual treatment, so both render through one shared view
+     * (public.pages.legal) instead of a dedicated view each.
+     */
+    public function privacyPolicy(): View
+    {
+        return view('public.pages.legal', ['page' => $this->publishedPage('privacy-policy')]);
+    }
+
+    public function termsAndConditions(): View
+    {
+        return view('public.pages.legal', ['page' => $this->publishedPage('terms-and-conditions')]);
+    }
+
     private function publishedPage(string $slug): Page
     {
         $page = Page::where('slug', $slug)->firstOrFail();

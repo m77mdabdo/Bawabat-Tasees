@@ -43,7 +43,7 @@ class CountryController extends Controller
 
         return redirect()
             ->route('dashboard.countries.index')
-            ->with('status', 'Country created.');
+            ->with('status', __('dashboard.flash.country_created'));
     }
 
     public function edit(Country $country): View
@@ -67,7 +67,7 @@ class CountryController extends Controller
 
         return redirect()
             ->route('dashboard.countries.index')
-            ->with('status', 'Country updated.');
+            ->with('status', __('dashboard.flash.country_updated'));
     }
 
     public function destroy(Country $country): RedirectResponse
@@ -76,6 +76,6 @@ class CountryController extends Controller
 
         return redirect()
             ->route('dashboard.countries.index')
-            ->with('status', 'Country deleted.');
+            ->with('status', __('dashboard.flash.country_deleted'));
     }
 }

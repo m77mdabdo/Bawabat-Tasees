@@ -1,28 +1,28 @@
 @php
     $fields = [
         'meta_pixel_id' => [
-            'label' => __('معرّف بكسل ميتا (Meta / Facebook Pixel ID)'),
-            'placeholder' => 'مثال: 123456789012345',
+            'label' => __('dashboard.tracking_settings.meta_pixel_id'),
+            'placeholder' => __('dashboard.tracking_settings.example_meta'),
         ],
         'gtm_container_id' => [
-            'label' => __('معرّف حاوية Google Tag Manager'),
-            'placeholder' => 'مثال: GTM-XXXXXXX',
+            'label' => __('dashboard.tracking_settings.gtm_container_id'),
+            'placeholder' => __('dashboard.tracking_settings.example_gtm'),
         ],
         'ga4_measurement_id' => [
-            'label' => __('معرّف قياس Google Analytics 4'),
-            'placeholder' => 'مثال: G-XXXXXXXXXX',
+            'label' => __('dashboard.tracking_settings.ga4_measurement_id'),
+            'placeholder' => __('dashboard.tracking_settings.example_ga4'),
         ],
         'google_ads_conversion_id' => [
-            'label' => __('معرّف تحويل Google Ads'),
-            'placeholder' => 'مثال: AW-XXXXXXXXX',
+            'label' => __('dashboard.tracking_settings.google_ads_conversion_id'),
+            'placeholder' => __('dashboard.tracking_settings.example_google_ads_id'),
         ],
         'google_ads_conversion_label' => [
-            'label' => __('تسمية تحويل Google Ads (Conversion Label)'),
-            'placeholder' => 'مثال: AbCdEfGhIjKlMnOp',
+            'label' => __('dashboard.tracking_settings.google_ads_conversion_label'),
+            'placeholder' => __('dashboard.tracking_settings.example_google_ads_label'),
         ],
         'tiktok_pixel_id' => [
-            'label' => __('معرّف بكسل TikTok'),
-            'placeholder' => 'مثال: XXXXXXXXXXXXXXXXXX',
+            'label' => __('dashboard.tracking_settings.tiktok_pixel_id'),
+            'placeholder' => __('dashboard.tracking_settings.example_tiktok'),
         ],
     ];
 @endphp
@@ -30,7 +30,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-text-main leading-tight">
-            {{ __('إعدادات التتبع') }}
+            {{ __('dashboard.tracking_settings.heading') }}
         </h2>
     </x-slot>
 
@@ -43,7 +43,7 @@
 
         <x-card class="p-6">
             <p class="text-sm text-text-secondary">
-                {{ __('هذه المعرّفات ليست بيانات سرية (تُعرض في كود الصفحة العام)، لكنها لا تُدرج إلا من هنا — لن يعمل أي كود تتبع إلا بعد إدخال قيمته هنا وتفعيله.') }}
+                {{ __('dashboard.tracking_settings.intro') }}
             </p>
         </x-card>
 
@@ -81,7 +81,7 @@
                                     @checked(old("settings.{$key}.is_active", $settings[$key]?->is_active))
                                     class="rounded border-border-default text-primary-green shadow-sm"
                                 >
-                                <span class="text-sm text-text-main">{{ __('مفعّل') }}</span>
+                                <span class="text-sm text-text-main">{{ __('dashboard.tracking_settings.active') }}</span>
                             </label>
                         </div>
                     </x-card>
@@ -89,7 +89,7 @@
             </div>
 
             <button type="submit" class="mt-6 rounded-md bg-primary-green px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-green/90">
-                {{ __('حفظ الإعدادات') }}
+                {{ __('dashboard.tracking_settings.save') }}
             </button>
         </form>
     </div>

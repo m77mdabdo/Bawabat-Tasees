@@ -32,7 +32,7 @@ class MediaController extends Controller
 
         return redirect()
             ->route('dashboard.media.index')
-            ->with('status', 'Media uploaded.');
+            ->with('status', __('dashboard.flash.media_created'));
     }
 
     public function destroy(Media $media): RedirectResponse
@@ -41,6 +41,6 @@ class MediaController extends Controller
 
         return redirect()
             ->route('dashboard.media.index')
-            ->with('status', 'Media deleted.');
+            ->with('status', __('dashboard.flash.media_deleted'));
     }
 }

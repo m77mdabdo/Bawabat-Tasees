@@ -85,8 +85,11 @@
                          consultation/contact forms (real visitors never
                          see it — CSS-hidden, not type="hidden"). If
                          filled, the controller silently accepts the
-                         request without creating a Comment. --}}
-                    <div class="absolute -left-[9999px]" aria-hidden="true" tabindex="-1">
+                         request without creating a Comment. NOT `sr-only` —
+                         that utility stays VISIBLE to screen readers by
+                         design, the opposite of what a honeypot needs; see
+                         the same note in contact-form.blade.php. --}}
+                    <div class="absolute h-px w-px overflow-hidden opacity-0 pointer-events-none" aria-hidden="true" tabindex="-1">
                         <label for="website_url">{{ __('site.common.honeypot_label') }}</label>
                         <input type="text" name="website_url" id="website_url" autocomplete="off" tabindex="-1" value="{{ old('website_url') }}">
                     </div>

@@ -37,6 +37,8 @@ return [
 
     'footer' => [
         'rights' => 'All rights reserved.',
+        'privacy_link' => 'Privacy Policy',
+        'terms_link' => 'Terms and Conditions',
     ],
 
     'common' => [
@@ -55,6 +57,10 @@ return [
         'cta_consultation' => 'Book a Free Consultation',
         'cta_whatsapp' => 'Chat on WhatsApp',
 
+        'about_eyebrow' => 'About Us',
+        'about_heading' => 'Your Trusted Partner for Business Formation',
+        'about_cta' => 'Read More About Us',
+
         'services_eyebrow' => 'Our Services',
         'services_heading' => 'Everything You Need to Establish Your Company',
         'services_cta' => 'View All Services',
@@ -70,6 +76,14 @@ return [
         'testimonials_eyebrow' => 'Client Testimonials',
         'testimonials_heading' => 'What Our Clients Say',
         'testimonial_slide_label' => 'Testimonial number',
+
+        'countries_eyebrow' => 'Our Reach',
+        'countries_heading' => 'Countries We Support',
+        'countries_cta' => 'View All Countries',
+
+        'faqs_eyebrow' => 'FAQs',
+        'faqs_heading' => 'Questions You Might Have',
+        'faqs_cta' => 'View All FAQs',
 
         'articles_eyebrow' => 'Blog',
         'articles_heading' => 'Latest Articles',

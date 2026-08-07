@@ -1816,3 +1816,1737 @@ both fully functional today.
    still shows correctly in Arabic (no blank fields) because no English
    translations have been entered yet and the fallback catches it.
    Click "عربي" to switch back.
+
+## 2026-08-04 — Full English translation — infrastructure + content
+
+The public site is now genuinely bilingual: every static UI string, every
+public route, and all real database content (4 Pages + 19 PageSections —
+the only content that actually exists, see the honest gap note below)
+now has a real, professionally-written English translation. Dashboard/
+admin UI, hero video, and Leads/Consultation backend logic were not
+touched, per this task's explicit restrictions.
+
+### `docs/decisions/00-technical-decisions.md` does not exist
+Checked first, as this task's rule 1 required. This file has never been
+created in any earlier task — `find`/`ls` across `docs/` confirms it.
+The routing structure below therefore follows this task's own explicit,
+repeatedly-stated specification (no-prefix Arabic, `/en/...` English,
+toggle preserves the current page) rather than a source document that
+doesn't exist. Flagging this clearly rather than silently inventing or
+ignoring the reference, per rule 7.
+
+### A real architectural conflict found and resolved: the previous session's locale mechanism had to be replaced, not extended
+The earlier "Navbar Polish" task built a **session-based** locale toggle
+(`/locale/{locale}`, a `locale` session key, no URL prefix for English at
+all) — a deliberate, reasonable choice at the time, since no `/en/...`
+routing requirement had been specified yet. This task explicitly requires
+real `/en/...` URLs (routing, hreflang alternates, and the acceptance
+criteria all depend on English having its own crawlable, bookmarkable
+URLs) — session state can't provide that. The old mechanism was fully
+removed and replaced:
+- **Deleted**: `app/Http/Controllers/Public/LocaleController.php`, the
+  `/locale/{locale}` route, the global `SetLocale` middleware
+  registration in `bootstrap/app.php`.
+- **A genuine Laravel routing limitation discovered by direct testing**,
+  not assumed: a route like `Route::get('/{locale?}/services', ...)`
+  does **not** match `/services` once `{locale}` is omitted — Laravel/
+  Symfony route compilation doesn't support an optional parameter
+  followed by required literal segments. Proved this with a throwaway
+  test route (`/{locale?}/zzztest` → 404 on `/zzztest`, 200 on
+  `/en/zzztest`) before designing around it, rather than shipping a
+  routing structure that silently 404s on every Arabic URL.
+- **The actual fix** — `routes/web.php`: every public route is now
+  registered **twice** via one shared closure — canonical names with no
+  prefix for Arabic (`services.index`, `services.show`, ...), and
+  `"{name}.en"` names under an `en` prefix for English
+  (`services.index.en`, `services.show.en`, ...). `Route::pattern` isn't
+  involved at all now; the `en` prefix is a literal path segment.
+- **`app/helpers.php`** (new, autoloaded via a `composer.json`
+  `"files"` entry — `composer dump-autoload` run after adding it) — two
+  small global helpers so ~15 Blade views didn't all need bespoke
+  if/else locale branching:
+  - `lroute($name, $params, $absolute)` — resolves to the `.en` variant
+    automatically when the current locale is English, otherwise plain
+    `route()`. Every `route(...)` call across every public Blade view
+    was changed to `lroute(...)` (dashboard/auth views were **not**
+    touched — they have no English variant, and `lroute()` gracefully
+    falls through to plain `route()` for names with no `.en` counterpart
+    anyway, so it would have been harmless either way, but changing them
+    was out of scope).
+  - `route_in_locale($locale)` — builds the URL for the **current**
+    route in the given locale, preserving every route parameter (a
+    service slug, an article slug, ...). This is what makes the
+    language toggle preserve the current page and what generates the
+    hreflang tags.
+- **`app/Http/Middleware/SetLocale.php`** (rewritten) — now reads
+  `Route::currentRouteName()` and sets the app locale to `en` if it ends
+  in `.en`, `ar` otherwise. Applied per-group in `routes/web.php`, not
+  globally.
+- **Navbar toggle** (`resources/views/layouts/public.blade.php`) — now
+  built from `route_in_locale()` instead of a fixed `/locale/{locale}`
+  link; verified to preserve the current page including dynamic slugs
+  (see `LocaleTest::test_locale_toggle_preserves_the_current_service_page`).
+- **hreflang tags** — added to `<head>`: `ar`, `en`, and `x-default`
+  (pointing at the Arabic/no-prefix URL, since that's this site's actual
+  default), generated the same way, present on every public route.
+
+### Translatable fallback locale — confirmed, made explicit
+`spatie/laravel-translatable` in the version installed here ships **no
+publishable `config/translatable.php`** — just an in-memory
+`Translatable` singleton with a `fallback()` method (confirmed by reading
+the package source; there's nothing to "modify" at that config path in
+this version). It was already falling back to `config('app.fallback_locale')`
+(`'ar'`, set in an earlier task) implicitly, through an uninitialized
+property default — behaviorally correct already, but not a deliberate
+setting. Made explicit in `app/Providers/AppServiceProvider.php`:
+`Translatable::fallback(fallbackLocale: config('app.fallback_locale'))`.
+This is the mechanism that keeps every English page honest today even
+before all content has a real translation — proven directly by
+`LocaleTest::test_translatable_fallback_returns_arabic_when_english_is_missing`
+and the equivalent full-HTTP-request test right after it.
+
+### Hardcoded Arabic string extraction — `lang/ar/site.php` / `lang/en/site.php`
+One `site.php` file per locale (not split further — the total string
+count didn't justify multiple files), organized into `nav`, `footer`,
+`common`, and one section per page (`home`, `services`, `countries`,
+`faqs`, `articles`, `consultation`, `contact`, `about`). Every hardcoded
+`__('نص عربي...')` call across every public Blade view and the layout
+was replaced with `__('site.section.key')`. The English side is
+hand-written natural business English for an audience of foreign
+investors — not a mechanical/literal translation (e.g. "خطوات العمل" →
+"Process", not "Work Steps"; "جاهز لتبدأ؟" → "Ready to Get Started?",
+not "Ready to Start?").
+
+**Two real bugs found and fixed while doing this extraction, not just
+string moves:**
+1. `resources/views/public/services/show.blade.php` had a stale
+   `href="#"` TODO link on its "Book a Free Consultation" button — the
+   comment said "once Group C builds it," but `/consultation` has existed
+   since the Leads/Consultation task and was simply never wired up here.
+   Fixed to `lroute('consultation')`.
+2. Every article/comment publish date was rendered via
+   `->locale('ar')->translatedFormat(...)` **unconditionally**, regardless
+   of the actual current locale — dates would have stayed in Arabic month
+   names even on the English site. Fixed to `->locale(app()->getLocale())`
+   in `home.blade.php`, `articles/index.blade.php`, and
+   `articles/show.blade.php` (both the article date and the comment date).
+
+### Brand name — the "pick one consistent form" decision
+Using **"Bawabat Taasees Al Sharikat"** as the single consistent English
+form everywhere the brand name itself appears (nav logo alt text, footer,
+every page `<title>`) — not "Companies Establishment Gate" or any other
+literal machine-translation of "بوابة تأسيس الشركات". The fuller
+descriptor "Company Formation Gateway" is stored as a separate
+`site.brand.tagline` key and used contextually (available for meta
+descriptions/taglines) rather than appended to the name on every single
+occurrence, which would make page titles and the footer look cluttered
+and unprofessional. This is a judgment call on the task's two offered
+options — picking the short transliterated form as the actual *name*,
+with the English descriptor available as a *tagline*, is how real
+bilingual GCC corporate sites typically handle this, and reads as more
+professional in a browser tab or footer line than repeating the full
+phrase everywhere.
+
+### Part B — the content:translate-to-english command
+`app/Console/Commands/TranslateContentToEnglish.php`
+(`content:translate-to-english {--force}`):
+- Iterates Service, Country, Faq, Article, Testimonial, Page,
+  PageSection (read/written directly — its `content` JSON blob isn't a
+  spatie/laravel-translatable field, so `getTranslation()`/
+  `setTranslation()` don't apply to it), and SeoMeta.
+- **No machine-translation API is wired into this project, and none was
+  requested** — every English string was written by hand for this task,
+  stored in a dictionary **keyed by the exact Arabic source text**. A
+  field only gets translated if its Arabic value is an exact match in
+  that dictionary; anything else is reported as "no translation
+  available" rather than silently skipped or guessed at — this is what
+  keeps a future run over new (currently nonexistent) Service/Country/
+  Faq/Article/Testimonial content from disappearing into a false
+  "nothing to report" — proven by
+  `TranslateContentToEnglishTest::test_reports_arabic_content_with_no_available_translation`.
+- Idempotent by default (skips any field with existing non-empty
+  English), `--force` overwrites.
+- HTML body fields (`Page.body`, `Service.body`, `Article.body`) are
+  translated **with their wrapping tags preserved**, then still passed
+  through `HtmlSanitizerService::sanitizeArticleBody()` before saving —
+  no special bypass of that sanitizer for command-authored content.
+- Prints a per-model table (translated / skipped-existing /
+  skipped-no-translation) plus a full total and a list of every
+  untranslated field for manual follow-up.
+- **A real bug found by testing, not assumed away**: the command's
+  running-totals were instance properties on the Command class, and
+  Laravel reuses the same resolved Command instance across multiple
+  `Artisan::call()`s within one process — the idempotency test's second
+  call was silently inheriting the first call's counts. Fixed by
+  resetting all three tracking properties at the top of `handle()`.
+  Caught by `TranslateContentToEnglishTest::test_running_twice_is_idempotent`,
+  which failed before the fix and passes after it.
+
+### Real command output (run against the actual project database)
+**Honest finding, exactly as flagged in every earlier task's TASKS.md
+entry**: Service, Country, Faq, Article, Testimonial, and SeoMeta all
+have **0 rows** in this database — only the 4 Pages (about,
+why-invest-saudi-arabia, formation-process, required-documents) and
+their 19 PageSections, seeded in the earlier Pages/Sections task, have
+real content. This is not a limitation of the command — it faithfully
+reflects that no other business content has been entered yet. The
+command is fully generic and ready for all 8 models the moment real data
+exists.
+
+First run:
+```
++-------------+------------+---------------------------+------------------------------------+
+| Model       | Translated | Skipped (already English) | Skipped (no translation available) |
++-------------+------------+---------------------------+------------------------------------+
+| Page        | 16         | 0                         | 0                                  |
+| PageSection | 38         | 0                         | 0                                  |
+| Service     | 0          | 0                         | 0                                  |
+| Country     | 0          | 0                         | 0                                  |
+| Faq         | 0          | 0                         | 0                                  |
+| Article     | 0          | 0                         | 0                                  |
+| Testimonial | 0          | 0                         | 0                                  |
+| SeoMeta     | 0          | 0                         | 0                                  |
++-------------+------------+---------------------------+------------------------------------+
+Total fields translated: 54
+Total fields already had English content (skipped): 0
+```
+Second run (immediately after, no changes in between):
+```
+| Page        | 0          | 16                        | 0                                  |
+| PageSection | 0          | 38                        | 0                                  |
+Total fields translated: 0
+Total fields already had English content (skipped): 54
+```
+Idempotency confirmed with real output, not just the test suite.
+
+### Draft-copy caveat carried forward (task requirement #6)
+The Arabic starter copy for `about`, `why-invest-saudi-arabia`,
+`formation-process`, and `required-documents` was flagged in an earlier
+task's TASKS.md entry as **draft content pending legal/professional
+review, not final**. Their new English translations are translations of
+that same draft copy — the command's own console output ends with an
+explicit reminder of this every time it runs, and it's restated here:
+**the English versions of these 4 pages are not more final than the
+Arabic originals and should go through the same review before being
+treated as production copy.**
+
+### Part C — SEO/meta
+`SeoMeta.meta_title`/`meta_description` are covered by the same command
+(0 rows exist, same honest-gap note as above). Every page `<title>` tag
+already correctly reflects the active locale — confirmed via
+`LocaleTest::test_html_dir_is_rtl_for_arabic_and_ltr_for_english` and the
+brand-name assertion in `test_english_page_shows_english_brand_name_and_nav_labels`
+— since `:title="..."` on every public view now builds from
+`__('site.brand.name')` / translated page titles instead of the
+locale-blind `config('app.name')`.
+
+### Created
+- `lang/ar/site.php`, `lang/en/site.php`
+- `app/helpers.php` (+ `composer.json` `autoload.files` entry)
+- `app/Console/Commands/TranslateContentToEnglish.php`
+- `tests/Feature/Console/TranslateContentToEnglishTest.php` (6 tests)
+
+### Modified
+- `routes/web.php` (dual locale route registration, replacing the
+  session-based mechanism)
+- `bootstrap/app.php` (removed global `SetLocale` registration, added
+  the `setlocale` middleware alias)
+- `app/Http/Middleware/SetLocale.php` (rewritten — route-name based, not
+  session-based)
+- `app/Providers/AppServiceProvider.php` (explicit `Translatable::fallback()`)
+- `resources/views/layouts/public.blade.php` (hreflang tags, `lroute()`,
+  toggle rebuilt on `route_in_locale()`, all hardcoded strings extracted)
+- `resources/views/public/home.blade.php`
+- `resources/views/public/services/index.blade.php`
+- `resources/views/public/services/show.blade.php` (+ dead-link fix)
+- `resources/views/public/countries/index.blade.php`
+- `resources/views/public/faqs/index.blade.php`
+- `resources/views/public/articles/index.blade.php` (+ date-locale fix)
+- `resources/views/public/articles/show.blade.php` (+ date-locale fix ×2)
+- `resources/views/public/consultation.blade.php`
+- `resources/views/public/contact.blade.php`
+- `resources/views/public/pages/about.blade.php`
+- `resources/views/public/pages/why-invest.blade.php`
+- `resources/views/public/pages/formation-process.blade.php`
+- `resources/views/public/pages/requirements.blade.php`
+- `resources/views/components/whatsapp-float-button.blade.php`
+- `tests/Feature/LocaleTest.php` (fully rewritten for the new URL-based
+  mechanism — the old session-based tests no longer apply)
+
+### Deleted
+- `app/Http/Controllers/Public/LocaleController.php`
+
+### Verification
+- `php artisan test` — **245 tests / 728 assertions, all passing** (was
+  239/709 before this task; +6 new `TranslateContentToEnglishTest`
+  cases; `LocaleTest` fully rewritten, net 0 change in its own count).
+- `php artisan test --filter=Locale` — 10 tests, all passing, including
+  the toggle-preserves-current-page and hreflang-present tests.
+- `php artisan content:translate-to-english` (real output above) — run
+  twice, second run confirmed idempotent.
+- `npm run build` — clean.
+- Manual, real-HTTP verification via `php artisan serve` + `curl`: all
+  11 public routes return 200 under both the no-prefix Arabic form and
+  the `/en/` prefix (22 URLs total). The 4 translated pages
+  (`/en/about`, `/en/why-invest`, `/en/formation-process`,
+  `/en/requirements`) contain their full English content with **zero**
+  Arabic text leaking through except the intentional "العربية"
+  language-toggle label (kept in Arabic script by design, the same way
+  "Français" stays untranslated inside an English menu).
+- **Limitation, stated plainly**: this environment has no browser or
+  screenshot tooling available to me, so the "375px/768px/1280px visual
+  RTL/LTR correctness" verification could not be done as an actual
+  rendered-pixel check. What I *did* verify: no Tailwind class strings
+  were touched anywhere in this task (only `__()`/`lroute()` swaps and
+  the two bug fixes above), the `dir` attribute switches correctly and
+  is proven by test, and every English string was written with length
+  in mind against the existing (unchanged) layout containers. Recommend
+  an actual visual pass in a real browser at those three widths before
+  calling this task's RTL/LTR item fully closed.
+
+### How to review the English site yourself, page by page
+1. `/en` — homepage. Hero, "Why Invest" and "Formation Process" preview
+   sections show full English content (these read from the newly
+   translated PageSections); Services/Testimonials/Latest-Articles
+   sections are correctly hidden (0 real records — same standing gap
+   noted in every earlier homepage-related task entry, not new).
+2. `/en/about`, `/en/why-invest`, `/en/formation-process`,
+   `/en/requirements` — full English content, freshly written by the
+   command. Read these specifically for tone/accuracy since they're the
+   only pages with real translated body copy.
+3. `/en/services`, `/en/countries`, `/en/faqs`, `/en/articles` — English
+   UI chrome (heading, empty-state message) with the empty state
+   correctly showing, since no real records exist yet for any of these.
+4. `/en/consultation`, `/en/contact` — full English forms; submitting
+   either works identically to the Arabic versions (no backend logic was
+   touched).
+5. Click the language toggle from any of the above — confirms it lands
+   on the Arabic version of the *same* page, not the homepage (this is
+   directly tested, but worth clicking through yourself on a few pages).
+6. View source on any English page and confirm the three `hreflang`
+   `<link>` tags in `<head>`.
+
+## 2026-08-04 — Dashboard fully translated to Arabic — no English leftovers
+
+### Context
+The dashboard (Services, Countries, FAQs, Testimonials, Articles, Media,
+Pages/Sections, Profile, Breeze auth screens) was originally scaffolded
+in mixed Arabic/English — Breeze's default `__('English phrase')` calls
+were never swept to Arabic, and Laravel 10+ no longer ships `ar`
+translations for its own validation/pagination/passwords/auth strings.
+This task audited every dashboard view and controller, eliminated every
+remaining English string, and confirmed the dashboard is now 100%
+Arabic for staff. The dashboard remains single-locale (Arabic-only, no
+toggle) by standing decision — unrelated to and independent from the
+public site's separate `/en/` bilingual work.
+
+### Core Laravel lang files published + translated
+Laravel 10+ no longer ships `ar` translations for its framework
+strings, so `php artisan lang:publish` was run to pull the English
+defaults into `lang/en/`, then each was fully translated into
+`lang/ar/`:
+- `lang/ar/validation.php` — every built-in validation rule (required,
+  email, min/max/between for string/numeric/file/array, unique,
+  confirmed, etc.), plus a full `'attributes'` array translating every
+  field name used across this project's Form Requests (gathered via
+  grep of `app/Http/Requests/Dashboard/*.php` and `Public/*.php`) so
+  error sentences read naturally instead of mixing an English field
+  name into an Arabic sentence.
+- `lang/ar/pagination.php` — `previous` → "السابق", `next` → "التالي".
+  Laravel's default Tailwind pagination view already calls
+  `__('pagination.previous')`/`__('pagination.next')` internally with
+  no `dir="ltr"` override, so translating this one file fixes
+  pagination arrows across every paginated list in the dashboard with
+  no Blade changes needed.
+- `lang/ar/passwords.php` — password-reset flow messages (reset, sent,
+  throttled, token, user-not-found).
+- `lang/ar/auth.php` — login failure, wrong-password, and throttle
+  messages.
+
+### Created
+- `lang/ar/dashboard.php` — new file, ~230 keys across `common`,
+  `services`, `countries`, `faqs`, `testimonials`, `articles`, `media`,
+  `pages`, `sections`, `profile`, `auth`, and `flash` groups. Every
+  hardcoded English string found in the audit was extracted here.
+- `tests/Feature/Dashboard/DashboardArabicValidationTest.php` — two
+  Feature tests (`test_service_store_validation_errors_are_in_arabic`,
+  `test_country_store_validation_errors_are_in_arabic`) that submit an
+  empty payload to two different Form Requests and assert the resulting
+  error message contains Arabic script and does **not** contain the
+  English default "field is required" text — proof the published
+  `validation.php` translation is actually wired up, not just present
+  on disk.
+
+### Modified — Blade views (every `__('English phrase')` replaced with `__('dashboard.key')`)
+- `resources/views/dashboard/services/{index,create,edit,_form}.blade.php`
+- `resources/views/dashboard/countries/{index,create,edit,_form}.blade.php`
+- `resources/views/dashboard/faqs/{index,create,edit,_form}.blade.php`
+- `resources/views/dashboard/testimonials/{index,create,edit,_form}.blade.php`
+- `resources/views/dashboard/articles/{index,create,edit,_form}.blade.php`
+- `resources/views/dashboard/media/index.blade.php`
+- `resources/views/dashboard/pages/{index,edit}.blade.php`
+- `resources/views/dashboard/pages/sections/{index,create,edit,_form}.blade.php`
+- `resources/views/auth/{login,forgot-password,reset-password,confirm-password,verify-email}.blade.php`
+- `resources/views/profile/edit.blade.php`
+- `resources/views/profile/partials/{update-profile-information-form,update-password-form,delete-user-form}.blade.php`
+
+  While already touching every table-header `<th>` line for the text
+  swap, also corrected a pre-existing RTL bug in every CRUD index view:
+  data-column headers used physical `text-left` under `dir="rtl"`
+  (doesn't mirror), changed to `text-right`; action-link containers
+  gained `space-x-reverse` alongside the existing `space-x-2` so
+  Edit/Delete links space correctly right-to-left.
+
+### Modified — bug fix, missing RTL attribute
+- `resources/views/layouts/guest.blade.php` — the `<html>` tag only set
+  `lang="{{ ... }}"`, missing `dir="rtl"` entirely (unlike
+  `layouts/app.blade.php`, which already had it from an earlier task).
+  This meant the login and password-reset pages were rendering LTR.
+  Added `dir="rtl"` to match `layouts/app.blade.php`.
+
+### Modified — 8 controllers, hardcoded English flash messages
+Found via `grep -n "with('status'" app/Http/Controllers/Dashboard/*.php`
+— all 8 replaced `->with('status', 'X created/updated/deleted.')` with
+`->with('status', __('dashboard.flash.<key>'))`, new keys added to the
+`flash` group in `lang/ar/dashboard.php`:
+- `app/Http/Controllers/Dashboard/ServiceController.php` — created/updated/deleted
+- `app/Http/Controllers/Dashboard/CountryController.php` — created/updated/deleted
+- `app/Http/Controllers/Dashboard/FaqController.php` — created/updated/deleted
+- `app/Http/Controllers/Dashboard/TestimonialController.php` — created/updated/deleted
+- `app/Http/Controllers/Dashboard/ArticleController.php` — created/updated/deleted
+- `app/Http/Controllers/Dashboard/MediaController.php` — created/deleted
+- `app/Http/Controllers/Dashboard/PageController.php` — updated
+- `app/Http/Controllers/Dashboard/PageSectionController.php` — created/updated/deleted
+
+  (`LeadController`, `CommentController`, `TrackingSettingController`
+  already used `__('Arabic string')` directly — confirmed clean, not
+  modified.)
+
+### Confirmed clean, not modified
+- `resources/views/components/dashboard/*` (sidebar, home/KPI cards),
+  `resources/views/dashboard/leads/*`, `resources/views/dashboard/comments/*`,
+  `resources/views/dashboard/tracking-settings/*`,
+  `resources/views/components/coming-soon.blade.php` — zero English
+  found via grep sweep; these were already fully Arabic from earlier
+  tasks.
+- `resources/views/layouts/app.blade.php` — already had `dir="rtl"`
+  hardcoded, no English text.
+- Delete-confirmation `confirm()` JS prompts — all already pull from
+  `dashboard.*.confirm_delete` keys, confirmed Arabic.
+
+### Not touched (explicitly out of scope)
+- The public site and its separate `/en/` English translation
+  (`lang/ar/site.php` / `lang/en/site.php`, `resources/views/public/**`,
+  `layouts/public.blade.php`) — untouched, confirmed via grep that the
+  only `site.*` keys remaining are in public-site files, not dashboard
+  files.
+- No EN/AR toggle was added to the dashboard — it remains Arabic-only
+  by design.
+- No business logic was changed — only display strings.
+
+### Verification
+- `php artisan test` — **247 tests / 736 assertions, all passing** (was
+  245/728 before this task; +2 new
+  `DashboardArabicValidationTest` cases).
+- `php artisan test --filter=Dashboard` — **131 tests / 352 assertions,
+  all passing**.
+- Full grep sweep confirming zero `__('English...')` calls remain
+  anywhere under `resources/views/dashboard`, `resources/views/auth`,
+  `resources/views/profile`, `resources/views/layouts/{app,guest}.blade.php`,
+  and `resources/views/components/dashboard` — every match is now
+  `__('dashboard.*')`.
+
+### How to verify this yourself
+1. Log in as admin (`/login` — confirm the page itself now renders
+   RTL and every label is Arabic: "البريد الإلكتروني", "كلمة المرور",
+   "تذكرني", "تسجيل الدخول").
+2. Visit every dashboard section (Services, Countries, FAQs,
+   Testimonials, Articles, Media, Pages → Sections, Leads, Tracking
+   Settings, Comments) — sidebar, headings, table columns, empty
+   states, and buttons should all read in Arabic.
+3. Trigger a validation error on **two different forms** to match the
+   acceptance criteria — e.g. submit the Service create form with the
+   Arabic name left blank, and separately the Country create form the
+   same way. Both should show a red Arabic error message under the
+   field (something like "حقل الاسم (عربي) مطلوب."), never the English
+   default "The name.ar field is required."
+4. Trigger a delete confirmation (e.g. click Delete on any Service,
+   Country, FAQ, Testimonial, Article, Media item, or Page Section) —
+   the native browser `confirm()` dialog should show Arabic text.
+5. Create/update/delete any record and confirm the green flash banner
+   at the top shows an Arabic sentence (e.g. "تم إنشاء الخدمة.") not
+   "Service created."
+6. Visit `/profile` — confirm "معلومات الملف الشخصي", "تحديث كلمة
+   المرور", and "حذف الحساب" sections are all Arabic, and that saving
+   either form shows "تم الحفظ." Try the password-reset flow
+   (`/forgot-password`) and confirm every screen is Arabic end to end.
+7. If any list has enough records to paginate, confirm the pagination
+   controls read "السابق" / "التالي" instead of "Previous" / "Next".
+
+## 2026-08-04 — Dashboard made fully bilingual (ar/en) with per-admin persisted toggle
+
+### Context
+The previous task made the dashboard 100% Arabic with no toggle, by
+standing decision. This task reverses that decision: staff now get a
+genuine English version of the dashboard alongside Arabic, switchable
+per admin via a top-bar toggle, persisted on the `users` table so it
+survives logout/login — independent of whatever locale a public-site
+visitor happens to be browsing in (that mechanism, `SetLocale` +
+`lang/{ar,en}/site.php`, was not touched).
+
+### Inspection findings (done before writing any code, per behavior rule 1)
+- The public site's locale is resolved by `SetLocale` middleware from
+  the **route name** (`{name}.en` suffix vs canonical) — stateless,
+  per-visitor, no user/session involved. Confirmed safe to leave
+  completely alone.
+- No "Carbon-per-request approach from an earlier Final Arabic Sweep
+  task" exists anywhere in this project — grepped `TASKS.md` and
+  `app/` for both terms, zero hits. That task and mechanism were never
+  built (a similar phantom-reference was flagged in an earlier task
+  around a `docs/decisions/00-technical-decisions.md` that also never
+  existed). Built `Carbon::setLocale()` fresh inside the new
+  `SetDashboardLocale` middleware instead of pretending to "extend"
+  something that isn't there.
+- `spatie/laravel-translatable`'s fallback was already configured in
+  `AppServiceProvider` (`Translatable::fallback(fallbackLocale: config('app.fallback_locale'))`,
+  which is `'ar'`) — meaning `$model->name`-style magic accessors on
+  Service/Country/Faq/Testimonial/Article/Page are **already**
+  locale-aware with Arabic fallback, with zero code changes needed for
+  that part of requirement 6. The only places that needed fixing were
+  ~10 spots where CRUD **index** views had hardcoded
+  `->getTranslation('field', 'ar')` (baked in from the previous
+  Arabic-only task) instead of the locale-aware magic accessor — every
+  create/edit **form** already correctly shows both `[ar]`/`[en]`
+  inputs explicitly and those were left untouched, exactly matching
+  "forms always show both languages regardless of toggle."
+- `PageSection` (used for Why-Invest/Formation-Process step cards) is
+  a raw JSON `content` column, not a Translatable model — but it
+  already had a locale-aware `title`/`description` accessor
+  (`$this->content['title'][app()->getLocale()] ?? ... ['ar']`) built
+  in an earlier public-site task. Dashboard views were using
+  `$section->content['title']['ar']` directly instead of that
+  accessor — fixed to use `$section->title`.
+- Found and fixed a **real bug** while writing the locale toggle test:
+  routes/dashboard.php built its 5 "coming soon" placeholder
+  title/message strings via `__()` calls sitting directly in the route
+  file, evaluated once when the file loads — which happens during
+  routing bootstrap, **before** any request-scoped middleware runs.
+  This meant Reports/Settings/Campaigns/Lead Sources/Contact Messages
+  would always render in whatever locale was active at boot time,
+  never respecting the toggle. Fixed by moving the `__()` calls inside
+  the route closures (lazy, evaluated per-request after
+  `dashboardlocale` middleware sets the locale) — covered by
+  `test_coming_soon_placeholder_pages_respect_the_admins_locale`.
+- Confirmed via `grep` which dashboard screens actually exist:
+  Services/Countries/FAQs/Testimonials/Articles/Media/Pages+Sections
+  (full CRUD), Leads (index/show/archive), Comments
+  (index/approve/reject/destroy), Tracking Settings (single edit
+  form) — all real and built. **Campaigns, Lead Sources, Contact
+  Messages, Reports, and Settings are still "coming soon" placeholders
+  with no real content or fields** — per behavior rule 7, these were
+  translated as placeholders (their title/message chrome now flips
+  ar/en correctly) and nothing more was invented for them.
+- Confirmed Tailwind 3.4.19 is installed (not the `^3.1.0` floor in
+  `package.json`) — full support for `rtl:`/`ltr:` variants and
+  logical properties (`text-start`/`text-end`, `ms-*`/`me-*`,
+  `start-*`/`end-*`), already used correctly in the existing
+  `x-dropdown` component. Used the same idiom throughout rather than
+  inventing a second RTL mechanism.
+
+### Created
+- `database/migrations/2026_08_04_195246_add_locale_to_users_table.php`
+  — `locale` string(5) column on `users`, default `'ar'`, positioned
+  after `is_admin`. Ran via `php artisan migrate`; existing/seeded
+  admin unaffected (still `'ar'` until they explicitly toggle).
+- `lang/en/dashboard.php` — full English translation of every key in
+  `lang/ar/dashboard.php`, same nesting, verified key-for-key parity
+  by script (`324` keys each side, zero missing either direction).
+  Written as natural admin-panel English ("Save", "Are you sure you
+  want to delete this service?"), not literal translation.
+- `app/Http/Middleware/SetDashboardLocale.php` — reads
+  `$request->user()?->locale ?? 'ar'`, calls `app()->setLocale()` and
+  `Carbon::setLocale()`. Registered as the `dashboardlocale` alias in
+  `bootstrap/app.php`.
+- `app/Http/Controllers/Dashboard/LocaleController.php` — single
+  `update()` action, thin: flips `auth()->user()->locale` between
+  `ar`/`en` and persists it, always operating on `$request->user()`
+  (never accepts a user id from the request, so one admin can never
+  change another's preference).
+- `tests/Feature/Dashboard/DashboardLocaleTest.php` — 12 new Feature
+  tests (see Verification below).
+
+### Modified — lang files
+- `lang/ar/dashboard.php` — added `sidebar`, `topbar`, `home`,
+  `leads`, `comments`, `tracking_settings`, and `coming_soon` key
+  groups (these screens were previously left as raw
+  `__('Arabic literal string')` phrase-keys, which is why the earlier
+  Arabic-only task's audit reported them "already 100% Arabic" — true
+  for Arabic, but meant there was no English counterpart to switch to).
+  Also added 5 more `flash.*` keys (comment approve/reject/delete,
+  lead archive, tracking settings update).
+- `lang/en/validation.php` — added a 73-entry `attributes` array
+  mirroring `lang/ar/validation.php`'s custom field-name translations.
+  **Found via a failing test**, not by inspection: without this, an
+  English-locale admin submitting an empty Service form saw the
+  mixed-language message *"The الاسم (عربي) field is required."* —
+  Laravel's translator resolved the rule template from `lang/en/`
+  (present) but fell through to the `fallback_locale` (`'ar'`) for the
+  specific `attributes.name.ar` key, which only existed on the Arabic
+  side. Now both files have identical attribute keys, so English-locale
+  admins get fully English messages like *"The name (Arabic) field is
+  required."*
+
+### Modified — routing, middleware, model
+- `app/Models/User.php` — added `locale` to `$fillable` (deliberately;
+  unlike `is_admin`, this is safe for a user to self-set — task's own
+  explicit instruction).
+- `bootstrap/app.php` — registered `dashboardlocale` middleware alias.
+- `routes/dashboard.php` — added `dashboardlocale` to the dashboard
+  group's middleware stack; added `PATCH dashboard/locale` →
+  `dashboard.locale.update`; fixed the coming-soon eager-`__()` bug
+  described above.
+- `routes/web.php` — added `dashboardlocale` to the `/profile` route
+  group's middleware (Profile is reachable only once authenticated, so
+  there's always a `$user` to read from).
+- `routes/auth.php` — added `dashboardlocale` to the post-login
+  `auth` group (verify-email, confirm-password, password update,
+  logout) for the same reason. Pre-login screens (`login`,
+  `forgot-password`, `reset-password`) are **not** in this group —
+  there is no user record to read a preference from before
+  authentication, so those stay on the app's default locale (`ar`),
+  which was already the case and is unaffected by this task.
+
+### Modified — layout & toggle UI
+- `resources/views/layouts/app.blade.php` — `dir` attribute on
+  `<html>` changed from hardcoded `"rtl"` to
+  `{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}`. Added the
+  locale toggle as a form (`PATCH` to `dashboard.locale.update`) in
+  the top bar next to the admin avatar/name dropdown, showing
+  "English" when currently Arabic and "عربي" when currently English.
+  Restructured the top bar's flex layout (removed an unused empty
+  spacer `<span>`, grouped the new toggle with the existing dropdown)
+  rather than bolting the toggle on awkwardly. Dropdown/Logout labels
+  switched to `dashboard.topbar.profile` / `dashboard.auth.logout`.
+
+### Modified — sidebar + RTL/LTR mirroring
+- `resources/views/components/dashboard/sidebar.blade.php` — every
+  label converted from a raw Arabic `__()` phrase-key to
+  `dashboard.sidebar.*`. Also fixed physical-direction classes that
+  only ever worked for RTL: `right-0` → `end-0` (logical, flips
+  automatically with `dir`), and the open/closed transform classes
+  changed from a single `translate-x-full` to
+  `rtl:translate-x-full ltr:-translate-x-full` for the closed state so
+  the sidebar slides off to the correct side in both directions.
+- Table headers/action cells across **all 7 CRUD index views**
+  (`services`, `countries`, `faqs`, `testimonials`, `articles`,
+  `pages`, `pages/sections`) plus `leads/index.blade.php` and
+  `leads/show.blade.php`: `text-right` → `text-start`, `text-left` →
+  `text-end`, `space-x-2 space-x-reverse` → `space-x-2
+  rtl:space-x-reverse` — these were hardcoded physical-direction
+  utilities added in the earlier Arabic-only task (correct for RTL
+  only); now they flip correctly for LTR using Tailwind's built-in
+  logical-property and `rtl:`/`ltr:` variant support, the same idiom
+  already used by the pre-existing `x-dropdown` component.
+
+### Modified — views converted to `dashboard.*` keys (previously raw Arabic phrase-keys, now bilingual)
+- `resources/views/dashboard/home.blade.php`
+- `resources/views/dashboard/leads/index.blade.php`
+- `resources/views/dashboard/leads/show.blade.php`
+- `resources/views/dashboard/comments/index.blade.php`
+- `resources/views/dashboard/tracking-settings/edit.blade.php`
+
+### Modified — controllers (flash messages, previously raw Arabic `__()` phrase-keys)
+- `app/Http/Controllers/Dashboard/CommentController.php` — approve/reject/delete
+- `app/Http/Controllers/Dashboard/LeadController.php` — archive
+- `app/Http/Controllers/Dashboard/TrackingSettingController.php` — update
+
+### Modified — locale-aware data display (requirement 6: active locale + Arabic fallback in lists, both languages always in forms)
+- `resources/views/dashboard/services/index.blade.php`
+- `resources/views/dashboard/countries/index.blade.php`
+- `resources/views/dashboard/faqs/index.blade.php`
+- `resources/views/dashboard/testimonials/index.blade.php`
+- `resources/views/dashboard/articles/index.blade.php`
+- `resources/views/dashboard/pages/index.blade.php`
+- `resources/views/dashboard/pages/edit.blade.php` (header title only — the form fields below were already correct)
+- `resources/views/dashboard/pages/sections/index.blade.php`
+- `resources/views/dashboard/pages/sections/create.blade.php` (header title only)
+- `resources/views/dashboard/pages/sections/edit.blade.php` (header title only)
+
+  Pattern in each: `$model->getTranslation('field', 'ar')` (hardcoded
+  Arabic) → `$model->field` (locale-aware magic accessor with Arabic
+  fallback, already wired up project-wide via `AppServiceProvider`).
+  `_form.blade.php` partials and the inline form fields in
+  `pages/edit.blade.php` were **not** touched — those correctly keep
+  explicit `getTranslation($field, 'ar')` / `getTranslation($field, 'en')`
+  calls so both language inputs always show regardless of the toggle.
+
+### Not touched (explicitly out of scope)
+- Public site's `SetLocale` middleware, `lang/{ar,en}/site.php`,
+  `resources/views/public/**`, `layouts/public.blade.php` — completely
+  separate mechanism, confirmed unaffected by
+  `test_dashboard_locale_toggle_does_not_affect_public_site_locale`.
+- No public self-registration route was added — `dashboard.locale.update`
+  sits inside the existing `['auth', 'admin', 'dashboardlocale']`
+  group and never accepts a user id.
+- Business logic — only display strings, locale resolution, and the
+  new `locale` column were touched.
+- `resources/views/layouts/guest.blade.php` (login/forgot-password)
+  intentionally left with static `dir="rtl"` — see routing note above.
+
+### Verification
+- `php artisan test` — **259 tests / 771 assertions, all passing**
+  (was 247/736 before this task; +12 new
+  `DashboardLocaleTest` cases).
+- `php artisan test --filter=Dashboard` — **142 tests / 383 assertions,
+  all passing**.
+- `php artisan test --filter=Locale` — **21 tests / 60 assertions, all
+  passing** (10 pre-existing public-site `LocaleTest` + 11 of the new
+  dashboard ones matching the filter name).
+- Manual: `php artisan tinker` — confirmed `__('dashboard.sidebar.dashboard')`
+  resolves to `"Dashboard"` under `app()->setLocale('en')` and
+  `"لوحة التحكم"` under `'ar'`, and `dashboard.coming_soon.reports_title`
+  resolves correctly per-locale (proving the route-file lazy-evaluation
+  fix actually works, not just passes its own test).
+- Grepped `resources/views/dashboard`, `resources/views/components/dashboard`,
+  `app/Http/Controllers/Dashboard`, `routes/dashboard.php` for any
+  remaining `__('literal string')` calls not pointing at a
+  `dashboard.*` key — zero found.
+
+### How to verify this yourself
+1. Log in as admin — dashboard loads in Arabic/RTL exactly as before
+   (untouched default).
+2. Click the "English" button in the top bar next to your avatar —
+   the whole dashboard (sidebar, current page, table headers, buttons)
+   switches to English/LTR immediately, and the sidebar itself
+   visually mirrors (now sits on the left, opens/closes from the left).
+3. Click through every real section — Services, Countries, FAQs,
+   Testimonials, Articles, Media, Pages → Sections, Leads, Comments,
+   Tracking Settings — confirm full English chrome, no leftover
+   Arabic. Click Campaigns/Lead Sources/Contact Messages/Reports/
+   Settings in the sidebar — confirm the "coming soon" placeholder
+   text is in English too (these remain placeholders with no real
+   content, by design — not part of this task to build).
+4. On any list (e.g. Services), confirm each row shows the record's
+   **English** name/title if one was entered, or its **Arabic** value
+   as a fallback if the English field was left blank when the record
+   was created — never a blank cell.
+5. Open any Create or Edit form (e.g. Services → Add Service) —
+   confirm both an Arabic-labeled input and an English-labeled input
+   are visible for every translatable field, unaffected by which
+   language the surrounding page chrome is in.
+6. Submit a form with a required field left blank (e.g. Service create
+   with the Arabic name blank) — confirm the validation error under
+   the field reads in English, e.g. "The name (Arabic) field is
+   required."
+7. Log out and log back in — confirm the dashboard is still English
+   (this is the persistence requirement: it's stored on your user
+   record, not just the browser session).
+8. Click "عربي" to toggle back — confirm everything (including RTL
+   layout, sidebar side, table alignment) is restored exactly as it
+   was before step 2.
+9. Open the public site (`/` and `/en/`) in a separate tab — confirm
+   its language/RTL-LTR is completely unrelated to whatever you just
+   set in the dashboard.
+
+## 2026-08-05 — Full bilingual QA sweep completed — top bar RTL/LTR mirroring fixed, exhaustive audit in docs/testing/bilingual-audit-2026-08-05.md
+
+**Summary: 4 real issues found and fixed** — the top-bar mirroring bug,
+2 hardcoded-brand-name spots, and 7 mislabeled table column headers.
+Full itemized checklist covering every public route and dashboard
+screen in both locales: `docs/testing/bilingual-audit-2026-08-05.md`.
+
+### Part A — Top bar RTL/LTR mirroring bug (real bug, root-caused)
+`resources/views/layouts/app.blade.php`'s `<header>` used
+`justify-between` with two children: a hamburger button (`lg:hidden`)
+and the admin-controls cluster (locale toggle + avatar dropdown). At
+desktop widths the hamburger is removed from the box tree entirely
+(`display: none`), leaving exactly one flex child — and per the CSS
+spec, `justify-content: space-between` with a single item collapses to
+`flex-start`, landing the cluster on the wrong side (and the same
+physical side regardless of `dir`) instead of mirroring.
+
+**Fix**: `justify-between` → `ms-auto` (`margin-inline-start: auto`) on
+the cluster div — pushes it to the logical end of the row
+unconditionally, independent of the hamburger's visibility. Resolves
+to the LEFT edge under `dir="rtl"`, RIGHT edge under `dir="ltr"`.
+
+While in there, also fixed two physical-positioning leftovers in the
+sidebar that the earlier CRUD-table RTL fix never covered (it only
+touched `resources/views/dashboard/**`, not
+`resources/views/components/dashboard/*`):
+- `resources/views/components/dashboard/sidebar.blade.php` — `right-0`
+  → `end-0` (logical); closed-state `translate-x-full` → conditional
+  `rtl:translate-x-full ltr:-translate-x-full` so it slides off to the
+  correct side in both directions.
+
+### Part B — Exhaustive bilingual audit
+Real dev-database content barely exists yet (1 placeholder Service, 1
+Country, 0 everything else — content entry is the client's job via the
+dashboard). Used two methods together: (1) `curl` against a running
+`php artisan serve` for the 5 real-content public pages (Home, About,
+Why Invest, Formation Process, Requirements), and (2) a one-time,
+since-deleted Feature test (`BilingualAuditDumpTest.php`) that seeded
+full bilingual representative data — including a real run of the
+`content:translate-to-english` command, the same one that produced the
+dev DB's actual English page content — and dumped all 92 route×locale
+HTML renders to disk for grep + manual review. Full methodology,
+including a test-harness false-positive that was caught and
+re-verified against a real server (not silently trusted), is in the
+audit doc.
+
+**3 real issues found (plus the topbar bug above) and fixed**:
+1. Dashboard `<title>` used `config('app.name')` (fixed to the Arabic
+   company name via `.env`) instead of the locale-aware
+   `__('site.brand.name')` the public site already uses — browser tab
+   title stayed Arabic even in English mode.
+   `resources/views/layouts/app.blade.php`.
+2. Same bug in the sidebar logo's `alt` text —
+   `resources/views/components/dashboard/sidebar.blade.php`.
+3. 7 CRUD index table column headers (Services, Countries, FAQs,
+   Testimonials, Articles, Pages, Page Sections) were labeled "Name
+   (Arabic)" / "الاسم (عربي)" etc., left over from when the dashboard
+   was Arabic-only and that column always showed the Arabic value. An
+   earlier task made the cell content itself locale-aware (shows the
+   record's English value when toggled), but never updated the header
+   label to match — so an English-locale admin saw an English name
+   under a column literally saying "(Arabic)". Added locale-neutral
+   `dashboard.common.name` / `dashboard.common.title` /
+   `dashboard.faqs.question_column` / `dashboard.testimonials.quote_column`
+   keys (both languages); the old `_ar`-suffixed keys are untouched and
+   still correctly label the create/edit form's Arabic-specific input.
+
+No other issues found across 92 page×locale renders, automated grep
+screening (Arabic-on-English pages, English-Breeze-leftovers-on-Arabic
+pages, unresolved translation keys, mixed-language lines), and manual
+line-by-line reading of a representative sample.
+
+### Created
+- `docs/testing/bilingual-audit-2026-08-05.md` — the full itemized
+  checklist (route/screen × locale × checked × issues × fixed) for
+  every public route and dashboard screen, plus the methodology and
+  spot-check instructions.
+
+### Modified
+- `resources/views/layouts/app.blade.php` — `justify-between` → `ms-auto`
+  fix on the top bar; `<title>` brand name fix.
+- `resources/views/components/dashboard/sidebar.blade.php` — `right-0`
+  → `end-0`, closed-state transform made direction-aware, logo `alt`
+  brand name fix.
+- `lang/ar/dashboard.php` / `lang/en/dashboard.php` — added
+  `common.name`, `common.title`, `faqs.question_column`,
+  `testimonials.quote_column` (locale-neutral); renamed
+  `faqs.question_ar_column` → `question_column` and
+  `testimonials.quote_ar_column` → `quote_column` in place (both had no
+  other usages). Verified key-for-key parity between the two files
+  (326 keys each, zero missing either direction).
+- `resources/views/dashboard/services/index.blade.php`,
+  `countries/index.blade.php`, `faqs/index.blade.php`,
+  `testimonials/index.blade.php`, `articles/index.blade.php`,
+  `pages/index.blade.php`, `pages/sections/index.blade.php` — column
+  header key swaps (issue #3).
+- `tests/Feature/Dashboard/DashboardLocaleTest.php` — 2 new tests:
+  `test_dashboard_html_dir_is_rtl_for_arabic_and_ltr_for_english_admins`,
+  `test_top_bar_controls_use_logical_end_margin_not_a_fragile_justify_between`
+  (the latter is a regression guard for the exact root cause found in
+  Part A — asserts `ms-auto` is present and `justify-between` is gone
+  from the `<header>`).
+
+### Created then deleted (audit tooling, not a permanent test)
+- `tests/Feature/BilingualAuditDumpTest.php` — used once to generate
+  the 92 HTML dumps this audit is based on, then deleted per the
+  task's framing (this was audit infrastructure, not a regression
+  test — the actual regression protection lives in the 2 tests added
+  to `DashboardLocaleTest.php` above).
+
+### Verification
+- `php artisan test` — **261 tests / 777 assertions, all passing** (was
+  259/771 before this task; +2 new).
+- `php artisan test --filter=Dashboard` — **145 tests / 393 assertions,
+  all passing**.
+- `php artisan test --filter=Locale` — **24 tests / 70 assertions, all
+  passing**.
+- `npm run build` — clean (58 modules, no errors).
+
+### Honesty note on what was and wasn't visually verified
+This environment has no browser or screenshot tooling. The top-bar
+mirroring fix (Part A) is verified by: understanding exactly why the
+old code broke (traced to the CSS flexbox single-item collapse
+behavior), a regression test confirming the new markup, and the fact
+that the same `ms-auto`/logical-property pattern is already used
+correctly elsewhere in this codebase. It has **not** been visually
+confirmed pixel-by-pixel in an actual browser — see the spot-check
+steps below, item 1, before considering this fully closed.
+
+### How to verify this yourself
+1. **Top bar mirroring** — log in, toggle to English. The toggle
+   button + your avatar should now sit on the right edge of the top
+   bar (sidebar on the left). Toggle back to Arabic — both should sit
+   on the left (sidebar back on the right). This is the one item not
+   yet confirmed in an actual browser — check it first.
+2. **Services index column header** — visit Services in English: the
+   first column should say "Name" (not "Name (Arabic)"), and the row
+   underneath should show the service's actual English name. Toggle to
+   Arabic — column says "الاسم", row shows the Arabic name.
+3. **Dashboard browser tab title** — toggle to English, check the
+   browser tab / `<title>` tag and the sidebar logo's alt text — should
+   read "Bawabat Taasees Al Sharikat", not the Arabic company name.
+4. **Public English content pages** — visit `/en/why-invest` and
+   `/en/formation-process` — every section card should be full English
+   with zero Arabic leftover text.
+5. Read `docs/testing/bilingual-audit-2026-08-05.md` for the complete
+   route-by-route record, including the two items marked "does not
+   exist" (Privacy Policy, Terms and Conditions — no such routes exist
+   anywhere in this project, confirmed via `route:list`; not built, as
+   that would be a new feature, not a translation fix).
+
+## 2026-08-05 — URGENT FIX — dashboard sidebar visibility regression from RTL/LTR task, root cause and fix
+
+### Symptom
+`/dashboard` at desktop width showed the top bar and content area
+correctly, but the sidebar area was blank white space — the sidebar
+was rendering completely off-screen.
+
+### Root cause (confirmed empirically, not guessed)
+The previous task's RTL/LTR mirroring fix changed the sidebar's Alpine
+`:class` binding to:
+```
+:class="sidebarOpen ? 'translate-x-0' : 'rtl:translate-x-full ltr:-translate-x-full'"
+```
+with **no breakpoint qualification** on the closed-state classes,
+while the sidebar's static `class` attribute separately carries
+`lg:translate-x-0` (meant to force the sidebar visible at desktop
+widths regardless of `sidebarOpen`).
+
+Both `.rtl\:translate-x-full` and `.lg\:translate-x-0` target the same
+CSS property (`transform`) and, after compiling, turned out to have
+**equal specificity** — Tailwind wraps the `[dir="rtl"]` condition in
+`:where(...)`, which by CSS spec always contributes zero specificity,
+so `.rtl\:translate-x-full:where([dir=rtl],[dir=rtl] *)` has the exact
+same specificity (0,1,0) as `.lg\:translate-x-0`. With specificity
+tied, the browser falls back to **source order** — and I confirmed by
+directly inspecting the compiled `public/build/assets/app-*.css` that
+`.rtl\:translate-x-full` (no `@media` wrapper — always active) is
+emitted **after** `.lg\:translate-x-0` (wrapped in
+`@media (min-width:1024px)`) in Tailwind's default variant-ordering.
+So at desktop width, with `dir="rtl"` (the app's default locale is
+`ar`), both rules matched the element and the later one
+(`.rtl\:translate-x-full`) won the cascade — permanently translating
+the sidebar 100% off-screen even though the viewport was well above
+the `lg` breakpoint. This is why the bug was universally reproducible:
+every dashboard visit starts in Arabic.
+
+### Fix
+Scoped the closed-state RTL/LTR classes to `max-lg:`:
+```
+:class="sidebarOpen ? 'translate-x-0' : 'max-lg:rtl:translate-x-full max-lg:ltr:-translate-x-full'"
+```
+`resources/views/components/dashboard/sidebar.blade.php`. This
+compiles to `.max-lg\:rtl\:translate-x-full` /
+`.max-lg\:ltr\:-translate-x-full`, both wrapped in
+`@media not all and (min-width:1024px)` — confirmed by re-inspecting
+the rebuilt CSS. That media query and `lg:translate-x-0`'s
+`@media (min-width:1024px)` are **mutually exclusive by construction**,
+so there is no longer any specificity/cascade-order question to get
+wrong: below 1024px only the direction-aware slide applies, at
+1024px and above only `lg:translate-x-0` applies. The RTL/LTR
+mirroring behavior itself (which direction the drawer slides off to
+below `lg`) is fully preserved — only the missing breakpoint scoping
+was fixed.
+
+### Modified
+- `resources/views/components/dashboard/sidebar.blade.php` — one line,
+  the `:class` binding described above.
+- `tests/Feature/Dashboard/DashboardLocaleTest.php` — added
+  `test_sidebar_closed_state_transform_is_scoped_below_the_lg_breakpoint`,
+  a regression guard asserting the exact `max-lg:`-scoped class string
+  is present and `lg:translate-x-0` is still there.
+
+### Verification
+- `php artisan test` — **262 tests / 779 assertions, all passing** (was
+  261/777 before this fix; +1 new test).
+- `php artisan test --filter=Dashboard` — **146 tests / 395 assertions,
+  all passing**.
+- `npm run build` — clean; verified the fix by directly reading the
+  compiled CSS's `@media` boundaries for
+  `.max-lg\:rtl\:translate-x-full`, `.max-lg\:ltr\:-translate-x-full`,
+  and `.lg\:translate-x-0` (excerpts above) — this is what makes this a
+  confirmed fix rather than a guess-and-hope.
+- **Honesty note**: as with the previous task, no browser is available
+  in this environment, so the actual pixel-level rendering at 375px/
+  768px/1280px was not visually confirmed — the fix is verified by
+  tracing the exact CSS cascade mechanism that broke it and confirming
+  the compiled output no longer has any overlapping media-query
+  condition between the two competing rules. Please do the manual
+  checks below before considering this fully closed.
+
+### How to verify this yourself
+1. **Desktop (1280px+)**: load `/dashboard` in Arabic (the default) —
+   the dark-green sidebar should be visible immediately on the right
+   side, no hamburger icon shown, no click needed. Toggle to English —
+   sidebar should now sit on the left, still permanently visible.
+2. **Tablet (768px)**: resize the browser (or use dev tools device
+   emulation) — sidebar should now be off-canvas by default (hidden),
+   with a hamburger icon in the top bar. Click it — sidebar slides in
+   from the right in Arabic, left in English. Click the backdrop or
+   the X — it slides back out.
+3. **Mobile (375px)**: same behavior as tablet — off-canvas by default,
+   hamburger toggles it, correct side per locale.
+4. Open the browser console at all three widths — no Alpine.js errors
+   or warnings.
+
+## 2026-08-05 — Login page background video added (IMG_3416 compressed to login-bg.mp4/.webm)
+
+### Source video
+`ffprobe public/videos/IMG_3416.mp4`: H.264 + AAC, 1280×720, 30fps,
+~10.0s, overall bitrate ~1.95 Mbps, **2,444,614 bytes** (~2.33 MB).
+
+### Processing (ffmpeg available, same exact pattern as the homepage
+hero video — commands reused verbatim from that task's TASKS.md entry
+for consistency):
+```
+ffmpeg -i IMG_3416.mp4 -vf "scale='min(1920,iw)':-2" -c:v libx264 -crf 23 -preset slow -an -movflags +faststart login-bg.mp4
+ffmpeg -i IMG_3416.mp4 -vf "scale='min(1920,iw)':-2" -c:v libvpx-vp9 -crf 32 -b:v 0 -an login-bg.webm
+ffmpeg -i IMG_3416.mp4 -ss 00:00:01 -vframes 1 login-poster.jpg
+```
+Source was already 1280×720 (below the 1920px cap), so the scale
+filter correctly did not upscale it — both outputs stayed 1280×720.
+
+**Before/after size**:
+- `login-bg.mp4` — **1,987,752 bytes** (~1.90 MB), H.264, no audio
+  track — **18.7% smaller** than the source despite it being a re-encode
+  at a similar visual bitrate, purely from dropping the AAC audio track
+  (source had audio; background videos are always muted, so it was
+  stripped, matching the hero video's `-an`).
+- `login-bg.webm` — **1,554,161 bytes** (~1.48 MB), VP9, no audio —
+  **36.4% smaller** than the source.
+- `login-poster.jpg` — 52,705 bytes, 1280×720 JPEG, extracted at the
+  1-second mark.
+
+Both compressed outputs were decode-verified end-to-end
+(`ffmpeg -v error -i ... -f null -`, exit code 0 for both) before the
+source file was deleted, matching the same integrity check used for
+the hero video.
+
+### Modified
+- `resources/views/layouts/guest.blade.php` — added the video as a
+  `position: absolute; inset-0; object-cover` full-viewport background
+  (`autoplay muted loop playsinline`, `poster`, `.webm` source before
+  `.mp4`, matching `resources/views/public/home.blade.php`'s hero
+  exactly), a `bg-dark-green/70` overlay (the same brand token/opacity
+  the homepage hero uses) between the video and the content, and
+  restructured the centered wrapper so the logo + login card sit in a
+  `position: relative; z-10` layer above the overlay. The login card
+  itself keeps its white background, now with `shadow-lg` (up from
+  `shadow-md`) to read clearly against the video/overlay per the
+  "elegant cards, soft shadow" brand direction.
+
+  While inspecting this file (per behavior rule 1) for the "renders
+  correctly in both locales — logo, direction, any text" check this
+  task explicitly asked for, found and fixed two small pre-existing
+  inconsistencies directly relevant to that check, not new scope:
+  `dir="rtl"` was hardcoded (now
+  `{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}`, matching
+  `layouts/app.blade.php`'s pattern) and `<title>` used
+  `config('app.name')` (the raw Arabic company name; now
+  `__('site.brand.name')`, locale-aware). These have **zero visual
+  effect** on `/login`, `/forgot-password`, `/reset-password` — those
+  three are pre-authentication, so `app()->getLocale()` is always the
+  app default (`ar`) there, exactly as before. They matter for the
+  other two screens that share this same layout post-login —
+  `confirm-password` and `verify-email` — which **do** carry the
+  `dashboardlocale` middleware (added in an earlier task) and can
+  render in English for an English-locale admin; previously those two
+  screens would have shown English text inside a `dir="rtl"` container
+  with an Arabic `<title>`, a mismatch. Now consistent in both cases.
+- `resources/views/components/application-logo.blade.php` — `alt`
+  attribute changed from `config('app.name')` to
+  `__('site.brand.name')`, same reasoning, only used on this layout.
+
+### Created
+- `public/videos/login-bg.mp4`, `public/videos/login-bg.webm`,
+  `public/images/login-poster.jpg`.
+
+### Deleted
+- `public/videos/IMG_3416.mp4` — only after both compressed outputs
+  were decode-verified.
+
+### Confirmed untouched
+- `resources/views/public/home.blade.php` and
+  `public/videos/hero-bg.{mp4,webm}` / `public/images/hero-poster.jpg`
+  — not read for content, not modified; grepped the rebuilt homepage
+  HTML and confirmed it still references `hero-bg`, not `login-bg`.
+- `resources/views/layouts/app.blade.php` and
+  `resources/views/components/dashboard/sidebar.blade.php` — not
+  touched; confirmed the sidebar-visibility fix
+  (`max-lg:rtl:translate-x-full max-lg:ltr:-translate-x-full`) and the
+  top-bar mirroring fix (`ms-auto flex items-center gap-4`) from the
+  two immediately preceding tasks are both still present verbatim in
+  the source files.
+
+### Verification
+- `php artisan test --filter=Auth` — **22 tests / 53 assertions, all
+  passing** (login, logout, email verification, password confirmation,
+  password reset, password update, dashboard auth — none of this
+  task's changes touch authentication logic, only the surrounding
+  visual layer).
+- `php artisan test` (full suite) — **262 tests / 779 assertions, all
+  passing** — identical count to before this task, confirming zero
+  regressions anywhere.
+- `npm run build` — clean.
+- Manual `curl` against a running `php artisan serve`: confirmed
+  `/login` renders the `<video>` tag with correct `poster`/source
+  order/attributes; confirmed `/forgot-password` (same guest layout)
+  also gets the video; confirmed the homepage still only references
+  `hero-bg`, never `login-bg`.
+
+### Honesty note
+As with the two preceding tasks, no browser is available in this
+environment, so the actual video playback, overlay contrast, and card
+legibility were not visually confirmed pixel-by-pixel — verified
+instead by: decode-integrity-checking both compressed files, exact
+markup-pattern reuse from the already-shipped, presumably-reviewed
+homepage hero, and confirming via `curl` that the correct tags/
+attributes/file paths are actually present in the rendered HTML. A
+real-browser check (autoplay actually starts, overlay reads well
+against the specific footage in this clip, mobile `object-cover`
+framing looks intentional and not awkwardly cropped) is recommended
+before calling this fully done.
+
+### How to verify this yourself
+1. Visit `/login` — the background should be a looping, muted video
+   with a dark green tint over it, and a white login card clearly
+   readable in the center.
+2. Visit `/forgot-password` — same background video (shared layout).
+3. Resize to mobile width (~375px) — video should fill the viewport
+   without stretching/distortion (`object-cover`), card still centered
+   and readable.
+4. Right-click the video → confirm it's playing (or check dev tools
+   Network tab for `login-bg.webm`/`.mp4`, not `IMG_3416.mp4`, which no
+   longer exists).
+5. Open `/` (homepage) in another tab — confirm the existing hero video
+   there is completely unaffected.
+6. Log in, then (if email verification/password-confirmation screens
+   are reachable in your flow) toggle your dashboard locale to English
+   first, then visit one of those — confirm the page now reads
+   left-to-right with the correct `dir="ltr"`, unlike before this
+   task.
+
+## 2026-08-05 — Real WhatsApp icon site-wide + homepage Countries/About/FAQ preview sections added
+
+### Part A — Real WhatsApp icon
+
+**Icon source**: the `simple-icons` npm package (v16.28.0,
+https://www.npmjs.com/package/simple-icons — a well-maintained,
+widely-used open-source brand-icon library), installed as a
+`devDependency` (`npm install --save-dev simple-icons`, build-time
+source of truth only, nothing shipped to the browser beyond the
+compiled inline SVG). Path data copied from
+`node_modules/simple-icons/icons/whatsapp.svg` and verified
+**byte-for-byte identical** against the installed package file via a
+script comparison before use — not hand-drawn or recalled from memory.
+
+**Every usage found** (searched the whole codebase for "whatsapp",
+confirmed 3 actual icon-bearing spots, not just text mentions):
+1. `resources/views/components/whatsapp-float-button.blade.php` — the
+   site-wide floating button. Previously a placeholder rect+triangle
+   speech-bubble (deliberately simple shapes, explicitly documented at
+   the time as "no risk of a mis-recalled path" — superseded now by an
+   actually-verified real path).
+2. `resources/views/public/home.blade.php` hero CTA button — had a
+   `gap-2` class already reserved for an icon, but no icon element
+   existed yet.
+3. `resources/views/public/home.blade.php` final-CTA-band button — same
+   as #2, a second identical button.
+
+`resources/views/public/contact.blade.php` and
+`resources/views/public/consultation.blade.php` only contain the text
+label "WhatsApp" (a contact-info value and a form field label,
+respectively) — no icon graphic there to replace, confirmed by reading
+both files.
+
+### Created
+- `resources/views/components/icons/whatsapp.blade.php` — the single
+  shared component (`<x-icons.whatsapp class="h-X w-X" />`), all 3
+  usages above now reference it instead of inline/duplicated SVG.
+  `fill="currentColor"`, so it inherits color from its parent exactly
+  like the old placeholder did (white on the green circular button).
+
+### Modified
+- `resources/views/components/whatsapp-float-button.blade.php` —
+  inline placeholder SVG replaced with `<x-icons.whatsapp>`.
+- `resources/views/public/home.blade.php` — icon added to both
+  WhatsApp CTA buttons (hero + final CTA band).
+- `package.json` / `package-lock.json` — `simple-icons` added as a
+  devDependency.
+
+### Part B — Homepage: 3 new preview sections
+
+**Data availability, checked honestly before building anything** (per
+behavior rule 7 — reporting the real dev database state rather than
+assuming or faking content):
+- **Countries**: 1 active record exists (مصر/Egypt) — real, not
+  fabricated for this task. It has **no English name** set yet, so on
+  `/en` this card correctly falls back to showing "مصر" (the existing,
+  already-tested Translatable fallback behavior, not a bug) — worth
+  the client adding an English name via the dashboard when convenient.
+  It also has no flag image, so it uses the same 🌍 fallback the full
+  `/countries` page already uses for flagless records.
+- **FAQs**: **zero active FAQs exist** in the real database right now.
+  The new FAQ section is fully built and will appear automatically the
+  moment real FAQs are added via the dashboard, but **it does not
+  render on the live site today** — confirmed by curling the real dev
+  database (0 matches for the section heading). This is the honest
+  state, not a claim that FAQs are showing.
+- **About**: real, already-translated content exists (from an earlier
+  translation task) — the teaser reuses the About page's own first
+  `<p>` paragraph as-is (via a new `HomeController::firstParagraph()`
+  helper), rather than duplicate-authoring separate homepage copy or
+  crudely truncating mid-sentence by character count.
+
+**Placement** (Hero first, Final CTA last, as required; everything
+else inserted so no two adjacent sections share the same background
+tone, without changing any existing section's classes):
+1. Hero (unchanged)
+2. **NEW: About teaser** — plain background, photo (reuses
+   `about-team-meeting.jpg` from the earlier About Media task) +
+   excerpt + "read more" link to `/about`.
+3. Services preview (unchanged)
+4. Why-Invest highlights (unchanged)
+5. Formation-Process preview (unchanged)
+6. Testimonials (unchanged)
+7. **NEW: Countries teaser** — soft-gray background, compact
+   flag+name card grid, links to `/countries`.
+8. **NEW: FAQ teaser** — plain background, first 4 active FAQs
+   (question + answer), links to `/faqs`.
+9. Latest Articles (unchanged)
+10. Final CTA band (unchanged)
+
+All 3 new sections follow the exact same empty-state rule as every
+existing homepage section — wrapped in `@if ($collection->isNotEmpty())`
+/ `@if ($excerpt)`, hiding completely rather than rendering a
+broken/empty block.
+
+### Modified
+- `app/Http/Controllers/Public/HomeController.php` — added
+  `aboutPage`, `aboutExcerpt`, `homeCountries` (`Country::active()`,
+  take 8), `homeFaqs` (`Faq::active()`, take 4) to the view data, plus
+  the new `firstParagraph()` helper.
+- `lang/ar/site.php` / `lang/en/site.php` — added `home.about_*`,
+  `home.countries_*`, `home.faqs_*` keys (9 new keys each side,
+  verified paired — no new mismatches introduced; one pre-existing,
+  unrelated `brand.tagline` EN-only key was already there before this
+  task and was left alone).
+
+### Not touched (confirmed)
+- The homepage Hero video/section, `public/videos/hero-bg.*`, the
+  login page video, and the entire `resources/views/layouts/app.blade.php`
+  / dashboard sidebar were not read for content and not modified.
+- No existing homepage section (Services, Why-Invest, Formation-Process,
+  Testimonials, Articles, Final CTA) was rebuilt, restyled, or
+  duplicated — all their Blade markup is byte-for-byte what it was
+  before this task; only new sections were inserted around them.
+
+### Verification
+- `php artisan test --filter=HomeTest` — **29 tests / 103 assertions,
+  all passing** (was 25 tests before this task; +4 new: About teaser,
+  Countries teaser, FAQ teaser, and a WhatsApp-icon regression test
+  asserting the real path string is present and the old placeholder
+  rect is gone).
+- `php artisan test` (full suite) — **266 tests / 796 assertions, all
+  passing** — zero regressions.
+- `npm run build` — clean.
+- Manual `curl` against a running server, against the **real dev
+  database**: confirmed the About teaser and Countries teaser
+  (showing the real "مصر" record) both render; confirmed the FAQ
+  section correctly does NOT render (0 active FAQs); confirmed the
+  WhatsApp path string appears exactly 3 times and the old placeholder
+  rect 0 times; confirmed the English homepage (`/en`) shows the real
+  English About excerpt and the English section headings, with the
+  Country name correctly falling back to Arabic (no English
+  translation on that one record yet, as noted above).
+
+### How to verify this yourself
+1. **WhatsApp icon**: visit any public page, look at the floating
+   green button in the bottom-left corner — should show the real
+   WhatsApp phone-in-a-speech-bubble mark, not a plain rectangle. Visit
+   `/` and look at the two green "Chat on WhatsApp" buttons (hero and
+   the dark final-CTA band near the bottom) — same real icon should
+   appear to the start-side of the text on both.
+2. **Homepage new sections (Arabic)**: visit `/` and scroll — right
+   after the hero you should see an About teaser with a real office
+   photo and a "read more" link to `/about`. Continue scrolling past
+   Testimonials — you should see a "الدول التي ندعمها" strip showing
+   at least the one real country (مصر) with a 🌍 placeholder (no flag
+   image yet), linking to `/countries`. The FAQ section will **not**
+   appear (zero FAQs currently exist — add one via the dashboard to
+   see it render).
+3. **English (`/en`)**: repeat the same scroll — About teaser and
+   Countries section headings should be in English; the country card
+   itself will still show "مصر" until an English name is added for it
+   in the dashboard (this is the existing, correct fallback behavior,
+   not a new bug).
+4. Confirm `/services`, `/countries`, `/faqs`, `/about` (the full
+   pages these teasers link to) still work exactly as before — nothing
+   on those pages was touched.
+
+## 2026-08-05 — Homepage Contact Us section added, reusing existing contact form logic — no duplicated validation/attribution code
+
+### Inspection (before building anything)
+Confirmed `/contact` is fully built and working: `ContactController`
+(create/store), `StoreContactRequest` (validation), honeypot
+(`website_url`), `throttle:5,1` rate limiting already on the POST
+route, `AttributionService` resolving UTM/first-touch/latest-touch into
+the `leads` table with `type='contact'` — all pre-existing from the
+earlier Leads/Attribution task, confirmed via
+`tests/Feature/Public/ContactFormTest.php` (7 passing tests) before
+touching anything. Nothing needed to be built from scratch — this task
+was purely: extract the existing form into something reusable, then
+reuse it twice.
+
+**Found one real, pre-existing, untested gap while inspecting**:
+`ContactController::store()` always redirected to `route('contact')` —
+the plain Arabic route, never the `.en` variant — regardless of the
+visitor's locale. Every existing test only ever asserted against the
+Arabic route, so this had never been exercised. Fixed as part of this
+task (see below) since the same redirect-target logic needed touching
+anyway to support the new "redirect home vs redirect to /contact"
+requirement.
+
+### Created
+- `resources/views/components/contact-form.blade.php` — the entire
+  form (honeypot, hidden attribution-snapshot fields, all inputs,
+  validation error display, submit button, success banner + Meta Pixel
+  tracking script, and the JS that populates the attribution hidden
+  fields from `window.BtsAttribution`), extracted verbatim from the
+  old `/contact` view with one addition: a `redirectTo` prop (default
+  `'contact'`) rendered as a hidden `redirect_to` field, read by
+  `ContactController::redirectTarget()` to decide where a successful
+  submit sends the visitor back to. This is the single source of truth
+  now — both `/contact` and the new homepage section render this exact
+  component, same `<form action>` (`lroute('contact.store')`), so
+  there is no duplicated markup or logic anywhere.
+
+### Modified
+- `resources/views/public/contact.blade.php` — the entire form block
+  replaced with `<x-contact-form redirect-to="contact" />`. The
+  surrounding heading and contact-info card (reading from `Setting`)
+  are unchanged.
+- `resources/views/public/home.blade.php` — new Contact section
+  (`id="contact"`, plain background — contrasts both the Articles
+  section before it and the dark Final CTA band after it, matching the
+  established alternation pattern from the previous homepage task, no
+  existing section's classes touched), placed directly before the
+  Final CTA band as instructed. Same heading/subheading/info-card
+  layout as the standalone page (reusing the exact same `site.contact.*`
+  lang keys — no new lang keys needed), embedding
+  `<x-contact-form redirect-to="home" />`.
+- `app/Http/Controllers/Public/ContactController.php` — `store()` now
+  computes a `$redirectTarget` once via a new private
+  `redirectTarget()` method instead of hardcoding `route('contact')`
+  in two places:
+  ```php
+  private function redirectTarget(StoreContactRequest $request): string
+  {
+      if ($request->input('redirect_to') === 'home') {
+          return lroute('home').'#contact';
+      }
+      return lroute('contact');
+  }
+  ```
+  Both branches (honeypot short-circuit and the real success path) use
+  this. `redirect_to` is never used to build an arbitrary URL — only
+  compared against the one literal string `'home'` — so there is no
+  open-redirect surface regardless of what a client sends. Using
+  `lroute()` for both targets also fixes the pre-existing English-locale
+  redirect gap described above, for both `/contact` and the new
+  homepage section.
+- `app/Http/Controllers/Public/HomeController.php` — added
+  `contactPhone`, `contactWhatsapp`, `contactEmail`, `contactAddress`
+  to the view data, using the exact same `Setting::where('key', ...)`
+  queries `ContactController::create()` already uses — same source of
+  truth, not a second copy.
+
+### Not touched (confirmed)
+- `StoreContactRequest` — zero changes; `redirect_to` is intentionally
+  not added to its validation rules (same treatment as the `website_url`
+  honeypot — an internal field, not user-facing content).
+- `AttributionService`, the `leads` table/migration, rate limiting
+  (`throttle:5,1` on the shared route) — untouched, and proven to still
+  apply identically regardless of entry point (see tests below).
+- No other homepage section, the hero video, the login video, or the
+  dashboard were read for content or modified.
+
+### Verification
+- `php artisan test --filter=ContactFormTest` — **14 tests / 58
+  assertions, all passing** (was 7 before this task; +7 new):
+  homepage shows the real form; homepage submission creates a
+  `type='contact'` lead and redirects to `route('home').'#contact'`;
+  submitting with no `redirect_to` still defaults to `/contact`
+  (regression guard for the standalone page); honeypot from the
+  homepage still redirects to the home anchor with zero leads created;
+  attribution snapshots populate correctly when submitted from the
+  homepage; and two new tests proving the English-locale redirect fix
+  — `contact.store.en` now redirects to `route('contact.en')` /
+  `route('home.en').'#contact'`, not the Arabic URLs.
+- `php artisan test` (full suite) — **273 tests / 820 assertions, all
+  passing** — zero regressions anywhere, including the original 7
+  `/contact` tests (unchanged assertions, still passing against the
+  refactored controller).
+- `npm run build` — clean.
+- **Live manual verification against the real dev database** (not just
+  the test suite): started `php artisan serve`, fetched the real
+  homepage, extracted the live CSRF token from the form's hidden
+  `_token` field, POSTed a real submission with `redirect_to=home` —
+  got back `HTTP 302` with `Location: http://127.0.0.1:8153#contact`,
+  exactly as designed. Confirmed via `tinker` that a real `Lead` row
+  was created: `full_name="Test Homepage Lead"`, `type="contact"`,
+  `consent_given=true`. **This is a genuine test lead now sitting in
+  the real leads table** — visible in the dashboard Leads list like
+  any other submission; archive/delete it from there if you don't want
+  it kept.
+
+### How to verify this yourself
+1. Visit `/` and scroll down — right before the final dark green CTA
+   band, you should see a "تواصل معنا" section with the same contact
+   info card and form as `/contact`.
+2. Submit a real test message from that section — you should land back
+   on the homepage (URL ending in `#contact`) with the same green
+   success banner shown on `/contact`.
+3. Log into the dashboard → Leads — the submission should appear there
+   with type "طلب تواصل"/contact, identical in every way to a
+   submission made from `/contact` directly (including UTM/attribution
+   columns if you arrived via a tracked link).
+4. Visit `/contact` directly and submit — confirm it still redirects
+   back to `/contact` itself (not the homepage), exactly as before this
+   task.
+5. Switch to English (`/en`), scroll to the Contact section, submit —
+   confirm you land back on `/en#contact`, not the Arabic homepage.
+6. Try the honeypot: submit via a raw HTTP client with `website_url`
+   filled in — confirm no lead is created but the success message still
+   shows (matches the existing anti-spam behavior, now proven identical
+   from both entry points by the new tests).
+
+## 2026-08-05 — Full responsive QA and fix pass completed — docs/testing/responsive-audit-2026-08-05.md
+
+**Summary: 9 real issues found and fixed across 17 files** — dashboard
+table clipping (9 files), iOS-zoom-risk textareas (2 files), a
+homepage text-overflow risk, undersized carousel touch targets, a
+WhatsApp-button/footer overlap, a honeypot-positioning technique that
+could expand page scroll width (3 files), a dashboard filter-grid
+squeeze at the sidebar's own breakpoint, and a leads-detail overflow
+risk. Full page×breakpoint checklist, methodology (no browser
+available — static/structural analysis against Tailwind's actual
+compiled CSS, honestly disclosed), and spot-check guidance:
+`docs/testing/responsive-audit-2026-08-05.md`.
+
+### Methodology (see the audit doc for full detail)
+No browser or screenshot tool is available in this environment. Every
+page's Blade source was read in full and traced against Tailwind's
+confirmed default breakpoints (640/768/1024/1280/1536px — verified via
+`tailwind.config.js` having no override) for all 6 requested widths.
+Anything safety-critical was verified empirically against the actual
+compiled CSS rather than assumed — e.g. confirmed Tailwind's Preflight
+already applies `img,video{max-width:100%;height:auto}` globally
+(ruling out an article-body-image overflow concern without needing a
+fix), and confirmed the exact computed rule for `sr-only` before using
+it to fix a real overflow bug.
+
+### Modified — dashboard table clipping → horizontal scroll (9 files)
+`overflow-hidden` on the table's rounded-corner wrapper was clipping
+(not scrolling) wide tables on narrow screens. Added an inner
+`<div class="overflow-x-auto">` around each `<table>`:
+`dashboard/services/index.blade.php`, `dashboard/countries/index.blade.php`,
+`dashboard/faqs/index.blade.php`, `dashboard/testimonials/index.blade.php`,
+`dashboard/articles/index.blade.php`, `dashboard/pages/index.blade.php`,
+`dashboard/pages/sections/index.blade.php`, `dashboard/leads/index.blade.php`,
+`dashboard/comments/index.blade.php`.
+
+### Modified — iOS zoom-on-focus risk (2 files)
+`font-mono text-sm` (14px) on real text-entry `<textarea>` fields
+triggers iOS Safari's auto-zoom. Changed to `text-base sm:text-sm` (16px
+on touch widths, compact again on desktop `sm:`+) in
+`dashboard/articles/_form.blade.php` and `dashboard/pages/edit.blade.php`
+(4 textareas total: body_ar/body_en in each).
+
+### Modified — homepage (2 fixes, 1 file)
+`resources/views/public/home.blade.php`:
+- Countries teaser: added `min-w-0` to the card, `truncate` to the
+  country-name span — a long name could otherwise force the 2-column
+  mobile grid wider than the viewport.
+- Testimonial carousel dots: were exactly 8×8px with zero padding
+  (unusable touch target). Kept the visible dot at 8×8px on an inner
+  `<span>`, added `-m-2 p-2` to the outer `<button>` for a ~24×24px tap
+  area with no visual change.
+
+### Modified — WhatsApp button / footer overlap (1 file)
+`resources/views/layouts/public.blade.php` — the fixed WhatsApp button
+sits over whatever is at the true bottom of the viewport once scrolled
+to the end of any page; the footer's copyright text (the last,
+bottom-left content on every public page) had no clearance for it.
+`py-12` → `pt-12 pb-24` on the footer's inner wrapper.
+
+### Modified — honeypot overflow risk (3 files)
+`absolute -left-[9999px]` positions relative to the viewport when no
+ancestor is positioned (true here), which can silently expand the
+page's scrollable width and produce a horizontal scrollbar site-wide.
+Switched to Tailwind's `sr-only` utility (clips to 1×1px, confirmed via
+compiled CSS — can never expand document width) in
+`resources/views/components/contact-form.blade.php`,
+`resources/views/public/consultation.blade.php`, and
+`resources/views/public/articles/show.blade.php` (comment form).
+`aria-hidden="true"` and the field name/detection logic are unchanged —
+confirmed by every honeypot test still passing.
+
+### Modified — dashboard Leads (2 fixes, 2 files)
+- `dashboard/leads/index.blade.php` — the 5-field filter form jumped
+  straight from 2 to 5 columns at exactly `lg` (1024px), the same
+  breakpoint where the sidebar becomes permanently visible and takes
+  288px from the content area, squeezing each field to ~130px.
+  `lg:grid-cols-5` → `lg:grid-cols-3 xl:grid-cols-5` (and the matching
+  button-row `col-span`).
+- `dashboard/leads/show.blade.php` — label/value rows in the
+  customer-data and source-data lists had no `min-w-0`/`shrink-0`; a
+  long value (e.g. a long email) risked the same overflow class as the
+  Countries teaser fix. Added `shrink-0` to labels, `min-w-0
+  break-words` (customer data) / `min-w-0 break-all` (source data,
+  already had `break-all`) to values.
+
+### Confirmed NOT a bug (checked, ruled out)
+Article-body embedded images (`{!! $page->body !!}`) have no explicit
+`max-width` in the `.article-body img` component rule, but Tailwind's
+Preflight base layer already applies `max-width:100%;height:auto` to
+every `img`/`video` globally — confirmed in the compiled CSS. No fix
+needed.
+
+### Confirmed unchanged / not touched
+- Privacy Policy and Terms and Conditions — **do not exist anywhere in
+  this project**, confirmed via `route:list`. Reported honestly per
+  the task's own instructions rather than built (would be a new
+  feature, out of scope for a responsive-fix task).
+- The RTL/LTR mirroring fix and the sidebar-visibility fix from the
+  two immediately preceding tasks — re-verified present and correct in
+  their source files, not rebuilt.
+- The hero video and login video — not touched; both already used
+  `object-cover` correctly from their respective earlier tasks.
+- No content, routes, or business logic changed anywhere — every
+  change in this task is a CSS class or a wrapping `<div>`.
+
+### Verification
+- `php artisan test` — **273 tests / 820 assertions, all passing** —
+  identical count to before this task, confirming zero functional
+  regressions from any of the 17 markup changes.
+- `npm run build` — clean.
+
+### Honesty note
+This was a structural/static audit — every page was read in full and
+traced against Tailwind's real, confirmed breakpoint values and
+(where relevant) the actual compiled CSS, not assumed or guessed. It
+is **not** a substitute for a real browser check, which was not
+possible in this environment. The audit doc's "How to spot-check this
+yourself" section names the 5 specific combinations most worth a real
+look — prioritize those first.
+
+## 2026-08-05 — Honeypot accessibility fixed (sr-only replaced with proper aria-hidden pattern), Privacy Policy + Terms and Conditions pages built and seeded
+
+### Part A — Honeypot accessibility fix
+
+**Root problem**: the previous responsive-fix task replaced an
+overflow-risky `absolute -left-[9999px]` honeypot hiding technique with
+Tailwind's `sr-only` utility. `sr-only`'s entire designed purpose is
+the opposite of what's needed here — it keeps content **visible to
+screen readers** while hiding it visually (that's what "screen-reader
+only" means), whereas a honeypot must be invisible to every real human,
+sighted or using assistive technology, while staying present in the DOM
+for bots that blanket-fill form fields.
+
+**Every honeypot field found** (searched the whole codebase for
+`website_url`, confirmed exactly 3 real usages — a 4th `sr-only` match
+in `profile/partials/delete-user-form.blade.php` is an unrelated,
+correct usage — a Breeze password label meant to stay screen-reader-
+visible — and was left untouched):
+1. `resources/views/components/contact-form.blade.php` (used by both
+   `/contact` and the homepage Contact section)
+2. `resources/views/public/consultation.blade.php`
+3. `resources/views/public/articles/show.blade.php` (comment form)
+
+**Fix**: replaced `class="sr-only"` with
+`class="absolute h-px w-px overflow-hidden opacity-0 pointer-events-none"`
+on all 3, keeping `aria-hidden="true"` and `tabindex="-1"` on the
+wrapper and `autocomplete="off"` and `tabindex="-1"` on the `<input>`
+unchanged. This hides the field from sighted users (opacity-0, 1×1px)
+**and** screen readers (`aria-hidden`, and no `sr-only` fighting it),
+and — same as the previous task's fix — never risks page overflow: no
+`absolute` offset is set, so the element stays at its normal in-flow
+position (inside the form, inside the page's max-width container)
+rather than escaping to the viewport edge, and `overflow-hidden` clips
+it to 1×1px regardless.
+
+### Modified — Part A
+- `resources/views/components/contact-form.blade.php`
+- `resources/views/public/consultation.blade.php`
+- `resources/views/public/articles/show.blade.php`
+- `tests/Feature/Public/ContactFormTest.php`,
+  `tests/Feature/Public/ConsultationFormTest.php`,
+  `tests/Feature/Public/CommentSubmissionTest.php` — added
+  `test_honeypot_is_hidden_from_screen_readers_not_just_visually` to
+  each, asserting the exact `aria-hidden="true"`/`tabindex="-1"`
+  markup is present and `sr-only` is gone (3 new tests).
+
+### Part B — Privacy Policy and Terms and Conditions pages
+
+**Confirmed absent first** (per behavior rule 1): `php artisan
+route:list` had zero matches for `privacy|terms` before this task —
+these pages were never actually built, despite being part of the
+original page plan.
+
+**Built using the existing Page/PageSection CMS — no new rendering
+mechanism**, following the same pattern as About/Why-Invest/Formation-
+Process/Requirements:
+- `database/seeders/PageContentSeeder.php` — two new idempotent
+  `updateOrCreate`-on-slug methods, `seedPrivacyPolicy()` and
+  `seedTermsAndConditions()`, both called from `run()`. Unlike the
+  four existing pages (seeded Arabic-only, translated to English later
+  by a separate command in an earlier task), these two are written
+  **directly bilingual** — this project is fully bilingual now, so new
+  content is authored in both languages from the start, with no extra
+  translate-command step needed after seeding.
+- `app/Http/Controllers/Public/PageController.php` — two new thin
+  methods, `privacyPolicy()` and `termsAndConditions()`. Both pages
+  are intro-only prose with no sections (like About), and — unlike the
+  four existing pages, which each have a dedicated view because they
+  need genuinely different visual treatment (prose vs. card-grid vs.
+  timeline vs. checklist) — Privacy Policy and Terms share the exact
+  same simple layout, so both render through one new shared view
+  rather than two near-duplicate files.
+- `resources/views/public/pages/legal.blade.php` — new shared view
+  (dark-green title band + sanitized prose body, same as About's first
+  two sections, without About's photo/video sections).
+- `routes/web.php` — two new routes inside the existing
+  `$registerPublicRoutes` closure, so both get the standard `ar`
+  (no prefix) / `en` (`.en` suffix, `/en/` prefix) variants
+  automatically, exactly like every other public route.
+- `resources/views/layouts/public.blade.php` — footer links to both
+  pages, added below the copyright line, using `lroute()` so they
+  stay locale-correct.
+- `lang/ar/site.php` / `lang/en/site.php` — added `footer.privacy_link`
+  / `footer.terms_link` keys (verified paired, no new mismatches; one
+  pre-existing unrelated `brand.tagline` EN-only key predates this
+  task and was left alone).
+
+**Content**: professional-sounding starter copy, written to be
+factually conservative (no unverifiable statistics, no specific legal
+claims presented as certain) — covers, for Privacy: what data is
+collected (contact-form fields, first-party attribution cookies,
+IP address on comments), how it's used, no data sale, limited sharing
+with analytics/ad platforms (Google/Meta/TikTok) when enabled, cookie
+disclosure, data protection/retention, user rights, and a reference to
+Saudi Arabia's Personal Data Protection Law (PDPL) by name only (no
+specific-article claims). For Terms: nature of services (consulting,
+explicitly **not** formal legal/financial/tax advice), user
+responsibilities, service-scope and no-guarantee-of-outcome disclaimer
+(government approval processes are outside the company's control),
+intellectual property, limitation of liability, Saudi governing
+law/jurisdiction, and a changes-to-terms clause.
+
+**⚠️ Explicit flag, per this task's own instruction**: this is
+**starter content only** — professionally worded but written by an AI
+assistant, not a lawyer. **It must be reviewed by a qualified Saudi
+legal professional before being treated as final/relied upon in
+production.** This is the same standing caveat already documented in
+this seeder for the other four pages' starter copy, called out
+explicitly here given the legal (not just marketing) nature of this
+specific content — see the seeder's own doc comment for the same
+notice in code.
+
+**Also fixed while here**: the dashboard Pages screen's notice text
+said "these **four** pages are fixed" — now factually wrong with 6
+pages seeded. Reworded to drop the specific count entirely (in both
+`lang/ar/dashboard.php` and `lang/en/dashboard.php`, plus a matching
+doc-comment update in `app/Http/Controllers/Dashboard/PageController.php`)
+rather than hardcoding "six", so it won't go stale again if more fixed
+pages are ever added.
+
+### Modified — Part B
+- `database/seeders/PageContentSeeder.php`
+- `app/Http/Controllers/Public/PageController.php`
+- `app/Http/Controllers/Dashboard/PageController.php` (comment only)
+- `routes/web.php`
+- `resources/views/layouts/public.blade.php`
+- `lang/ar/site.php`, `lang/en/site.php`
+- `lang/ar/dashboard.php`, `lang/en/dashboard.php` (`fixed_notice` wording)
+- `tests/Feature/Public/PagesTest.php` — 6 new tests: Privacy Policy
+  200 + bilingual content, Privacy Policy 404 when missing, Terms 200 +
+  bilingual content, Terms 404 when missing, footer links present, and
+  one test that runs the **real** `PageContentSeeder` (not a hand-built
+  fixture) and asserts real seeded phrases appear — proving the actual
+  shipped content works, not just the rendering mechanism.
+
+### Created
+- `resources/views/public/pages/legal.blade.php`
+
+### Verification
+- `php artisan db:seed --class=PageContentSeeder` — real output: seeded
+  cleanly, confirmed via `tinker` that all 6 pages now exist:
+  `about, why-invest-saudi-arabia, formation-process, required-documents,
+  privacy-policy, terms-and-conditions`.
+- `php artisan test --filter=Contact` — **17 tests / 64 assertions, all
+  passing**.
+- `php artisan test --filter=Page` — **81 tests / 243 assertions, all
+  passing**.
+- `php artisan test` (full suite) — **282 tests / 849 assertions, all
+  passing** (was 273/820 before this task; +9 new: 3 honeypot
+  accessibility regression tests, 6 legal-page tests).
+- `npm run build` — clean.
+- Live verification against a running `php artisan serve`: confirmed
+  all 4 routes (`/privacy-policy`, `/en/privacy-policy`,
+  `/terms-and-conditions`, `/en/terms-and-conditions`) return 200 with
+  real bilingual content; confirmed the footer links render with
+  correct locale-aware `href`s on both `/` and `/en`; confirmed the
+  honeypot's actual rendered HTML on `/contact` shows exactly
+  `class="absolute h-px w-px overflow-hidden opacity-0 pointer-events-none" aria-hidden="true" tabindex="-1"`
+  with no `sr-only` anywhere.
+
+### How to verify this yourself
+1. **Honeypot accessibility**: open dev tools on `/contact`,
+   `/consultation`, or any article page, inspect the hidden
+   `website_url` field's wrapping `<div>` — confirm it has
+   `aria-hidden="true"` and no `sr-only` class. If you have a screen
+   reader available, confirm it is never announced while tabbing/
+   reading through the form (it also has `tabindex="-1"`, so keyboard
+   users skip it entirely).
+2. **No overflow reintroduced**: load `/contact` and the homepage,
+   confirm no horizontal scrollbar appears at any width — the honeypot
+   change was specifically designed to preserve the previous task's
+   overflow fix.
+3. Visit `/privacy-policy` and `/terms-and-conditions` in Arabic, then
+   `/en/privacy-policy` and `/en/terms-and-conditions` in English —
+   confirm real, readable content in both languages, not placeholders.
+4. Scroll to the footer on any public page — confirm "سياسة الخصوصية" /
+   "الشروط والأحكام" (or the English equivalents on `/en`) links are
+   present and go to the right pages.
+5. Log into the dashboard → Pages — confirm both new pages appear in
+   the list alongside the original four, and that editing their
+   content there updates the public page (same as the other four).
+6. **Read the seeded legal content yourself** before this site goes
+   live — it's professional-sounding starter copy, not something
+   written or reviewed by a lawyer.
+
+## 2026-08-05 — Full post-sprint health check completed
+
+Full end-to-end re-verification of the entire system from a clean
+bootstrap (composer/npm install, `migrate:fresh --seed`, `npm run
+build`, full test suite, complete route inventory, all cross-feature
+integration checks, security spot-check, housekeeping). **Overall
+verdict: the application works correctly as an integrated system —
+282/282 tests passing, all 113 routes checked as expected, no code
+bugs found, nothing fixed.** Four process/housekeeping gaps were found
+and reported (not silently patched): (A) a fresh seed alone does not
+produce fully bilingual content — `content:translate-to-english` must
+be run separately; (B) the project has only 1 git commit total, so
+nearly the entire build history exists only as uncommitted
+working-tree changes; (C) an earlier task's manual-verification test
+lead was never archived and was only cleared by this task's own
+database wipe; (D) no real `ADMIN_EMAIL`/`ADMIN_PASSWORD` are set, so
+every fresh seed still uses placeholder dev credentials. Full detail,
+evidence, and re-run instructions:
+[docs/testing/health-check-2026-08-05.md](docs/testing/health-check-2026-08-05.md).

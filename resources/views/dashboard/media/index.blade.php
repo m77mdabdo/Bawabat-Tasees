@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Media Library') }}
+            {{ __('dashboard.media.heading') }}
         </h2>
     </x-slot>
 
@@ -14,23 +14,23 @@
             @endif
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="font-medium text-gray-900 mb-4">{{ __('Upload New Media') }}</h3>
+                <h3 class="font-medium text-gray-900 mb-4">{{ __('dashboard.media.upload_heading') }}</h3>
                 <form method="POST" action="{{ route('dashboard.media.store') }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 
                     <div>
-                        <x-input-label for="file" :value="__('File — image: jpeg/png/webp max 5MB, video: mp4/webm max 100MB')" />
+                        <x-input-label for="file" :value="__('dashboard.media.file_hint')" />
                         <input id="file" name="file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" class="mt-1 block w-full text-sm text-gray-700" required>
                         <x-input-error :messages="$errors->get('file')" class="mt-2" />
                     </div>
 
                     <div>
-                        <x-input-label for="alt_text" :value="__('Alt Text')" />
+                        <x-input-label for="alt_text" :value="__('dashboard.media.alt_text')" />
                         <x-text-input id="alt_text" name="alt_text" type="text" class="mt-1 block w-full md:w-96" :value="old('alt_text')" />
                         <x-input-error :messages="$errors->get('alt_text')" class="mt-2" />
                     </div>
 
-                    <x-primary-button>{{ __('Upload') }}</x-primary-button>
+                    <x-primary-button>{{ __('dashboard.media.upload_button') }}</x-primary-button>
                 </form>
             </div>
 
@@ -39,23 +39,23 @@
                     <div class="bg-white shadow-sm rounded-lg overflow-hidden">
                         @if ($item->type === 'video')
                             <div class="h-32 bg-gray-800 flex items-center justify-center text-white text-xs uppercase tracking-widest">
-                                {{ __('Video') }}
+                                {{ __('dashboard.media.video_label') }}
                             </div>
                         @else
                             <img src="{{ Illuminate\Support\Facades\Storage::disk($item->disk)->url($item->path) }}" alt="{{ $item->alt_text }}" class="h-32 w-full object-cover">
                         @endif
                         <div class="p-2 text-xs text-gray-600 space-y-1">
-                            <div class="truncate" title="{{ $item->alt_text }}">{{ $item->alt_text ?: __('No alt text') }}</div>
+                            <div class="truncate" title="{{ $item->alt_text }}">{{ $item->alt_text ?: __('dashboard.media.no_alt_text') }}</div>
                             <div class="text-gray-400">{{ strtoupper($item->type) }} · {{ number_format($item->size / 1024, 0) }} KB</div>
-                            <form action="{{ route('dashboard.media.destroy', $item) }}" method="POST" onsubmit="return confirm('{{ __('Delete this media item?') }}');">
+                            <form action="{{ route('dashboard.media.destroy', $item) }}" method="POST" onsubmit="return confirm('{{ __('dashboard.media.confirm_delete') }}');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900">{{ __('Delete') }}</button>
+                                <button type="submit" class="text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
                             </form>
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full text-center text-sm text-gray-500 py-8">{{ __('No media uploaded yet.') }}</div>
+                    <div class="col-span-full text-center text-sm text-gray-500 py-8">{{ __('dashboard.media.empty') }}</div>
                 @endforelse
             </div>
 
