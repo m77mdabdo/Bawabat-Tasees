@@ -10,8 +10,6 @@ use Illuminate\Http\RedirectResponse;
 
 class CommentController extends Controller
 {
-    private const SUCCESS_MESSAGE = 'تم إرسال تعليقك وسيظهر بعد المراجعة.';
-
     public function store(StoreCommentRequest $request, Article $article): RedirectResponse
     {
         // Same rules as the article's own public show() action — no
@@ -29,8 +27,8 @@ class CommentController extends Controller
         // bot never learns it was caught, but no Comment row is created.
         if ($request->filled('website_url')) {
             return redirect()
-                ->route('articles.show', $article)
-                ->with('status', self::SUCCESS_MESSAGE);
+                ->to(lroute('articles.show', $article))
+                ->with('status', __('site.flash.comment_submitted'));
         }
 
         // status is never taken from the request — every public
@@ -45,7 +43,7 @@ class CommentController extends Controller
         ]);
 
         return redirect()
-            ->route('articles.show', $article)
-            ->with('status', self::SUCCESS_MESSAGE);
+            ->to(lroute('articles.show', $article))
+            ->with('status', __('site.flash.comment_submitted'));
     }
 }

@@ -274,4 +274,48 @@ class ConsultationFormTest extends TestCase
         $response->assertSessionHasErrors('email');
         $this->assertDatabaseCount('leads', 0);
     }
+
+    /**
+     * An English visitor must land back on the English consultation page.
+     * Before the lroute() fix this redirected to the Arabic URL, silently
+     * switching the visitor's language mid-journey.
+     */
+    public function test_english_submission_redirects_to_the_english_page(): void
+    {
+        $service = $this->makeService();
+
+        $this->post(route('consultation.store.en'), $this->validPayload([
+            'requested_service_id' => $service->id,
+        ]))->assertRedirect(route('consultation.en'));
+    }
+
+    public function test_english_honeypot_submission_also_redirects_to_the_english_page(): void
+    {
+        $service = $this->makeService();
+
+        $this->post(route('consultation.store.en'), $this->validPayload([
+            'requested_service_id' => $service->id,
+            'website_url' => 'http://spam.example',
+        ]))->assertRedirect(route('consultation.en'));
+
+        $this->assertDatabaseCount('leads', 0);
+    }
+
+    public function test_english_submission_flashes_the_english_success_message(): void
+    {
+        $service = $this->makeService();
+
+        $this->post(route('consultation.store.en'), $this->validPayload([
+            'requested_service_id' => $service->id,
+        ]))->assertSessionHas('status', __('site.flash.consultation_submitted', [], 'en'));
+    }
+
+    public function test_arabic_submission_still_redirects_to_the_arabic_page(): void
+    {
+        $service = $this->makeService();
+
+        $this->post(route('consultation.store'), $this->validPayload([
+            'requested_service_id' => $service->id,
+        ]))->assertRedirect(route('consultation'));
+    }
 }

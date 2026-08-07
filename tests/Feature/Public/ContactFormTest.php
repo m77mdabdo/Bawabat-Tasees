@@ -227,4 +227,16 @@ class ContactFormTest extends TestCase
 
         $response->assertRedirect(route('home.en').'#contact');
     }
+
+    public function test_english_submission_flashes_the_english_success_message(): void
+    {
+        $this->post(route('contact.store.en'), $this->validPayload())
+            ->assertSessionHas('status', __('site.flash.contact_submitted', [], 'en'));
+    }
+
+    public function test_arabic_submission_flashes_the_arabic_success_message(): void
+    {
+        $this->post(route('contact.store'), $this->validPayload())
+            ->assertSessionHas('status', __('site.flash.contact_submitted', [], 'ar'));
+    }
 }
