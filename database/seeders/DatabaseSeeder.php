@@ -21,6 +21,11 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             TrackingSettingSeeder::class,
             PageContentSeeder::class,
+            ServiceSeeder::class,
+            CountrySeeder::class,
+            FaqSeeder::class,
+            TestimonialSeeder::class,
+            ArticleSeeder::class,
         ]);
 
         // The content seeders above author Arabic only — English comes
