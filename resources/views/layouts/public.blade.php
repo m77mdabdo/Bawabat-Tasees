@@ -199,8 +199,19 @@
             {{ $slot }}
         </main>
 
+        {{--
+            pb-24 (not py-12's plain pb-12) on this specific edge — the
+            floating WhatsApp button is `position: fixed` at bottom-6
+            left-6 or a 56px-tall circle, so it always sits over
+            whatever is at the true bottom of the viewport once a
+            visitor scrolls to the end of any page. The extra bottom
+            padding here guarantees the copyright line (the last, and
+            without this fix the bottom-most-left, piece of content on
+            every public page) always has clearance above the button
+            instead of sitting behind it.
+        --}}
         <footer class="bg-dark-green text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="max-w-7xl mx-auto px-4 pb-24 pt-12 sm:px-6 lg:px-8">
                 <img
                     src="{{ asset('images/brand/logo-full-white-256.png') }}"
                     alt="{{ __('site.brand.name') }}"
@@ -209,6 +220,15 @@
                 <p class="text-sm text-white/70">
                     &copy; {{ now()->year }} {{ __('site.brand.name') }}. {{ __('site.footer.rights') }}
                 </p>
+
+                <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                    <a href="{{ lroute('pages.privacy-policy') }}" class="text-white/70 underline hover:text-white">
+                        {{ __('site.footer.privacy_link') }}
+                    </a>
+                    <a href="{{ lroute('pages.terms-and-conditions') }}" class="text-white/70 underline hover:text-white">
+                        {{ __('site.footer.terms_link') }}
+                    </a>
+                </div>
             </div>
         </footer>
 

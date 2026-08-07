@@ -31,6 +31,8 @@ return [
 
     'footer' => [
         'rights' => 'جميع الحقوق محفوظة.',
+        'privacy_link' => 'سياسة الخصوصية',
+        'terms_link' => 'الشروط والأحكام',
     ],
 
     'common' => [
@@ -49,6 +51,10 @@ return [
         'cta_consultation' => 'احجز استشارة مجانية',
         'cta_whatsapp' => 'تواصل عبر واتساب',
 
+        'about_eyebrow' => 'من نحن',
+        'about_heading' => 'شريكك الموثوق لتأسيس الأعمال',
+        'about_cta' => 'اقرأ المزيد عنا',
+
         'services_eyebrow' => 'خدماتنا',
         'services_heading' => 'كل ما تحتاجه لتأسيس شركتك',
         'services_cta' => 'عرض كل الخدمات',
@@ -64,6 +70,14 @@ return [
         'testimonials_eyebrow' => 'آراء عملائنا',
         'testimonials_heading' => 'ماذا يقول عملاؤنا',
         'testimonial_slide_label' => 'الشهادة رقم',
+
+        'countries_eyebrow' => 'انتشارنا',
+        'countries_heading' => 'الدول التي ندعمها',
+        'countries_cta' => 'عرض كل الدول',
+
+        'faqs_eyebrow' => 'أسئلة شائعة',
+        'faqs_heading' => 'أسئلة قد تخطر ببالك',
+        'faqs_cta' => 'عرض جميع الأسئلة',
 
         'articles_eyebrow' => 'المدونة',
         'articles_heading' => 'أحدث المقالات',

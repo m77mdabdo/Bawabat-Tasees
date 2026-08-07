@@ -44,6 +44,6 @@ class LeadController extends Controller
 
         return redirect()
             ->route('dashboard.leads.index')
-            ->with('status', __('تم أرشفة العميل المحتمل.'));
+            ->with('status', __('dashboard.flash.lead_archived'));
     }
 }

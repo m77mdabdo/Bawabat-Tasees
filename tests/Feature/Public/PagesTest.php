@@ -122,6 +122,79 @@ class PagesTest extends TestCase
         $response->assertSee('نسخة من جواز السفر');
     }
 
+    public function test_privacy_policy_page_returns_200_with_bilingual_content(): void
+    {
+        $this->makePage('privacy-policy', [
+            'title' => ['ar' => 'سياسة الخصوصية', 'en' => 'Privacy Policy'],
+            'body' => ['ar' => '<p>محتوى عربي</p>', 'en' => '<p>English content</p>'],
+        ]);
+
+        $ar = $this->get(route('pages.privacy-policy'));
+        $ar->assertOk();
+        $ar->assertSee('سياسة الخصوصية');
+        $ar->assertSee('محتوى عربي');
+
+        $en = $this->get(route('pages.privacy-policy.en'));
+        $en->assertOk();
+        $en->assertSee('Privacy Policy');
+        $en->assertSee('English content');
+    }
+
+    public function test_privacy_policy_page_404s_when_missing(): void
+    {
+        $this->get(route('pages.privacy-policy'))->assertNotFound();
+    }
+
+    public function test_terms_and_conditions_page_returns_200_with_bilingual_content(): void
+    {
+        $this->makePage('terms-and-conditions', [
+            'title' => ['ar' => 'الشروط والأحكام', 'en' => 'Terms and Conditions'],
+            'body' => ['ar' => '<p>محتوى عربي</p>', 'en' => '<p>English content</p>'],
+        ]);
+
+        $ar = $this->get(route('pages.terms-and-conditions'));
+        $ar->assertOk();
+        $ar->assertSee('الشروط والأحكام');
+        $ar->assertSee('محتوى عربي');
+
+        $en = $this->get(route('pages.terms-and-conditions.en'));
+        $en->assertOk();
+        $en->assertSee('Terms and Conditions');
+        $en->assertSee('English content');
+    }
+
+    public function test_terms_and_conditions_page_404s_when_missing(): void
+    {
+        $this->get(route('pages.terms-and-conditions'))->assertNotFound();
+    }
+
+    public function test_footer_links_to_privacy_policy_and_terms_pages(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee(route('pages.privacy-policy'), false);
+        $response->assertSee(route('pages.terms-and-conditions'), false);
+    }
+
+    public function test_seeded_privacy_and_terms_pages_are_real_bilingual_content_not_placeholders(): void
+    {
+        // Runs the actual seeder (not a hand-built test fixture) so this
+        // proves the real content that will ship, not just that the
+        // rendering mechanism works with arbitrary test data.
+        $this->seed(\Database\Seeders\PageContentSeeder::class);
+
+        $ar = $this->get(route('pages.privacy-policy'));
+        $ar->assertOk();
+        $ar->assertSee('سياسة الخصوصية');
+        $ar->assertSee('البيانات التي نجمعها', false);
+
+        $en = $this->get(route('pages.terms-and-conditions.en'));
+        $en->assertOk();
+        $en->assertSee('Terms and Conditions');
+        $en->assertSee('Governing Law', false);
+    }
+
     public function test_dashboard_edit_is_reflected_on_public_page(): void
     {
         $page = $this->makePage('about', ['title' => ['ar' => 'من نحن']]);

@@ -1,34 +1,34 @@
 @php
     $customerFields = [
-        ['label' => __('الاسم الكامل'), 'value' => $lead->full_name],
-        ['label' => __('الهاتف'), 'value' => $lead->phone],
-        ['label' => __('رقم واتساب'), 'value' => $lead->whatsapp_number],
-        ['label' => __('البريد الإلكتروني'), 'value' => $lead->email],
-        ['label' => __('الجنسية'), 'value' => $lead->nationality],
-        ['label' => __('بلد الإقامة'), 'value' => $lead->country_of_residence],
-        ['label' => __('الخدمة المطلوبة'), 'value' => $lead->requestedService?->name],
-        ['label' => __('النشاط التجاري المطلوب'), 'value' => $lead->requested_activity],
-        ['label' => __('يملك شركة خارج المملكة'), 'value' => $lead->owns_external_company ? __('نعم') : __('لا')],
-        ['label' => __('نوع الطلب'), 'value' => $lead->type === 'consultation' ? __('طلب استشارة') : __('تواصل معنا')],
-        ['label' => __('الموافقة على التواصل'), 'value' => $lead->consent_given ? __('نعم') . ' — ' . $lead->consented_at?->format('Y-m-d H:i') : __('لا')],
-        ['label' => __('تاريخ الاستلام'), 'value' => $lead->created_at->format('Y-m-d H:i')],
+        ['label' => __('dashboard.leads.full_name'), 'value' => $lead->full_name],
+        ['label' => __('dashboard.leads.phone'), 'value' => $lead->phone],
+        ['label' => __('dashboard.leads.whatsapp_number'), 'value' => $lead->whatsapp_number],
+        ['label' => __('dashboard.leads.email'), 'value' => $lead->email],
+        ['label' => __('dashboard.leads.nationality'), 'value' => $lead->nationality],
+        ['label' => __('dashboard.leads.country_of_residence'), 'value' => $lead->country_of_residence],
+        ['label' => __('dashboard.leads.requested_service'), 'value' => $lead->requestedService?->name],
+        ['label' => __('dashboard.leads.requested_activity'), 'value' => $lead->requested_activity],
+        ['label' => __('dashboard.leads.owns_external_company'), 'value' => $lead->owns_external_company ? __('dashboard.leads.yes') : __('dashboard.leads.no')],
+        ['label' => __('dashboard.leads.request_type'), 'value' => $lead->type === 'consultation' ? __('dashboard.leads.type_consultation') : __('dashboard.leads.type_contact')],
+        ['label' => __('dashboard.leads.consent_given'), 'value' => $lead->consent_given ? __('dashboard.leads.yes') . ' — ' . $lead->consented_at?->format('Y-m-d H:i') : __('dashboard.leads.no')],
+        ['label' => __('dashboard.leads.received_at'), 'value' => $lead->created_at->format('Y-m-d H:i')],
     ];
 
     $sourceFields = [
-        ['label' => __('المصدر'), 'value' => $lead->source_platform],
-        ['label' => __('اسم الحملة'), 'value' => $lead->campaign_name],
-        ['label' => __('معرف الحملة'), 'value' => $lead->campaign_id],
-        ['label' => __('اسم المجموعة الإعلانية'), 'value' => $lead->adset_name],
-        ['label' => __('معرف المجموعة الإعلانية'), 'value' => $lead->adset_id],
-        ['label' => __('اسم الإعلان'), 'value' => $lead->ad_name],
-        ['label' => __('معرف الإعلان'), 'value' => $lead->ad_id],
+        ['label' => __('dashboard.leads.source'), 'value' => $lead->source_platform],
+        ['label' => __('dashboard.leads.campaign_name'), 'value' => $lead->campaign_name],
+        ['label' => __('dashboard.leads.campaign_id'), 'value' => $lead->campaign_id],
+        ['label' => __('dashboard.leads.adset_name'), 'value' => $lead->adset_name],
+        ['label' => __('dashboard.leads.adset_id'), 'value' => $lead->adset_id],
+        ['label' => __('dashboard.leads.ad_name'), 'value' => $lead->ad_name],
+        ['label' => __('dashboard.leads.ad_id'), 'value' => $lead->ad_id],
         ['label' => 'UTM Source', 'value' => $lead->utm_source],
         ['label' => 'UTM Medium', 'value' => $lead->utm_medium],
         ['label' => 'UTM Campaign', 'value' => $lead->utm_campaign],
         ['label' => 'UTM Content', 'value' => $lead->utm_content],
         ['label' => 'UTM Term', 'value' => $lead->utm_term],
-        ['label' => __('رابط صفحة الهبوط'), 'value' => $lead->landing_page_url],
-        ['label' => __('الرابط المُحيل'), 'value' => $lead->referrer_url],
+        ['label' => __('dashboard.leads.landing_page_url'), 'value' => $lead->landing_page_url],
+        ['label' => __('dashboard.leads.referrer_url'), 'value' => $lead->referrer_url],
         ['label' => 'Google Click ID', 'value' => $lead->gclid],
         ['label' => 'Facebook Click ID', 'value' => $lead->fbclid],
         ['label' => 'TikTok Click ID', 'value' => $lead->ttclid],
@@ -42,7 +42,7 @@
                 {{ $lead->full_name }}
             </h2>
             <a href="{{ route('dashboard.leads.index') }}" class="text-sm text-primary-green hover:text-primary-green/70">
-                {{ __('العودة إلى القائمة') }}
+                {{ __('dashboard.leads.back_to_list') }}
             </a>
         </div>
     </x-slot>
@@ -50,20 +50,20 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <x-card class="p-6">
             <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-text-secondary">
-                {{ __('بيانات العميل') }}
+                {{ __('dashboard.leads.customer_data') }}
             </h3>
             <dl class="space-y-3">
                 @foreach ($customerFields as $field)
                     <div class="flex items-start justify-between gap-4 text-sm">
-                        <dt class="text-text-secondary">{{ $field['label'] }}</dt>
-                        <dd class="text-text-main text-right">{{ $field['value'] ?? '—' }}</dd>
+                        <dt class="shrink-0 text-text-secondary">{{ $field['label'] }}</dt>
+                        <dd class="min-w-0 break-words text-end text-text-main">{{ $field['value'] ?? '—' }}</dd>
                     </div>
                 @endforeach
             </dl>
 
             @if ($lead->message)
                 <div class="mt-4 border-t border-border-default pt-4">
-                    <dt class="text-sm text-text-secondary">{{ __('الرسالة') }}</dt>
+                    <dt class="text-sm text-text-secondary">{{ __('dashboard.leads.message') }}</dt>
                     <dd class="mt-1 text-sm text-text-main whitespace-pre-line">{{ $lead->message }}</dd>
                 </div>
             @endif
@@ -71,13 +71,13 @@
 
         <x-card class="p-6">
             <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-text-secondary">
-                {{ __('من أين جاء العميل') }}
+                {{ __('dashboard.leads.lead_source_data') }}
             </h3>
             <dl class="space-y-3">
                 @foreach ($sourceFields as $field)
                     <div class="flex items-start justify-between gap-4 text-sm">
-                        <dt class="text-text-secondary">{{ $field['label'] }}</dt>
-                        <dd class="text-text-main text-right break-all">{{ $field['value'] ?? '—' }}</dd>
+                        <dt class="shrink-0 text-text-secondary">{{ $field['label'] }}</dt>
+                        <dd class="min-w-0 break-all text-end text-text-main">{{ $field['value'] ?? '—' }}</dd>
                     </div>
                 @endforeach
             </dl>
@@ -85,11 +85,11 @@
     </div>
 
     <div class="mt-6">
-        <form action="{{ route('dashboard.leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('{{ __('أرشفة هذا العميل المحتمل؟') }}');">
+        <form action="{{ route('dashboard.leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('{{ __('dashboard.leads.confirm_archive') }}');">
             @csrf
             @method('DELETE')
             <button type="submit" class="rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
-                {{ __('أرشفة العميل المحتمل') }}
+                {{ __('dashboard.leads.archive_lead') }}
             </button>
         </form>
     </div>

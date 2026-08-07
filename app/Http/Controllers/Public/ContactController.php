@@ -28,11 +28,12 @@ class ContactController extends Controller
 
     public function store(StoreContactRequest $request): RedirectResponse
     {
+        $redirectTarget = $this->redirectTarget($request);
+
         // Honeypot check happens before any DB write — see the same note
         // in ConsultationController@store.
         if ($request->filled('website_url')) {
-            return redirect()
-                ->route('contact')
+            return redirect($redirectTarget)
                 ->with('status', 'شكرًا لتواصلك معنا! سنرد عليك في أقرب وقت ممكن.');
         }
 
@@ -51,8 +52,28 @@ class ContactController extends Controller
             'consented_at' => now(),
         ]);
 
-        return redirect()
-            ->route('contact')
+        return redirect($redirectTarget)
             ->with('status', 'شكرًا لتواصلك معنا! سنرد عليك في أقرب وقت ممكن.');
+    }
+
+    /**
+     * The contact form is embedded in two places (the standalone
+     * /contact page and the homepage Contact section, see
+     * resources/views/components/contact-form.blade.php) that must
+     * redirect back to two different places after a successful submit.
+     * The hidden `redirect_to` field carries that hint — it is never
+     * used to build an arbitrary URL from user input, only compared
+     * against the one literal value 'home', so there is no
+     * open-redirect risk regardless of what a client sends. Both
+     * targets go through lroute() so an English-locale visitor lands
+     * back on the `/en/...` variant, not the Arabic one.
+     */
+    private function redirectTarget(StoreContactRequest $request): string
+    {
+        if ($request->input('redirect_to') === 'home') {
+            return lroute('home').'#contact';
+        }
+
+        return lroute('contact');
     }
 }

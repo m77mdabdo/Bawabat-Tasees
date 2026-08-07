@@ -113,4 +113,118 @@ class ContactFormTest extends TestCase
         $this->assertSame('cpc', $lead->utm_medium);
         $this->assertSame('/contact', $lead->landing_page_url);
     }
+
+    /**
+     * Regression guard: the honeypot must be invisible to sighted users
+     * AND screen readers. `sr-only` was tried in an earlier task to fix
+     * a horizontal-overflow bug, but `sr-only`'s entire purpose is to
+     * stay VISIBLE to screen readers while hidden visually — the
+     * opposite of what a honeypot needs. Asserts the field carries
+     * `aria-hidden="true"` and `tabindex="-1"`, and that the `sr-only`
+     * class is gone from this specific wrapper.
+     */
+    public function test_honeypot_is_hidden_from_screen_readers_not_just_visually(): void
+    {
+        $html = $this->get(route('contact'))->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/<div[^>]*aria-hidden="true"[^>]*tabindex="-1"[^>]*>\s*<label for="website_url"/',
+            $html
+        );
+        $this->assertDoesNotMatchRegularExpression('/class="sr-only"[^>]*>\s*<label for="website_url"/', $html);
+    }
+
+    public function test_homepage_shows_the_real_contact_form(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('id="contact"', false);
+        $response->assertSee('name="redirect_to" value="home"', false);
+        $response->assertSee('action="'.route('contact.store').'"', false);
+    }
+
+    public function test_submission_from_the_homepage_creates_a_contact_lead_and_redirects_to_home_anchor(): void
+    {
+        $response = $this->post(route('contact.store'), $this->validPayload([
+            'redirect_to' => 'home',
+        ]));
+
+        $response->assertRedirect(route('home').'#contact');
+        $response->assertSessionHas('status');
+
+        $this->assertDatabaseHas('leads', [
+            'full_name' => 'Sara Al-Qahtani',
+            'email' => 'sara@example.com',
+            'type' => 'contact',
+            'consent_given' => true,
+        ]);
+    }
+
+    public function test_submission_without_redirect_to_still_defaults_to_the_contact_page(): void
+    {
+        // Guards the /contact page's own behavior against any regression
+        // introduced by making the redirect conditional.
+        $response = $this->post(route('contact.store'), $this->validPayload());
+
+        $response->assertRedirect(route('contact'));
+    }
+
+    public function test_honeypot_filled_from_the_homepage_still_redirects_to_home_anchor_with_no_lead_created(): void
+    {
+        $response = $this->post(route('contact.store'), $this->validPayload([
+            'redirect_to' => 'home',
+            'website_url' => 'https://spambot.example.com',
+        ]));
+
+        $response->assertRedirect(route('home').'#contact');
+        $response->assertSessionHas('status');
+        $this->assertDatabaseCount('leads', 0);
+    }
+
+    public function test_attribution_snapshots_populate_lead_source_fields_when_submitted_from_the_homepage(): void
+    {
+        $touch = json_encode([
+            'utm_source' => 'facebook',
+            'utm_medium' => 'paid_social',
+            'landing_page' => '/',
+            'referrer' => 'https://facebook.com/',
+        ]);
+
+        $this->post(route('contact.store'), $this->validPayload([
+            'redirect_to' => 'home',
+            'first_touch_snapshot' => $touch,
+            'latest_touch_snapshot' => $touch,
+        ]))->assertRedirect(route('home').'#contact');
+
+        $lead = Lead::firstOrFail();
+
+        $this->assertSame('facebook', $lead->source_platform);
+        $this->assertSame('paid_social', $lead->utm_medium);
+        $this->assertSame('/', $lead->landing_page_url);
+        $this->assertSame('contact', $lead->type);
+    }
+
+    /**
+     * Pre-existing gap fixed as part of this task: the redirect used to
+     * hardcode the Arabic `route('contact')` regardless of locale, so an
+     * English-locale visitor submitting from /en/contact would land back
+     * on the Arabic /contact page. Now goes through lroute() for both
+     * the 'contact' and 'home' targets.
+     */
+    public function test_english_locale_submission_redirects_to_the_english_contact_page_not_arabic(): void
+    {
+        $response = $this->post(route('contact.store.en'), $this->validPayload());
+
+        $response->assertRedirect(route('contact.en'));
+    }
+
+    public function test_english_locale_homepage_submission_redirects_to_the_english_home_anchor(): void
+    {
+        $response = $this->post(route('contact.store.en'), $this->validPayload([
+            'redirect_to' => 'home',
+        ]));
+
+        $response->assertRedirect(route('home.en').'#contact');
+    }
 }

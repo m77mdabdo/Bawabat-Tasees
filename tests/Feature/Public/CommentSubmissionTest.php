@@ -135,6 +135,22 @@ class CommentSubmissionTest extends TestCase
         $response->assertSee('&lt;script&gt;alert(1)&lt;/script&gt;', false);
     }
 
+    /**
+     * Regression guard: see the same test/note in ContactFormTest.
+     */
+    public function test_honeypot_is_hidden_from_screen_readers_not_just_visually(): void
+    {
+        $article = $this->makeArticle(['is_published' => true, 'published_at' => now()->subDay()]);
+
+        $html = $this->get(route('articles.show', $article))->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/<div[^>]*aria-hidden="true"[^>]*tabindex="-1"[^>]*>\s*<label for="website_url"/',
+            $html
+        );
+        $this->assertDoesNotMatchRegularExpression('/class="sr-only"[^>]*>\s*<label for="website_url"/', $html);
+    }
+
     public function test_honeypot_filled_does_not_create_a_comment_but_still_shows_success(): void
     {
         $article = $this->makeArticle();

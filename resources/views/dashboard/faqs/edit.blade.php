@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit FAQ') }}
+            {{ __('dashboard.faqs.edit_heading') }}
         </h2>
     </x-slot>
 
@@ -15,8 +15,8 @@
                     @include('dashboard.faqs._form')
 
                     <div class="flex items-center justify-end gap-4 mt-6">
-                        <a href="{{ route('dashboard.faqs.index') }}" class="text-sm text-gray-600 underline">{{ __('Cancel') }}</a>
-                        <x-primary-button>{{ __('Update FAQ') }}</x-primary-button>
+                        <a href="{{ route('dashboard.faqs.index') }}" class="text-sm text-gray-600 underline">{{ __('dashboard.common.cancel') }}</a>
+                        <x-primary-button>{{ __('dashboard.faqs.update_button') }}</x-primary-button>
                     </div>
                 </form>
             </div>

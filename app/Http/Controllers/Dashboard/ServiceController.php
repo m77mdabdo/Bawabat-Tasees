@@ -43,7 +43,7 @@ class ServiceController extends Controller
 
         return redirect()
             ->route('dashboard.services.index')
-            ->with('status', 'Service created.');
+            ->with('status', __('dashboard.flash.service_created'));
     }
 
     public function edit(Service $service): View
@@ -67,7 +67,7 @@ class ServiceController extends Controller
 
         return redirect()
             ->route('dashboard.services.index')
-            ->with('status', 'Service updated.');
+            ->with('status', __('dashboard.flash.service_updated'));
     }
 
     public function destroy(Service $service): RedirectResponse
@@ -76,6 +76,6 @@ class ServiceController extends Controller
 
         return redirect()
             ->route('dashboard.services.index')
-            ->with('status', 'Service deleted.');
+            ->with('status', __('dashboard.flash.service_deleted'));
     }
 }

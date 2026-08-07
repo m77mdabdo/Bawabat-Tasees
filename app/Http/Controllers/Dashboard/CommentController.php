@@ -33,7 +33,7 @@ class CommentController extends Controller
 
         return redirect()
             ->route('dashboard.comments.index')
-            ->with('status', __('تم اعتماد التعليق، وأصبح ظاهرًا للعامة.'));
+            ->with('status', __('dashboard.flash.comment_approved'));
     }
 
     public function reject(Comment $comment): RedirectResponse
@@ -42,7 +42,7 @@ class CommentController extends Controller
 
         return redirect()
             ->route('dashboard.comments.index')
-            ->with('status', __('تم رفض التعليق.'));
+            ->with('status', __('dashboard.flash.comment_rejected'));
     }
 
     public function destroy(Comment $comment): RedirectResponse
@@ -51,6 +51,6 @@ class CommentController extends Controller
 
         return redirect()
             ->route('dashboard.comments.index')
-            ->with('status', __('تم حذف التعليق.'));
+            ->with('status', __('dashboard.flash.comment_deleted'));
     }
 }

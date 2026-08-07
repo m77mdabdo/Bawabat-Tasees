@@ -30,7 +30,7 @@ class PageSectionController extends Controller
 
         return redirect()
             ->route('dashboard.pages.sections.index', $page)
-            ->with('status', 'Section created.');
+            ->with('status', __('dashboard.flash.page_section_created'));
     }
 
     public function edit(Page $page, PageSection $section): View
@@ -44,7 +44,7 @@ class PageSectionController extends Controller
 
         return redirect()
             ->route('dashboard.pages.sections.index', $page)
-            ->with('status', 'Section updated.');
+            ->with('status', __('dashboard.flash.page_section_updated'));
     }
 
     public function destroy(Page $page, PageSection $section): RedirectResponse
@@ -53,7 +53,7 @@ class PageSectionController extends Controller
 
         return redirect()
             ->route('dashboard.pages.sections.index', $page)
-            ->with('status', 'Section deleted.');
+            ->with('status', __('dashboard.flash.page_section_deleted'));
     }
 
     /**

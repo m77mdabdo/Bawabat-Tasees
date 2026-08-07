@@ -38,6 +38,6 @@ class TrackingSettingController extends Controller
 
         return redirect()
             ->route('dashboard.tracking-settings.edit')
-            ->with('status', __('تم تحديث إعدادات التتبع.'));
+            ->with('status', __('dashboard.flash.tracking_settings_updated'));
     }
 }

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('New Service') }}
+            {{ __('dashboard.services.create_heading') }}
         </h2>
     </x-slot>
 
@@ -14,8 +14,8 @@
                     @include('dashboard.services._form')
 
                     <div class="flex items-center justify-end gap-4 mt-6">
-                        <a href="{{ route('dashboard.services.index') }}" class="text-sm text-gray-600 underline">{{ __('Cancel') }}</a>
-                        <x-primary-button>{{ __('Create Service') }}</x-primary-button>
+                        <a href="{{ route('dashboard.services.index') }}" class="text-sm text-gray-600 underline">{{ __('dashboard.common.cancel') }}</a>
+                        <x-primary-button>{{ __('dashboard.services.create_button') }}</x-primary-button>
                     </div>
                 </form>
             </div>

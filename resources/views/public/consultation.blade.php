@@ -29,8 +29,11 @@
                 {{-- Honeypot: real visitors never see or fill this (CSS-hidden,
                      not type="hidden", so bots that blanket-fill visible-looking
                      text inputs get caught). If filled, the controller silently
-                     accepts the request without creating a Lead. --}}
-                <div class="absolute -left-[9999px]" aria-hidden="true" tabindex="-1">
+                     accepts the request without creating a Lead. NOT `sr-only` —
+                     that utility stays VISIBLE to screen readers by design, the
+                     opposite of what a honeypot needs; see the same note in
+                     contact-form.blade.php for the full reasoning. --}}
+                <div class="absolute h-px w-px overflow-hidden opacity-0 pointer-events-none" aria-hidden="true" tabindex="-1">
                     <label for="website_url">{{ __('site.common.honeypot_label') }}</label>
                     <input type="text" name="website_url" id="website_url" autocomplete="off" tabindex="-1" value="{{ old('website_url') }}">
                 </div>

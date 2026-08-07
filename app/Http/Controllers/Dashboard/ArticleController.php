@@ -45,7 +45,7 @@ class ArticleController extends Controller
 
         return redirect()
             ->route('dashboard.articles.index')
-            ->with('status', 'Article created.');
+            ->with('status', __('dashboard.flash.article_created'));
     }
 
     public function edit(Article $article): View
@@ -69,7 +69,7 @@ class ArticleController extends Controller
 
         return redirect()
             ->route('dashboard.articles.index')
-            ->with('status', 'Article updated.');
+            ->with('status', __('dashboard.flash.article_updated'));
     }
 
     public function destroy(Article $article): RedirectResponse
@@ -78,7 +78,7 @@ class ArticleController extends Controller
 
         return redirect()
             ->route('dashboard.articles.index')
-            ->with('status', 'Article deleted.');
+            ->with('status', __('dashboard.flash.article_deleted'));
     }
 
     /**

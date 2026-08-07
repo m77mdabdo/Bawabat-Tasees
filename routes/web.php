@@ -60,6 +60,8 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
     Route::get('/why-invest', [PageController::class, 'whyInvest'])->name("pages.why-invest{$nameSuffix}");
     Route::get('/formation-process', [PageController::class, 'formationProcess'])->name("pages.formation-process{$nameSuffix}");
     Route::get('/requirements', [PageController::class, 'requirements'])->name("pages.requirements{$nameSuffix}");
+    Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name("pages.privacy-policy{$nameSuffix}");
+    Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'])->name("pages.terms-and-conditions{$nameSuffix}");
 
     Route::get('/consultation', [ConsultationController::class, 'create'])->name("consultation{$nameSuffix}");
     Route::post('/consultation', [ConsultationController::class, 'store'])
@@ -78,7 +80,7 @@ Route::middleware('setlocale')->group(fn () => $registerPublicRoutes());
 // English — "{name}.en" names, "en" prefix.
 Route::prefix('en')->middleware('setlocale')->group(fn () => $registerPublicRoutes('.en'));
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'dashboardlocale'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

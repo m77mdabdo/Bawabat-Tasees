@@ -50,12 +50,49 @@
                         onclick="if (typeof fbq === 'function') { fbq('trackCustom', 'WhatsAppClick'); }"
                         class="inline-flex items-center justify-center gap-2 rounded-md bg-[#25D366] px-8 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-[#25D366]/90"
                     >
+                        <x-icons.whatsapp class="h-5 w-5" />
                         {{ __('site.home.cta_whatsapp') }}
                     </a>
                 @endif
             </div>
         </div>
     </section>
+
+    {{-- About teaser: reuses the About page's own first paragraph (via
+         HomeController::firstParagraph()) rather than duplicate-authoring
+         separate homepage copy, plus one of the real About-page photos.
+         Hidden entirely if the About page doesn't exist/isn't published. --}}
+    @if ($aboutExcerpt)
+        <section class="py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+                    <img
+                        src="{{ asset('images/about/about-team-meeting.jpg') }}"
+                        alt="{{ __('site.about.meeting_photo_alt') }}"
+                        class="h-72 w-full rounded-2xl object-cover shadow-sm sm:h-96"
+                    >
+
+                    <div>
+                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">
+                            {{ __('site.home.about_eyebrow') }}
+                        </span>
+                        <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">
+                            {{ __('site.home.about_heading') }}
+                        </h2>
+                        <p class="mt-4 text-lg leading-relaxed text-text-secondary">
+                            {{ $aboutExcerpt }}
+                        </p>
+                        <a
+                            href="{{ lroute('pages.about') }}"
+                            class="mt-6 inline-flex items-center gap-1 font-medium text-primary-green hover:text-primary-green/80"
+                        >
+                            {{ __('site.home.about_cta') }} <span aria-hidden="true">&larr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endif
 
     {{-- Services preview: 3 flagship + up to 3 more active services, ordered
          flagship-first. Hidden entirely if no active services exist yet. --}}
@@ -226,15 +263,21 @@
                             </div>
                         @endforeach
 
+                        {{-- The visible dot stays 8px (h-2 w-2, unchanged design), but
+                             each <button> gets an invisible p-2 hit area around it
+                             (-m-2 cancels the padding's effect on layout/spacing) so
+                             the actual tappable target is closer to a usable mobile
+                             touch-target size instead of exactly 8x8px. --}}
                         <div class="mt-6 flex justify-center gap-2">
                             @foreach ($testimonials as $index => $testimonial)
                                 <button
                                     type="button"
                                     @click="active = {{ $index }}"
-                                    :class="active === {{ $index }} ? 'bg-primary-green' : 'bg-border-default'"
-                                    class="h-2 w-2 rounded-full"
+                                    class="-m-2 flex items-center justify-center rounded-full p-2"
                                     aria-label="{{ __('site.home.testimonial_slide_label') }} {{ $index + 1 }}"
-                                ></button>
+                                >
+                                    <span :class="active === {{ $index }} ? 'bg-primary-green' : 'bg-border-default'" class="h-2 w-2 rounded-full"></span>
+                                </button>
                             @endforeach
                         </div>
                     </div>
@@ -253,6 +296,74 @@
                         @endforeach
                     </div>
                 @endif
+            </div>
+        </section>
+    @endif
+
+    {{-- Countries teaser: compact flag+name strip, same fallback (🌍) as
+         /countries for records with no flag image. Hidden entirely if no
+         active countries exist yet. --}}
+    @if ($homeCountries->isNotEmpty())
+        <section class="bg-bg-soft py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                    <div>
+                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.countries_eyebrow') }}</span>
+                        <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.countries_heading') }}</h2>
+                    </div>
+                    <a href="{{ lroute('countries.index') }}" class="inline-flex items-center gap-1 font-medium text-primary-green hover:text-primary-green/80">
+                        {{ __('site.home.countries_cta') }} <span aria-hidden="true">&larr;</span>
+                    </a>
+                </div>
+
+                <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                    @foreach ($homeCountries as $country)
+                        <x-card class="flex min-w-0 items-center gap-3 p-4">
+                            @if ($country->flag_image)
+                                <img
+                                    src="{{ Illuminate\Support\Facades\Storage::url($country->flag_image) }}"
+                                    alt="{{ $country->name }}"
+                                    class="h-10 w-10 shrink-0 rounded-full border border-border-default object-cover"
+                                >
+                            @else
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-soft text-base">
+                                    🌍
+                                </div>
+                            @endif
+                            <span class="truncate font-medium text-text-main">{{ $country->name }}</span>
+                        </x-card>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    {{-- FAQ preview: first 3-4 active FAQs, question + answer, same
+         accordion styling reference as /faqs (kept static here — no
+         expand/collapse needed for a short 3-4 item teaser). Hidden
+         entirely if no active FAQs exist yet. --}}
+    @if ($homeFaqs->isNotEmpty())
+        <section class="py-16 sm:py-24">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.faqs_eyebrow') }}</span>
+                    <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.faqs_heading') }}</h2>
+                </div>
+
+                <div class="mt-10 space-y-4">
+                    @foreach ($homeFaqs as $faq)
+                        <x-card class="p-6">
+                            <h3 class="font-semibold text-text-main">{{ $faq->question }}</h3>
+                            <p class="mt-2 text-text-secondary">{{ $faq->answer }}</p>
+                        </x-card>
+                    @endforeach
+                </div>
+
+                <div class="mt-8 text-center">
+                    <a href="{{ lroute('faqs.index') }}" class="inline-flex items-center gap-1 font-medium text-primary-green hover:text-primary-green/80">
+                        {{ __('site.home.faqs_cta') }} <span aria-hidden="true">&larr;</span>
+                    </a>
+                </div>
             </div>
         </section>
     @endif
@@ -320,6 +431,70 @@
         </section>
     @endif
 
+    {{-- Contact section: the real, functional /contact form embedded
+         directly on the homepage (not just a link to it) — same route,
+         same StoreContactRequest, same honeypot/rate-limiting/
+         attribution capture, via x-contact-form. redirect-to="home"
+         sends a successful submit back to `/#contact` (see
+         ContactController::redirectTarget()) instead of /contact. --}}
+    <section id="contact" class="py-16 sm:py-24">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">
+                    {{ __('site.contact.eyebrow') }}
+                </span>
+                <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">
+                    {{ __('site.contact.heading') }}
+                </h2>
+                <p class="mt-4 text-lg text-text-secondary">
+                    {{ __('site.contact.subheading') }}
+                </p>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-5">
+                <div class="lg:col-span-2">
+                    <x-card class="p-6">
+                        <h3 class="font-semibold text-text-main">{{ __('site.contact.info_heading') }}</h3>
+
+                        <dl class="mt-4 space-y-4 text-sm">
+                            @if ($contactPhone)
+                                <div>
+                                    <dt class="font-medium text-text-secondary">{{ __('site.contact.phone_label') }}</dt>
+                                    <dd class="mt-1 text-text-main">{{ $contactPhone }}</dd>
+                                </div>
+                            @endif
+
+                            @if ($contactWhatsapp)
+                                <div>
+                                    <dt class="font-medium text-text-secondary">{{ __('site.contact.whatsapp_label') }}</dt>
+                                    <dd class="mt-1 text-text-main">{{ $contactWhatsapp }}</dd>
+                                </div>
+                            @endif
+
+                            @if ($contactEmail)
+                                <div>
+                                    <dt class="font-medium text-text-secondary">{{ __('site.contact.email_label') }}</dt>
+                                    <dd class="mt-1 text-text-main">{{ $contactEmail }}</dd>
+                                </div>
+                            @endif
+
+                            @if ($contactAddress)
+                                <div>
+                                    <dt class="font-medium text-text-secondary">{{ __('site.contact.address_label') }}</dt>
+                                    <dd class="mt-1 text-text-main">{{ $contactAddress }}</dd>
+                                </div>
+                            @endif
+                        </dl>
+                    </x-card>
+                </div>
+
+                <div class="lg:col-span-3">
+                    <x-contact-form redirect-to="home" />
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Final CTA band: same 3 actions as the hero, closing the page. --}}
     <section class="bg-dark-green py-16 sm:py-24">
         <div class="max-w-4xl mx-auto px-4 text-center sm:px-6 lg:px-8">
@@ -353,6 +528,7 @@
                         onclick="if (typeof fbq === 'function') { fbq('trackCustom', 'WhatsAppClick'); }"
                         class="inline-flex items-center justify-center gap-2 rounded-md bg-[#25D366] px-8 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-[#25D366]/90"
                     >
+                        <x-icons.whatsapp class="h-5 w-5" />
                         {{ __('site.home.cta_whatsapp') }}
                     </a>
                 @endif
