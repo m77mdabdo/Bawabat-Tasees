@@ -57,9 +57,15 @@ class Lead extends Model
         ];
     }
 
+    /**
+     * withTrashed() because a lead is a historical record: soft-deleting a
+     * service must not erase which service an existing lead asked about.
+     * Without it the relationship resolves to null and the dashboard shows
+     * a blank service on every affected lead.
+     */
     public function requestedService(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'requested_service_id');
+        return $this->belongsTo(Service::class, 'requested_service_id')->withTrashed();
     }
 
     public function conversionEvents(): HasMany
