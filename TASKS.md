@@ -3550,3 +3550,53 @@ database wipe; (D) no real `ADMIN_EMAIL`/`ADMIN_PASSWORD` are set, so
 every fresh seed still uses placeholder dev credentials. Full detail,
 evidence, and re-run instructions:
 [docs/testing/health-check-2026-08-05.md](docs/testing/health-check-2026-08-05.md).
+
+## 2026-08-08 — All work committed to git (commit c370f55), English translation now automatic during seeding
+
+Closed the two process gaps the health check found.
+
+**Part A — everything committed.** `.gitignore` was reviewed and needed
+no changes (it already correctly excludes `.env`, `.env.backup`,
+`.env.production`, `/vendor`, `/node_modules`, `/public/build`,
+`/public/hot`, `/public/storage`, `.DS_Store`, editor dirs and
+`/storage/*.key`). The full staged list was reviewed file-by-file
+before committing: 108 files, no `.env`, no `vendor`/`node_modules`,
+and no raw uncompressed video originals (the hero/login video cleanup
+from the earlier tasks was confirmed to have actually happened — the
+five largest staged files are all the intended compressed `.mp4`/
+`.webm` site assets at ~1.5–2.1 MB each). Committed as a single commit
+**`c370f55`** — 108 files changed, 6,425 insertions, 646 deletions.
+Working tree is now clean; `.env` confirmed never tracked in any commit
+in the repo's history. **This commit was not pushed** — the branch is
+now 1 commit ahead of `origin/main`.
+
+**Part B — bilingual seeding is now one step.**
+`database/seeders/DatabaseSeeder.php` now calls
+`Artisan::call('content:translate-to-english', [], $this->command?->getOutput())`
+after the content seeders, so `php artisan migrate:fresh --seed` alone
+produces a fully bilingual site. Verified on a genuinely fresh seed
+with no separate translate command: 54 fields translated automatically,
+and `/en/about`, `/en/why-invest`, `/en/formation-process`,
+`/en/requirements` all return 200 with real English content (h2s read
+"Our Expertise", "Aligned with Vision 2030", "Initial Consultation",
+"Passport Copy") and **zero** Arabic fallback — the only Arabic left on
+an English page is the navbar's "العربية" toggle label, which is
+correct. Idempotency confirmed: re-seeding an already-seeded database
+skips all 24 already-English Page fields; the 38 PageSection fields are
+re-translated only because `PageContentSeeder` deletes and recreates
+its sections each run (line 251), so those rows are genuinely new
+Arabic-only records — the end state is still fully bilingual either way.
+Full suite still **282 passed (849 assertions)**, no regressions,
+including `SeedersTest › seeding twice does not create duplicates`.
+
+Setup documentation created:
+[docs/setup-instructions.md](docs/setup-instructions.md) — the single
+correct sequence is now
+`composer install && npm install && php artisan migrate:fresh --seed && npm run build`,
+with nothing else required.
+
+**Process recommendation (not enforced in code):** future tasks should
+each end with their own commit, so the history stays granular and each
+change is individually reviewable and revertable. This task's single
+squashed commit was the right call only because the working tree
+already had everything mixed together — it should not become the norm.
