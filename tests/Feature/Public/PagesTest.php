@@ -3,6 +3,7 @@
 namespace Tests\Feature\Public;
 
 use App\Models\Page;
+use Database\Seeders\PageContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -182,7 +183,7 @@ class PagesTest extends TestCase
         // Runs the actual seeder (not a hand-built test fixture) so this
         // proves the real content that will ship, not just that the
         // rendering mechanism works with arbitrary test data.
-        $this->seed(\Database\Seeders\PageContentSeeder::class);
+        $this->seed(PageContentSeeder::class);
 
         $ar = $this->get(route('pages.privacy-policy'));
         $ar->assertOk();

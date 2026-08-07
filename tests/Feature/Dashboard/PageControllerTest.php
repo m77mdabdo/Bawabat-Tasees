@@ -5,6 +5,7 @@ namespace Tests\Feature\Dashboard;
 use App\Models\Page;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\Concerns\CreatesAdminUsers;
 use Tests\TestCase;
 
@@ -100,8 +101,8 @@ class PageControllerTest extends TestCase
 
     public function test_no_create_or_destroy_routes_exist_for_pages(): void
     {
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('dashboard.pages.store'));
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('dashboard.pages.destroy'));
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('dashboard.pages.create'));
+        $this->assertFalse(Route::has('dashboard.pages.store'));
+        $this->assertFalse(Route::has('dashboard.pages.destroy'));
+        $this->assertFalse(Route::has('dashboard.pages.create'));
     }
 }
