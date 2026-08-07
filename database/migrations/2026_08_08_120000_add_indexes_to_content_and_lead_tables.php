@@ -31,6 +31,18 @@ return new class extends Migration
             $table->index(['page_id', 'is_active', 'sort_order'], 'page_sections_page_active_sort_index');
         });
 
+        // On a FRESH apply MySQL drops the auto-created page_id index itself,
+        // since the composite above leads with page_id and supersedes it.
+        // It does NOT do that when the index was created explicitly (which is
+        // what down() does), so without this an apply→rollback→apply cycle
+        // ends up with a redundant index that a fresh deploy never has.
+        // Normalising here keeps the applied schema identical either way.
+        if (Schema::hasIndex('page_sections', 'page_sections_page_id_foreign')) {
+            Schema::table('page_sections', function (Blueprint $table) {
+                $table->dropIndex('page_sections_page_id_foreign');
+            });
+        }
+
         Schema::table('articles', function (Blueprint $table) {
             $table->index(['is_published', 'published_at'], 'articles_is_published_published_at_index');
         });
@@ -63,9 +75,18 @@ return new class extends Migration
         // auto-created one. Dropping it directly therefore fails with
         // errno 1553 ("needed in a foreign key constraint") — the plain
         // index has to be put back first.
-        Schema::table('page_sections', function (Blueprint $table) {
-            $table->index('page_id', 'page_sections_page_id_foreign');
-        });
+        //
+        // Conditional because MySQL only drops that auto-created index on a
+        // FRESH up(). After a rollback recreates it explicitly, a later
+        // up() leaves it in place, so an unguarded re-create on the second
+        // rollback dies with errno 1061 ("Duplicate key name") — and
+        // because it aborts mid-down(), it strands the schema half rolled
+        // back with the migration still recorded as applied.
+        if (! Schema::hasIndex('page_sections', 'page_sections_page_id_foreign')) {
+            Schema::table('page_sections', function (Blueprint $table) {
+                $table->index('page_id', 'page_sections_page_id_foreign');
+            });
+        }
 
         Schema::table('page_sections', function (Blueprint $table) {
             $table->dropIndex('page_sections_page_active_sort_index');
