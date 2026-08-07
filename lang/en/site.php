@@ -49,6 +49,17 @@ return [
         'honeypot_label' => 'Leave this field blank',
     ],
 
+    /*
+     * Success messages flashed after a public form submission. The
+     * honeypot path deliberately flashes the SAME message as a genuine
+     * submission, so a bot never learns it was caught.
+     */
+    'flash' => [
+        'comment_submitted' => 'Your comment has been submitted and will appear once reviewed.',
+        'consultation_submitted' => 'Thank you! We have received your request and will be in touch shortly.',
+        'contact_submitted' => 'Thank you for reaching out! We will get back to you as soon as possible.',
+    ],
+
     'home' => [
         'hero_eyebrow' => 'Your Trusted Gateway to Investing in Saudi Arabia',
         'hero_heading' => 'Establish Your Company in Saudi Arabia with Confidence',

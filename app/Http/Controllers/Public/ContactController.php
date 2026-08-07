@@ -34,7 +34,7 @@ class ContactController extends Controller
         // in ConsultationController@store.
         if ($request->filled('website_url')) {
             return redirect($redirectTarget)
-                ->with('status', 'شكرًا لتواصلك معنا! سنرد عليك في أقرب وقت ممكن.');
+                ->with('status', __('site.flash.contact_submitted'));
         }
 
         $data = $request->safe()->except([
@@ -53,7 +53,7 @@ class ContactController extends Controller
         ]);
 
         return redirect($redirectTarget)
-            ->with('status', 'شكرًا لتواصلك معنا! سنرد عليك في أقرب وقت ممكن.');
+            ->with('status', __('site.flash.contact_submitted'));
     }
 
     /**

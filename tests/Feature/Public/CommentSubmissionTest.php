@@ -229,4 +229,44 @@ class CommentSubmissionTest extends TestCase
         $comment = Comment::firstOrFail();
         $this->assertNotNull($comment->ip_address);
     }
+
+    /**
+     * An English reader must land back on the English article. Before the
+     * lroute() fix this redirected to the Arabic URL, silently switching
+     * the reader's language mid-journey.
+     */
+    public function test_english_submission_redirects_to_the_english_article(): void
+    {
+        $article = $this->makeArticle();
+
+        $this->post(route('articles.comments.store.en', $article), $this->validPayload())
+            ->assertRedirect(route('articles.show.en', $article));
+    }
+
+    public function test_english_honeypot_submission_also_redirects_to_the_english_article(): void
+    {
+        $article = $this->makeArticle();
+
+        $this->post(route('articles.comments.store.en', $article), $this->validPayload([
+            'website_url' => 'http://spam.example',
+        ]))->assertRedirect(route('articles.show.en', $article));
+
+        $this->assertDatabaseCount('comments', 0);
+    }
+
+    public function test_english_submission_flashes_the_english_success_message(): void
+    {
+        $article = $this->makeArticle();
+
+        $this->post(route('articles.comments.store.en', $article), $this->validPayload())
+            ->assertSessionHas('status', __('site.flash.comment_submitted', [], 'en'));
+    }
+
+    public function test_arabic_submission_still_redirects_to_the_arabic_article(): void
+    {
+        $article = $this->makeArticle();
+
+        $this->post(route('articles.comments.store', $article), $this->validPayload())
+            ->assertRedirect(route('articles.show', $article));
+    }
 }

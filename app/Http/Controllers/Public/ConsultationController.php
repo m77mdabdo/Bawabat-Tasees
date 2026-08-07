@@ -31,8 +31,8 @@ class ConsultationController extends Controller
         // never learns it was caught, but skip creating the Lead.
         if ($request->filled('website_url')) {
             return redirect()
-                ->route('consultation')
-                ->with('status', 'شكرًا لك! تم استلام طلبك وسنتواصل معك قريبًا.');
+                ->to(lroute('consultation'))
+                ->with('status', __('site.flash.consultation_submitted'));
         }
 
         $data = $request->safe()->except([
@@ -51,7 +51,7 @@ class ConsultationController extends Controller
         ]);
 
         return redirect()
-            ->route('consultation')
-            ->with('status', 'شكرًا لك! تم استلام طلبك وسنتواصل معك قريبًا.');
+            ->to(lroute('consultation'))
+            ->with('status', __('site.flash.consultation_submitted'));
     }
 }
