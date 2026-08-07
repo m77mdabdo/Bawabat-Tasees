@@ -8,6 +8,7 @@ use App\Models\Faq;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\Testimonial;
 use App\Models\TrackingSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -179,7 +180,7 @@ class HomeTest extends TestCase
      */
     public function test_whatsapp_buttons_use_the_real_whatsapp_icon(): void
     {
-        \App\Models\Setting::create(['key' => 'contact_whatsapp', 'value' => '+966500000000', 'group' => 'contact']);
+        Setting::create(['key' => 'contact_whatsapp', 'value' => '+966500000000', 'group' => 'contact']);
 
         $response = $this->get('/');
         $html = $response->getContent();
@@ -209,7 +210,7 @@ class HomeTest extends TestCase
      */
     public function test_whatsapp_is_not_in_the_navbar_but_is_a_floating_button(): void
     {
-        \App\Models\Setting::create(['key' => 'contact_whatsapp', 'value' => '+966500000000', 'group' => 'contact']);
+        Setting::create(['key' => 'contact_whatsapp', 'value' => '+966500000000', 'group' => 'contact']);
 
         $response = $this->get('/');
         $html = $response->getContent();
