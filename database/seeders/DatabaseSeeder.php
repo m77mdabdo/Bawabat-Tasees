@@ -38,6 +38,10 @@ class DatabaseSeeder extends Seeder
             // Last of the content seeders: it derives its values from the
             // Pages and Articles the seeders above have just created.
             SeoMetaSeeder::class,
+            // Reproduces the previously-hardcoded navbar as data, so the
+            // public menu becomes admin-manageable without changing what
+            // a visitor sees.
+            MenuItemSeeder::class,
         ]);
 
         // The content seeders above author Arabic only — English comes
