@@ -14,6 +14,7 @@ class LeadSource extends Model
         'key',
         'label',
         'is_active',
+        'is_system',
         'sort_order',
     ];
 
@@ -21,6 +22,7 @@ class LeadSource extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_system' => 'boolean',
             'sort_order' => 'integer',
         ];
     }
@@ -28,5 +30,23 @@ class LeadSource extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('sort_order')->orderBy('key');
+    }
+
+    /**
+     * Leads that resolved to this source.
+     *
+     * NOT an Eloquent relation: leads.source_platform stores this row's
+     * KEY as a plain string rather than a foreign key (see
+     * AttributionService::resolveSourcePlatform), because a lead can also
+     * carry a raw utm_source that matches no source at all.
+     */
+    public function leadsCount(): int
+    {
+        return Lead::where('source_platform', $this->key)->count();
     }
 }

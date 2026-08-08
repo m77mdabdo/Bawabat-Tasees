@@ -131,7 +131,6 @@ class DashboardHomeTest extends TestCase
         // became real sections, covered by CampaignControllerTest,
         // ReportControllerTest and SettingsControllerTest instead.
         return [
-            'lead-sources' => ['dashboard.lead-sources.index', 'قسم مصادر العملاء'],
             'contact-messages' => ['dashboard.contact-messages.index', 'قسم رسائل التواصل'],
         ];
     }

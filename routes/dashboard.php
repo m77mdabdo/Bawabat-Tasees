@@ -8,6 +8,7 @@ use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\DashboardHomeController;
 use App\Http\Controllers\Dashboard\FaqController;
 use App\Http\Controllers\Dashboard\LeadController;
+use App\Http\Controllers\Dashboard\LeadSourceController;
 use App\Http\Controllers\Dashboard\LocaleController;
 use App\Http\Controllers\Dashboard\MediaController;
 use App\Http\Controllers\Dashboard\MenuItemController;
@@ -47,6 +48,14 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         Route::patch('menu/{menu}/visibility', [MenuItemController::class, 'toggleVisibility'])->name('menu.visibility');
         Route::resource('menu', MenuItemController::class)->except('show')->parameters(['menu' => 'menu']);
 
+        // Route name stays dashboard.lead-sources.* — the sidebar links
+        // to it, and orphaning that name 500s every dashboard page.
+        Route::patch('lead-sources/{leadSource}/active', [LeadSourceController::class, 'toggleActive'])
+            ->name('lead-sources.active');
+        Route::resource('lead-sources', LeadSourceController::class)
+            ->except('show')
+            ->parameters(['lead-sources' => 'leadSource']);
+
         Route::resource('leads', LeadController::class)->only(['index', 'show', 'destroy']);
 
         // Conversions are always logged against a specific lead, so they
@@ -83,7 +92,7 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         // 'dashboardlocale' middleware runs, so an eager __() call here
         // would always resolve in the app's boot-time locale ('ar')
         // regardless of the admin's toggle.
-        $comingSoonSlugs = ['lead-sources', 'contact-messages'];
+        $comingSoonSlugs = ['contact-messages'];
 
         foreach ($comingSoonSlugs as $slug) {
             $key = str_replace('-', '_', $slug);
