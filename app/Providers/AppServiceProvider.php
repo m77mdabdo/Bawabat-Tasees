@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Service;
 use App\Models\Setting;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -36,13 +35,17 @@ class AppServiceProvider extends ServiceProvider
         // switches the app locale to 'en'.
         Translatable::fallback(fallbackLocale: config('app.fallback_locale'));
 
-        // The public navbar (services dropdown + WhatsApp CTA) renders on
-        // every public page via layouts/public.blade.php, which is used by
-        // ~10 different controllers — a View composer avoids having to
-        // pass the same two queries from every one of them individually.
+        // The WhatsApp CTA renders on every public page via
+        // layouts/public.blade.php, which is used by ~10 different
+        // controllers — a View composer avoids passing the same query
+        // from every one of them individually.
+        //
+        // The services list this used to supply was dropped along with the
+        // navbar's services dropdown: that query ran on EVERY public page
+        // render purely to populate a menu that has since become a plain
+        // link to the services index.
         View::composer('layouts.public', function ($view) {
             $view->with([
-                'navServices' => Service::active()->orderBy('sort_order')->get(),
                 'navWhatsapp' => Setting::where('key', 'contact_whatsapp')->value('value'),
             ]);
         });

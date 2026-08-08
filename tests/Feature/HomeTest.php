@@ -190,14 +190,74 @@ class HomeTest extends TestCase
         $this->assertStringNotContainsString('<rect x="3" y="4" width="18" height="12" rx="2" />', $html);
     }
 
-    public function test_navbar_has_services_dropdown_countries_and_blog_label(): void
+    public function test_navbar_has_services_countries_and_blog_labels(): void
     {
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('كل الخدمات');
+        $response->assertSee('خدماتنا');
         $response->assertSee('الدول');
         $response->assertSee('المدونة');
+    }
+
+    /**
+     * "خدماتنا" is a plain link to the services index, not a dropdown —
+     * the index page already lists every service, so the menu layer was
+     * just a click in the way. These assertions pin the absence of the
+     * old dropdown so it cannot quietly return.
+     */
+    public function test_services_navbar_item_is_a_direct_link_with_no_dropdown(): void
+    {
+        Service::create([
+            'slug' => 'company-formation',
+            'name' => ['ar' => 'تأسيس الشركات', 'en' => 'Company Formation'],
+            'summary' => ['ar' => 'x'], 'body' => ['ar' => 'x'],
+            'requirements' => ['ar' => 'x'], 'process' => ['ar' => 'x'],
+            'is_active' => true,
+        ]);
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        // Scoped to <header>: the homepage BODY legitimately links to
+        // individual services from its services section — it is only the
+        // navbar that must not.
+        $header = substr($html, 0, strpos($html, '</header>'));
+
+        $this->assertStringContainsString('href="'.route('services.index').'"', $header);
+        $this->assertStringNotContainsString('servicesOpen', $header);
+        $this->assertStringNotContainsString(route('services.show', 'company-formation'), $header);
+    }
+
+    public function test_services_navbar_link_is_locale_aware(): void
+    {
+        $this->get('/')->assertOk()
+            ->assertSee('href="'.route('services.index').'"', escape: false);
+
+        $this->get('/en')->assertOk()
+            ->assertSee('href="'.route('services.index.en').'"', escape: false);
+    }
+
+    public function test_services_navbar_link_is_highlighted_on_services_pages(): void
+    {
+        $service = Service::create([
+            'slug' => 'company-formation',
+            'name' => ['ar' => 'تأسيس الشركات'],
+            'summary' => ['ar' => 'x'], 'body' => ['ar' => 'x'],
+            'requirements' => ['ar' => 'x'], 'process' => ['ar' => 'x'],
+            'is_active' => true,
+        ]);
+
+        // Highlight class present on both the index and a single service.
+        $this->get(route('services.index'))->assertOk()
+            ->assertSee('text-primary-green font-semibold', escape: false);
+        $this->get(route('services.show', $service))->assertOk()
+            ->assertSee('text-primary-green font-semibold', escape: false);
+
+        // …and absent on an unrelated page.
+        $this->assertStringNotContainsString(
+            'text-primary-green font-semibold',
+            $this->get(route('contact'))->assertOk()->getContent()
+        );
     }
 
     /**
