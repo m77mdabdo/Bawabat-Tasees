@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Article;
 use App\Models\Service;
+use Database\Seeders\MenuItemSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -57,6 +58,9 @@ class LocaleTest extends TestCase
 
     public function test_english_page_shows_english_brand_name_and_nav_labels(): void
     {
+        // Nav labels come from menu_items now.
+        $this->seed(MenuItemSeeder::class);
+
         $response = $this->get('/en');
 
         $response->assertOk();
