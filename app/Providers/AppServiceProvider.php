@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Models\MenuItem;
-use App\Models\Setting;
+use App\Services\Cms\SettingsRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -16,7 +16,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Singleton so the settings table is read at most once per
+        // request, however many callers ask for a value.
+        $this->app->singleton(SettingsRepository::class);
     }
 
     /**
@@ -48,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
         // link to the services index.
         View::composer('layouts.public', function ($view) {
             $view->with([
-                'navWhatsapp' => Setting::where('key', 'contact_whatsapp')->value('value'),
+                'navWhatsapp' => app(SettingsRepository::class)->string('contact_whatsapp'),
                 'menu' => $this->publicMenu(),
             ]);
         });

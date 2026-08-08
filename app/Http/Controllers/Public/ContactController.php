@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreContactRequest;
 use App\Models\Lead;
-use App\Models\Setting;
+use App\Services\Cms\SettingsRepository;
 use App\Services\Marketing\AttributionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -13,16 +13,17 @@ use Illuminate\View\View;
 class ContactController extends Controller
 {
     public function __construct(
-        private readonly AttributionService $attributionService
+        private readonly AttributionService $attributionService,
+        private readonly SettingsRepository $settings,
     ) {}
 
     public function create(): View
     {
         return view('public.contact', [
-            'contactPhone' => Setting::where('key', 'contact_phone')->value('value'),
-            'contactWhatsapp' => Setting::where('key', 'contact_whatsapp')->value('value'),
-            'contactEmail' => Setting::where('key', 'contact_email')->value('value'),
-            'contactAddress' => Setting::where('key', 'contact_address')->value('value'),
+            'contactPhone' => $this->settings->string('contact_phone'),
+            'contactWhatsapp' => $this->settings->string('contact_whatsapp'),
+            'contactEmail' => $this->settings->string('contact_email'),
+            'contactAddress' => $this->settings->string('contact_address'),
         ]);
     }
 

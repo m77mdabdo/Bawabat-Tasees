@@ -8,22 +8,22 @@ use App\Models\Country;
 use App\Models\Faq;
 use App\Models\Page;
 use App\Models\Service;
-use App\Models\Setting;
 use App\Models\Testimonial;
+use App\Services\Cms\SettingsRepository;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(): View
+    public function index(SettingsRepository $settings): View
     {
         $aboutPage = Page::where('slug', 'about')->where('is_published', true)->first();
 
         return view('public.home', [
-            'whatsappNumber' => Setting::where('key', 'contact_whatsapp')->value('value'),
-            'contactPhone' => Setting::where('key', 'contact_phone')->value('value'),
-            'contactWhatsapp' => Setting::where('key', 'contact_whatsapp')->value('value'),
-            'contactEmail' => Setting::where('key', 'contact_email')->value('value'),
-            'contactAddress' => Setting::where('key', 'contact_address')->value('value'),
+            'whatsappNumber' => $settings->string('contact_whatsapp'),
+            'contactPhone' => $settings->string('contact_phone'),
+            'contactWhatsapp' => $settings->string('contact_whatsapp'),
+            'contactEmail' => $settings->string('contact_email'),
+            'contactAddress' => $settings->string('contact_address'),
             'homeServices' => Service::active()->orderByDesc('is_flagship')->orderBy('sort_order')->take(6)->get(),
             'aboutPage' => $aboutPage,
             'aboutExcerpt' => $aboutPage ? $this->firstParagraph($aboutPage->body) : null,

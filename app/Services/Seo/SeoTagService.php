@@ -4,7 +4,7 @@ namespace App\Services\Seo;
 
 use App\Models\Article;
 use App\Models\SeoMeta;
-use App\Models\Setting;
+use App\Services\Cms\SettingsRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -148,9 +148,7 @@ class SeoTagService
 
     private function setting(string $key): ?string
     {
-        $value = Setting::where('key', $key)->value('value');
-
-        return is_string($value) && trim($value) !== '' ? $value : null;
+        return app(SettingsRepository::class)->string($key);
     }
 
     /**
