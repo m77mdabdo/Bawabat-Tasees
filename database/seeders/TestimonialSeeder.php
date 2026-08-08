@@ -6,10 +6,9 @@ use App\Models\Testimonial;
 use Illuminate\Database\Seeder;
 
 /**
- * Illustrative starter testimonials — these are SAMPLE entries, not real
- * client quotes. Replace or remove them from the dashboard before the
- * site goes live; publishing invented testimonials as genuine would be
- * misleading to visitors.
+ * FABRICATED testimonials — nobody said these. Loaded only via
+ * DemoDataSeeder, never by the default DatabaseSeeder, because
+ * publishing invented client quotes as genuine would mislead visitors.
  *
  * client_name is a plain column, so it serves as the match key.
  */

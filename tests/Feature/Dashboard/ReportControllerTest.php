@@ -7,6 +7,7 @@ use App\Models\Lead;
 use App\Models\LeadSource;
 use App\Models\User;
 use App\Services\Dashboard\ReportingService;
+use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\CreatesAdminUsers;
 use Tests\TestCase;
@@ -261,9 +262,12 @@ class ReportControllerTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_seeded_install_gives_reports_something_to_render(): void
+    public function test_demo_seed_gives_reports_something_to_render(): void
     {
+        // The default seed intentionally yields zero revenue; demo data
+        // is what makes the Reports screen non-empty.
         $this->seed();
+        $this->seed(DemoDataSeeder::class);
 
         $funnel = $this->reporting->funnel(90);
 

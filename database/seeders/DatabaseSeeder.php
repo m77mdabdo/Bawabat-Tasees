@@ -15,6 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // PRODUCTION seeders only. Everything here is real, shippable
+        // content — nothing invented. Sample testimonials, campaigns,
+        // leads and conversion events live in DemoDataSeeder, which this
+        // deliberately does NOT call: they would otherwise put fabricated
+        // client quotes on the public site and make the dashboard report
+        // revenue that was never earned.
+        //
+        //   php artisan db:seed --class=DemoDataSeeder
+        //
+        // See docs/setup-instructions.md.
         $this->call([
             AdminUserSeeder::class,
             LeadSourceSeeder::class,
@@ -24,19 +34,10 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             CountrySeeder::class,
             FaqSeeder::class,
-            TestimonialSeeder::class,
             ArticleSeeder::class,
             // Last of the content seeders: it derives its values from the
             // Pages and Articles the seeders above have just created.
             SeoMetaSeeder::class,
-            // Creates a clearly-labelled SAMPLE lead + conversions so the
-            // conversions UI and dashboard totals are not empty on a fresh
-            // install. Delete before launch — see the seeder's docblock.
-            // Campaigns before conversions: ConversionEventSeeder's sample
-            // lead carries an external campaign id these records match, so
-            // the link resolves on a fresh seed.
-            CampaignSeeder::class,
-            ConversionEventSeeder::class,
         ]);
 
         // The content seeders above author Arabic only — English comes

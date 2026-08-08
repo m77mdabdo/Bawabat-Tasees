@@ -8,8 +8,8 @@ use App\Models\Lead;
 use Illuminate\Database\Seeder;
 
 /**
- * Illustrative starter data so a fresh install shows the conversions UI
- * working rather than an empty state.
+ * FABRICATED leads and conversion revenue. Loaded only via
+ * DemoDataSeeder, never by the default DatabaseSeeder.
  *
  * These are SAMPLE events attached to SAMPLE leads — they are not real
  * revenue. Delete them from the dashboard before the site goes live;
