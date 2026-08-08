@@ -169,7 +169,11 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // Defaults to ON in production and OFF elsewhere, so a local http
+    // dev server still works while a real deployment never sends the
+    // session cookie in the clear. Override explicitly with
+    // SESSION_SECURE_COOKIE if needed.
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
 
     /*
     |--------------------------------------------------------------------------
