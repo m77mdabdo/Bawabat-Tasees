@@ -5,6 +5,7 @@ namespace Tests\Feature\Dashboard;
 use App\Models\ConversionEvent;
 use App\Models\Lead;
 use App\Models\User;
+use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\CreatesAdminUsers;
 use Tests\TestCase;
@@ -391,9 +392,12 @@ class ConversionEventControllerTest extends TestCase
         $this->assertSame($lead->id, $fresh->leadWithTrashed->id);
     }
 
-    public function test_seeded_install_has_sample_conversion_events(): void
+    public function test_demo_seed_has_sample_conversion_events(): void
     {
+        // Sample conversions live in DemoDataSeeder now — the default
+        // seed deliberately produces none.
         $this->seed();
+        $this->seed(DemoDataSeeder::class);
 
         $this->assertGreaterThan(0, ConversionEvent::count());
         $this->assertSame(0, ConversionEvent::whereNull('occurred_at')->count());

@@ -6,13 +6,10 @@ use App\Models\Campaign;
 use Illuminate\Database\Seeder;
 
 /**
- * SAMPLE campaigns so the Campaigns and Reports screens render real
- * structure on a fresh install rather than an empty state.
- *
- * These are NOT real campaigns and the budget/spend figures are invented.
- * Delete them before launch — Reports computes ROI from `spend`, so
- * leaving them in place makes the dashboard report a return on money that
- * was never spent.
+ * FABRICATED campaigns with invented budget/spend figures. Loaded only
+ * via DemoDataSeeder, never by the default DatabaseSeeder — Reports
+ * computes ROI from `spend`, so shipping these would make the dashboard
+ * report a return on money that was never spent.
  *
  * external_campaign_id values match what ConversionEventSeeder puts on its
  * sample lead, so the link resolves on a fresh seed.

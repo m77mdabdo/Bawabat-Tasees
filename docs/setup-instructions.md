@@ -39,6 +39,30 @@ That's it. Nothing else is required.
    php artisan storage:link
    ```
 
+## Real content vs demo data
+
+`php artisan migrate --seed` loads **production content only**: services,
+countries, FAQs, the six CMS pages, starter articles, settings, lead
+sources, tracking settings and SEO meta. Nothing in it is invented.
+
+Sample testimonials, campaigns, leads and conversion events are **not**
+loaded by default. They are fabricated — invented client quotes, made-up
+ad budgets, and revenue that was never earned — and the Reports screen
+computes ROI from those figures, so shipping them would make the
+dashboard lie.
+
+Load them explicitly when you want a populated dashboard to work against:
+
+```bash
+php artisan db:seed --class=DemoDataSeeder
+```
+
+It prints a warning, and it is idempotent, so re-running it will not
+duplicate rows. **Never run it against production.** If demo data has
+already been loaded somewhere it should not be, delete those rows from
+the dashboard (Testimonials, Campaigns, Leads) — every one of them is
+labelled `(بيانات عينة)` / `(SAMPLE DATA)`.
+
 ## Why English content is not a separate step anymore
 
 The content seeders author **Arabic only**. English translations come
