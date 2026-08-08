@@ -1,12 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-text-main leading-tight">
                 {{ __('dashboard.pages.sections_link') }} — {{ $page->title }}
             </h2>
-            <div class="flex items-center gap-3">
-                <a href="{{ route('dashboard.pages.edit', $page) }}" class="text-sm text-text-secondary underline">{{ __('dashboard.pages.back_to_page') }}</a>
-                <a href="{{ route('dashboard.pages.sections.create', $page) }}" class="inline-flex items-center px-4 py-2 bg-primary-green border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-dark-green">
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{{ route('dashboard.pages.edit', $page) }}" class="dash-action text-sm text-text-secondary underline hover:text-text-main">{{ __('dashboard.pages.back_to_page') }}</a>
+                <a href="{{ route('dashboard.pages.sections.create', $page) }}" class="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-md border border-transparent bg-primary-green px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-dark-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2">
                     {{ __('dashboard.sections.new') }}
                 </a>
             </div>

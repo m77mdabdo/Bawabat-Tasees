@@ -71,7 +71,7 @@
                     <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="mt-1 block w-full rounded-md border-border-default text-sm focus:border-primary-green focus:ring-primary-green">
                 </div>
 
-                <div class="lg:col-span-3 xl:col-span-5 flex items-center gap-3">
+                <div class="lg:col-span-3 xl:col-span-5 flex flex-wrap items-center gap-3">
                     <button type="submit" class="rounded-md bg-primary-green px-4 py-2 text-sm font-semibold text-white hover:bg-primary-green/90">
                         {{ __('dashboard.leads.filter') }}
                     </button>

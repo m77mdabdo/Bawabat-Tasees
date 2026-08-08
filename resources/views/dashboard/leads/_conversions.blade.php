@@ -52,7 +52,7 @@
                                 onsubmit="return confirm('{{ __('dashboard.conversions.delete_confirm') }}');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-xs font-semibold text-red-600 hover:underline">
+                                <button type="submit" class="dash-action text-xs font-semibold text-red-600 hover:underline">
                                     {{ __('dashboard.conversions.delete') }}
                                 </button>
                             </form>
@@ -66,7 +66,7 @@
         <form action="{{ route('dashboard.leads.conversions.store', $lead) }}" method="POST" class="mt-6 border-t border-border-default pt-4">
             @csrf
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div>
                     <x-input-label for="event_type" :value="__('dashboard.conversions.event_type')" />
                     <select id="event_type" name="event_type" required

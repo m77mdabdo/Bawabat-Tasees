@@ -78,7 +78,7 @@
                                                 alt="{{ __('dashboard.settings.current_logo') }}" class="mb-2 mt-1 h-16 w-auto">
                                         @endif
                                         <input id="{{ $key }}" name="{{ $key }}" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml"
-                                            class="mt-1 block w-full text-sm text-text-main">
+                                            class="mt-1 block w-full max-w-full py-2 text-sm text-text-main file:me-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0 file:bg-bg-soft file:px-4 file:text-sm file:font-medium file:text-text-main hover:file:bg-border-default">
                                         <p class="mt-1 text-xs text-text-secondary">{{ __('dashboard.settings.logo_hint') }}</p>
                                         <x-input-error :messages="$errors->get($key)" class="mt-2" />
                                     </div>

@@ -36,7 +36,7 @@
         </div>
 
         <div class="flex items-end">
-            <label class="inline-flex items-center">
+            <label class="inline-flex min-h-[44px] cursor-pointer items-center py-2">
                 <input type="hidden" name="is_active" value="0">
                 <input type="checkbox" name="is_active" value="1" class="rounded border-border-default text-primary-green shadow-sm focus:ring-primary-green"
                     {{ old('is_active', $isEdit ? $source->is_active : true) ? 'checked' : '' }}>

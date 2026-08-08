@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-text-main leading-tight">
                 {{ __('dashboard.pages.edit_heading') }} — {{ $page->title }}
             </h2>
-            <a href="{{ route('dashboard.pages.sections.index', $page) }}" class="inline-flex items-center px-4 py-2 bg-primary-green border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-dark-green">
+            <a href="{{ route('dashboard.pages.sections.index', $page) }}" class="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-md border border-transparent bg-primary-green px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-dark-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2">
                 {{ __('dashboard.pages.manage_sections') }}
             </a>
         </div>
@@ -72,8 +72,8 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-6">
-                            <label class="inline-flex items-center">
+                        <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+                            <label class="inline-flex min-h-[44px] cursor-pointer items-center py-2">
                                 <input type="hidden" name="is_published" value="0">
                                 <input type="checkbox" name="is_published" value="1" class="rounded border-border-default text-primary-green shadow-sm" {{ old('is_published', $page->is_published) ? 'checked' : '' }}>
                                 <span class="ms-2 text-sm text-text-secondary">{{ __('dashboard.pages.published_label') }}</span>
@@ -83,8 +83,8 @@
                         @include('dashboard._seo-fields', ['seoOwner' => $page])
                     </div>
 
-                    <div class="flex items-center justify-end gap-4 mt-6">
-                        <a href="{{ route('dashboard.pages.index') }}" class="text-sm text-text-secondary underline">{{ __('dashboard.common.cancel') }}</a>
+                    <div class="mt-6 flex flex-wrap items-center justify-end gap-4">
+                        <a href="{{ route('dashboard.pages.index') }}" class="dash-action text-sm text-text-secondary underline hover:text-text-main">{{ __('dashboard.common.cancel') }}</a>
                         <x-primary-button>{{ __('dashboard.pages.update_button') }}</x-primary-button>
                     </div>
                 </form>

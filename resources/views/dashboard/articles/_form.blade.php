@@ -14,7 +14,7 @@
         @if ($isEdit && $article->cover_image)
             <img src="{{ Illuminate\Support\Facades\Storage::url($article->cover_image) }}" alt="" class="h-20 mb-2 rounded">
         @endif
-        <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-text-main">
+        <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full max-w-full py-2 text-sm text-text-main file:me-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0 file:bg-bg-soft file:px-4 file:text-sm file:font-medium file:text-text-main hover:file:bg-border-default">
         <x-input-error :messages="$errors->get('cover_image')" class="mt-2" />
     </div>
 
@@ -63,8 +63,8 @@
         <x-input-error :messages="$errors->get('published_at')" class="mt-2" />
     </div>
 
-    <div class="flex items-center gap-6">
-        <label class="inline-flex items-center">
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+        <label class="inline-flex min-h-[44px] cursor-pointer items-center py-2">
             <input type="hidden" name="is_published" value="0">
             <input type="checkbox" name="is_published" value="1" class="rounded border-border-default text-primary-green shadow-sm" {{ old('is_published', $isEdit ? $article->is_published : false) ? 'checked' : '' }}>
             <span class="ms-2 text-sm text-text-secondary">{{ __('dashboard.articles.published_label') }}</span>

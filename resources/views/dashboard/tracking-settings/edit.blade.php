@@ -73,7 +73,7 @@
                                 @enderror
                             </div>
 
-                            <label class="flex shrink-0 items-center gap-2 sm:mt-7">
+                            <label class="flex min-h-[44px] shrink-0 cursor-pointer items-center gap-2 py-2 sm:mt-7">
                                 <input
                                     type="checkbox"
                                     name="settings[{{ $key }}][is_active]"

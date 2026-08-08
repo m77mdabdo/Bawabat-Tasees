@@ -34,7 +34,7 @@
                     </select>
                 </div>
 
-                <div class="flex items-end gap-3">
+                <div class="flex flex-wrap items-end gap-3">
                     <button type="submit" class="rounded-md bg-primary-green px-4 py-2 text-sm font-semibold text-white hover:bg-primary-green/90">
                         {{ __('dashboard.comments.filter') }}
                     </button>

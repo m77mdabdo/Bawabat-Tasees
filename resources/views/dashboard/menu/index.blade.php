@@ -14,12 +14,12 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="font-semibold text-xl text-text-main leading-tight">{{ __('dashboard.menu.title') }}</h2>
                 <p class="mt-1 text-sm text-text-secondary">{{ __('dashboard.menu.subtitle') }}</p>
             </div>
-            <a href="{{ route('dashboard.menu.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-green border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-dark-green">
+            <a href="{{ route('dashboard.menu.create') }}" class="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-md border border-transparent bg-primary-green px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-dark-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2">
                 {{ __('dashboard.menu.add') }}
             </a>
         </div>
@@ -71,10 +71,10 @@
 
                         <ul class="divide-y divide-border-default rounded-md border border-border-default">
                             <template x-for="(row, index) in rows" :key="row.id">
-                                <li class="flex flex-wrap items-center gap-3 px-4 py-3" :class="row.parent_id ? 'bg-bg-soft/60' : ''">
+                                <li class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3" :class="row.parent_id ? 'bg-bg-soft/60' : ''">
                                     <span class="text-text-secondary" x-show="row.parent_id" x-cloak aria-hidden="true">↳</span>
 
-                                    <span class="min-w-0 flex-1 truncate text-sm font-medium text-text-main" x-text="row.label"></span>
+                                    <span class="min-w-0 w-full truncate text-sm font-medium text-text-main sm:w-auto sm:flex-1" x-text="row.label"></span>
 
                                     <template x-if="row.system">
                                         <span class="rounded-full bg-luxury-gold/10 px-2 py-0.5 text-xs font-semibold text-gold-deep">
@@ -94,7 +94,7 @@
                                     @php
                                         $reorderBtn = 'inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded text-text-secondary transition hover:bg-bg-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green disabled:opacity-30';
                                     @endphp
-                                    <div class="flex items-center gap-1">
+                                    <div class="flex shrink-0 items-center gap-1">
                                         <button type="button" @click="moveUp(index)" :disabled="index === 0"
                                             class="{{ $reorderBtn }}"
                                             title="{{ __('dashboard.menu.move_up') }}" aria-label="{{ __('dashboard.menu.move_up') }}">▲</button>
@@ -127,8 +127,8 @@
                     <div class="mt-8 space-y-2 border-t border-border-default pt-6">
                         @foreach ($flat as $row)
                             @php $menuItem = $row['item']; @endphp
-                            <div class="flex flex-wrap items-center gap-3 text-sm {{ $row['depth'] ? 'ps-8' : '' }}">
-                                <span class="min-w-0 flex-1 truncate text-text-main">{{ $menuItem->label }}</span>
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm {{ $row['depth'] ? 'ps-8' : '' }}">
+                                <span class="min-w-0 w-full truncate text-text-main sm:w-auto sm:flex-1">{{ $menuItem->label }}</span>
 
                                 <form method="POST" action="{{ route('dashboard.menu.visibility', $menuItem) }}">
                                     @csrf

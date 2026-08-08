@@ -20,7 +20,7 @@
 
                     <div>
                         <x-input-label for="file" :value="__('dashboard.media.file_hint')" />
-                        <input id="file" name="file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" class="mt-1 block w-full text-sm text-text-main" required>
+                        <input id="file" name="file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" class="mt-1 block w-full max-w-full py-2 text-sm text-text-main file:me-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0 file:bg-bg-soft file:px-4 file:text-sm file:font-medium file:text-text-main hover:file:bg-border-default" required>
                         <x-input-error :messages="$errors->get('file')" class="mt-2" />
                     </div>
 
@@ -34,7 +34,7 @@
                 </form>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                 @forelse ($media as $item)
                     <div class="bg-white shadow-sm rounded-lg overflow-hidden">
                         @if ($item->type === 'video')

@@ -37,7 +37,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-text-main leading-tight">
                 {{ $lead->full_name }}
             </h2>
@@ -54,9 +54,9 @@
             </h3>
             <dl class="space-y-3">
                 @foreach ($customerFields as $field)
-                    <div class="flex items-start justify-between gap-4 text-sm">
-                        <dt class="shrink-0 text-text-secondary">{{ $field['label'] }}</dt>
-                        <dd class="min-w-0 break-words text-end text-text-main">{{ $field['value'] ?? '—' }}</dd>
+                    <div class="flex flex-col gap-0.5 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                        <dt class="text-text-secondary sm:shrink-0">{{ $field['label'] }}</dt>
+                        <dd class="min-w-0 break-words text-text-main sm:text-end">{{ $field['value'] ?? '—' }}</dd>
                     </div>
                 @endforeach
             </dl>
@@ -75,9 +75,9 @@
             </h3>
             <dl class="space-y-3">
                 @foreach ($sourceFields as $field)
-                    <div class="flex items-start justify-between gap-4 text-sm">
-                        <dt class="shrink-0 text-text-secondary">{{ $field['label'] }}</dt>
-                        <dd class="min-w-0 break-all text-end text-text-main">{{ $field['value'] ?? '—' }}</dd>
+                    <div class="flex flex-col gap-0.5 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                        <dt class="text-text-secondary sm:shrink-0">{{ $field['label'] }}</dt>
+                        <dd class="min-w-0 break-all text-text-main sm:text-end">{{ $field['value'] ?? '—' }}</dd>
                     </div>
                 @endforeach
             </dl>

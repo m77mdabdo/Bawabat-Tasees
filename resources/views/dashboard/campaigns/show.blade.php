@@ -6,7 +6,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-text-main leading-tight">{{ $campaign->name }}</h2>
             <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="text-sm text-primary-green hover:underline">{{ __('dashboard.common.edit') }}</a>
         </div>
@@ -43,9 +43,9 @@
                         ['label' => __('dashboard.campaigns.ends_on'), 'value' => $campaign->ends_on?->format('Y-m-d')],
                         ['label' => __('dashboard.common.active'), 'value' => $campaign->is_active ? __('dashboard.common.yes') : __('dashboard.common.no')],
                     ] as $field)
-                        <div class="flex items-start justify-between gap-4 text-sm">
-                            <dt class="shrink-0 text-text-secondary">{{ $field['label'] }}</dt>
-                            <dd class="min-w-0 break-all text-end text-text-main">{{ $field['value'] ?? '—' }}</dd>
+                        <div class="flex flex-col gap-0.5 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                            <dt class="text-text-secondary sm:shrink-0">{{ $field['label'] }}</dt>
+                            <dd class="min-w-0 break-all text-text-main sm:text-end">{{ $field['value'] ?? '—' }}</dd>
                         </div>
                     @endforeach
                 </dl>

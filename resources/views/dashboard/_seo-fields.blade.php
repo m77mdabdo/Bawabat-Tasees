@@ -46,7 +46,7 @@
                 <img src="{{ Illuminate\Support\Facades\Storage::url($seo->og_image) }}" alt="" class="h-20 mb-2 rounded">
             @endif
             <input id="seo_og_image" name="seo_og_image" type="file" accept="image/jpeg,image/png,image/webp"
-                class="mt-1 block w-full text-sm text-text-main">
+                class="mt-1 block w-full max-w-full py-2 text-sm text-text-main file:me-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0 file:bg-bg-soft file:px-4 file:text-sm file:font-medium file:text-text-main hover:file:bg-border-default">
             <p class="mt-1 text-xs text-text-secondary">{{ __('dashboard.seo.og_image_hint') }}</p>
             <x-input-error :messages="$errors->get('seo_og_image')" class="mt-2" />
         </div>

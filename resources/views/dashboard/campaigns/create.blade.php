@@ -9,8 +9,8 @@
                 <form method="POST" action="{{ route('dashboard.campaigns.store') }}">
                     @csrf
                     @include('dashboard.campaigns._form')
-                    <div class="flex items-center justify-end gap-4 mt-6">
-                        <a href="{{ route('dashboard.campaigns.index') }}" class="text-sm text-text-secondary underline">{{ __('dashboard.common.cancel') }}</a>
+                    <div class="mt-6 flex flex-wrap items-center justify-end gap-4">
+                        <a href="{{ route('dashboard.campaigns.index') }}" class="dash-action text-sm text-text-secondary underline hover:text-text-main">{{ __('dashboard.common.cancel') }}</a>
                         <x-primary-button>{{ __('dashboard.campaigns.create_button') }}</x-primary-button>
                     </div>
                 </form>

@@ -77,8 +77,8 @@
         <x-input-error :messages="$errors->get('notes')" class="mt-2" />
     </div>
 
-    <div class="flex items-center gap-6">
-        <label class="inline-flex items-center">
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+        <label class="inline-flex min-h-[44px] cursor-pointer items-center py-2">
             <input type="hidden" name="is_active" value="0">
             <input type="checkbox" name="is_active" value="1" class="rounded border-border-default text-primary-green shadow-sm"
                 {{ old('is_active', $isEdit ? $campaign->is_active : true) ? 'checked' : '' }}>
