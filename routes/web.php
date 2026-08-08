@@ -3,8 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\ArticleController;
 use App\Http\Controllers\Public\CommentController;
-use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\ConsultationController;
+use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\CountryController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
