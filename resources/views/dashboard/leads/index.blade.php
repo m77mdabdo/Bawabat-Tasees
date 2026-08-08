@@ -84,7 +84,7 @@
 
         <x-card class="overflow-hidden">
             <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-border-default">
+            <table class="dash-table-stacked min-w-full divide-y divide-border-default">
                 <thead class="bg-bg-soft">
                     <tr>
                         <th class="px-6 py-3 text-start text-xs font-medium text-text-secondary uppercase">{{ __('dashboard.leads.name') }}</th>
@@ -99,23 +99,23 @@
                 <tbody class="divide-y divide-border-default bg-white">
                     @forelse ($leads as $lead)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">
+                            <td data-label="{{ __('dashboard.leads.name') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-main">
                                 {{ $lead->full_name }}
                                 @if ($lead->isConverted())
                                     <span class="ms-2 rounded-full bg-primary-green/10 px-2 py-0.5 text-xs font-semibold text-primary-green">{{ __('dashboard.conversions.converted_badge') }}</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->phone }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->requestedService?->name ?? '—' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->source_platform ?? '—' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->campaign_name ?? '—' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->created_at->format('Y-m-d H:i') }}</td>
+                            <td data-label="{{ __('dashboard.leads.phone') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->phone }}</td>
+                            <td data-label="{{ __('dashboard.leads.requested_service') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->requestedService?->name ?? '—' }}</td>
+                            <td data-label="{{ __('dashboard.leads.source') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->source_platform ?? '—' }}</td>
+                            <td data-label="{{ __('dashboard.leads.campaign') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->campaign_name ?? '—' }}</td>
+                            <td data-label="{{ __('dashboard.leads.received_at') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->created_at->format('Y-m-d H:i') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-end text-sm space-x-2 rtl:space-x-reverse">
-                                <a href="{{ route('dashboard.leads.show', $lead) }}" class="text-primary-green hover:text-primary-green/70">{{ __('dashboard.leads.view') }}</a>
+                                <a href="{{ route('dashboard.leads.show', $lead) }}" class="dash-action text-primary-green hover:text-primary-green/70">{{ __('dashboard.leads.view') }}</a>
                                 <form action="{{ route('dashboard.leads.destroy', $lead) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('dashboard.leads.confirm_archive') }}');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800">{{ __('dashboard.leads.archive') }}</button>
+                                    <button type="submit" class="dash-action text-red-600 hover:text-red-800">{{ __('dashboard.leads.archive') }}</button>
                                 </form>
                             </td>
                         </tr>

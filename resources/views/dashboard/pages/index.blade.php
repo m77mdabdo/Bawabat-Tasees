@@ -19,7 +19,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-border-default">
+                <table class="dash-table-stacked min-w-full divide-y divide-border-default">
                     <thead class="bg-bg-soft">
                         <tr>
                             <th class="px-6 py-3 text-start text-xs font-medium text-text-secondary uppercase">{{ __('dashboard.common.title') }}</th>
@@ -31,12 +31,12 @@
                     <tbody class="bg-white divide-y divide-border-default">
                         @forelse ($pages as $page)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">{{ $page->title }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $page->slug }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $page->is_published ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
+                                <td data-label="{{ __('dashboard.common.title') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-main">{{ $page->title }}</td>
+                                <td data-label="{{ __('dashboard.common.slug') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $page->slug }}</td>
+                                <td data-label="{{ __('dashboard.pages.published_column') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $page->is_published ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-end text-sm space-x-2 rtl:space-x-reverse">
                                     <a href="{{ route('dashboard.pages.sections.index', $page) }}" class="text-text-secondary hover:text-text-main">{{ __('dashboard.pages.sections_link') }}</a>
-                                    <a href="{{ route('dashboard.pages.edit', $page) }}" class="text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
+                                    <a href="{{ route('dashboard.pages.edit', $page) }}" class="dash-action text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
                                 </td>
                             </tr>
                         @empty

@@ -16,7 +16,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-border-default">
+                    <table class="dash-table-stacked min-w-full divide-y divide-border-default">
                         <thead class="bg-bg-soft">
                             <tr>
                                 <th class="px-6 py-3 text-start text-xs font-medium text-text-secondary uppercase">{{ __('dashboard.campaigns.name') }}</th>
@@ -31,32 +31,32 @@
                         <tbody class="bg-white divide-y divide-border-default">
                             @forelse ($campaigns as $campaign)
                                 <tr>
-                                    <td class="px-6 py-4 text-sm text-text-main">
+                                    <td data-label="{{ __('dashboard.campaigns.name') }}" class="px-6 py-4 text-sm text-text-main">
                                         <a href="{{ route('dashboard.campaigns.show', $campaign) }}" class="font-medium text-primary-green hover:underline">{{ $campaign->name }}</a>
                                         @if ($campaign->external_campaign_id)
                                             <span class="block text-xs text-text-secondary" dir="ltr">{{ $campaign->external_campaign_id }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
+                                    <td data-label="{{ __('dashboard.campaigns.platform') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
                                         {{ $campaign->platform ? __('dashboard.campaigns.platforms.'.$campaign->platform) : '—' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary" dir="ltr">
+                                    <td data-label="{{ __('dashboard.campaigns.spend') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary" dir="ltr">
                                         {{ $campaign->spend !== null ? number_format((float) $campaign->spend, 2).' '.$campaign->currency : '—' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $campaign->leads_count }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary" dir="ltr">
+                                    <td data-label="{{ __('dashboard.campaigns.leads_count') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $campaign->leads_count }}</td>
+                                    <td data-label="{{ __('dashboard.campaigns.conversion_value') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary" dir="ltr">
                                         {{ number_format((float) $campaign->conversion_value_sum, 2) }} {{ $campaign->currency }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
+                                    <td data-label="{{ __('dashboard.common.active') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">
                                         {{ $campaign->is_active ? __('dashboard.common.yes') : __('dashboard.common.no') }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-end text-sm space-x-2 rtl:space-x-reverse">
-                                        <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
+                                        <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="dash-action text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
                                         <form action="{{ route('dashboard.campaigns.destroy', $campaign) }}" method="POST" class="inline"
                                             onsubmit="return confirm('{{ __('dashboard.campaigns.confirm_delete') }}');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
+                                            <button type="submit" class="dash-action text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
                                         </form>
                                     </td>
                                 </tr>

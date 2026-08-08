@@ -50,7 +50,7 @@
                             <form action="{{ route('dashboard.media.destroy', $item) }}" method="POST" onsubmit="return confirm('{{ __('dashboard.media.confirm_delete') }}');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
+                                <button type="submit" class="dash-action text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
                             </form>
                         </div>
                     </div>

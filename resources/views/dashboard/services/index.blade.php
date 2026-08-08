@@ -20,7 +20,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-border-default">
+                <table class="dash-table-stacked min-w-full divide-y divide-border-default">
                     <thead class="bg-bg-soft">
                         <tr>
                             <th class="px-6 py-3 text-start text-xs font-medium text-text-secondary uppercase">{{ __('dashboard.common.name') }}</th>
@@ -34,17 +34,17 @@
                     <tbody class="bg-white divide-y divide-border-default">
                         @forelse ($services as $service)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">{{ $service->name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->slug }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->is_flagship ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->is_active ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->sort_order }}</td>
+                                <td data-label="{{ __('dashboard.common.name') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-main">{{ $service->name }}</td>
+                                <td data-label="{{ __('dashboard.common.slug') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->slug }}</td>
+                                <td data-label="{{ __('dashboard.services.flagship_column') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->is_flagship ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
+                                <td data-label="{{ __('dashboard.common.active') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->is_active ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
+                                <td data-label="{{ __('dashboard.common.sort_order') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $service->sort_order }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-end text-sm space-x-2 rtl:space-x-reverse">
-                                    <a href="{{ route('dashboard.services.edit', $service) }}" class="text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
+                                    <a href="{{ route('dashboard.services.edit', $service) }}" class="dash-action text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
                                     <form action="{{ route('dashboard.services.destroy', $service) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('dashboard.services.confirm_delete') }}');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
+                                        <button type="submit" class="dash-action text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
                                     </form>
                                 </td>
                             </tr>

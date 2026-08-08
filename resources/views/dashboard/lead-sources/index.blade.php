@@ -19,7 +19,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-border-default">
+                    <table class="dash-table-stacked min-w-full divide-y divide-border-default">
                         <thead class="bg-bg-soft">
                             <tr>
                                 <th class="px-6 py-3 text-start text-xs font-medium text-text-secondary uppercase">{{ __('dashboard.lead_sources.key') }}</th>
@@ -32,22 +32,22 @@
                         <tbody class="bg-white divide-y divide-border-default">
                             @forelse ($sources as $source)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">
+                                    <td data-label="{{ __('dashboard.lead_sources.key') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-main">
                                         <span dir="ltr" class="font-mono">{{ $source->key }}</span>
                                         @if ($source->is_system)
                                             <span class="ms-2 inline-flex items-center rounded-full bg-bg-soft px-2 py-0.5 text-xs font-medium text-gold-deep">{{ __('dashboard.lead_sources.system_badge') }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $source->label }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $leadCounts[$source->key] ?? 0 }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $source->is_active ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
+                                    <td data-label="{{ __('dashboard.lead_sources.label') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $source->label }}</td>
+                                    <td data-label="{{ __('dashboard.lead_sources.leads_count') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $leadCounts[$source->key] ?? 0 }}</td>
+                                    <td data-label="{{ __('dashboard.common.active') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $source->is_active ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-end text-sm space-x-2 rtl:space-x-reverse">
-                                        <a href="{{ route('dashboard.lead-sources.edit', $source) }}" class="text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
+                                        <a href="{{ route('dashboard.lead-sources.edit', $source) }}" class="dash-action text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
 
                                         <form action="{{ route('dashboard.lead-sources.active', $source) }}" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="text-primary-green hover:text-dark-green">
+                                            <button type="submit" class="dash-action text-primary-green hover:text-dark-green">
                                                 {{ $source->is_active ? __('dashboard.lead_sources.deactivate') : __('dashboard.lead_sources.activate') }}
                                             </button>
                                         </form>
@@ -59,7 +59,7 @@
                                             onsubmit="return confirm('{{ $source->is_system ? __('dashboard.lead_sources.confirm_delete_system') : __('dashboard.lead_sources.confirm_delete') }}');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
+                                            <button type="submit" class="dash-action text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
                                         </form>
                                     </td>
                                 </tr>

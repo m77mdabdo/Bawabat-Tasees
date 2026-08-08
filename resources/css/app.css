@@ -53,25 +53,44 @@
     }
 
     /*
-     * Touch targets. Every native control inside the dashboard gets the
-     * 44px minimum; anchors styled as actions are inline, where
-     * min-height does nothing, so those carry .dash-action instead.
+     * Touch targets, in two tiers.
      *
-     * Checkboxes and radios are deliberately excluded — stretching the
-     * box itself would misalign it against its label. They are given
-     * room by the padded <label> that wraps them.
+     * Tier 1 — form controls, at every width. These are things you aim
+     * at and type into, and 44px is close to what @tailwindcss/forms
+     * already produces, so there is no desktop cost.
+     *
+     * Checkboxes and radios are deliberately excluded: stretching the
+     * box misaligns it against its label. They get their room from the
+     * padded <label> that wraps them.
      */
     .dashboard-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
         min-height: 44px;
     }
 
-    .dashboard-shell :is(button, [type='submit'], [type='button']) {
-        min-height: 44px;
+    /*
+     * Tier 2 — buttons and action links, only where a finger is doing
+     * the aiming. `pointer: coarse` catches touch devices at any width;
+     * the max-width arm catches a desktop browser narrowed to a phone
+     * size, which is how this gets checked in practice.
+     *
+     * Not applied at all widths on purpose: a table row carries three
+     * or four of these, and forcing 44px on a mouse-driven desktop
+     * table inflates every row for no accessibility gain.
+     */
+    @media (max-width: 767px), (pointer: coarse) {
+        .dashboard-shell :is(button, [type='submit'], [type='button']),
+        .dash-action {
+            min-height: 44px;
+        }
     }
 
-    /* Inline action links in table rows and card footers. */
+    /*
+     * Inline action links in table rows and card footers. <a> is inline,
+     * where min-height does nothing at all, so it needs the display
+     * change even though the height is conditional above.
+     */
     .dash-action {
-        @apply inline-flex min-h-[44px] items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green;
+        @apply inline-flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green;
     }
 
     /*
@@ -107,16 +126,20 @@
             border-width: 0;
         }
 
+        /* No border here: tbody already carries `divide-y`, whose
+           selector outspecifies this one, so adding a border would
+           simply double the line between cards. */
         .dash-table-stacked tr {
-            @apply border-b border-border-default px-4 py-3;
+            @apply px-4 py-3;
         }
 
-        .dash-table-stacked tr:last-child {
-            @apply border-b-0;
-        }
-
-        /* Row-level utilities from the desktop table would otherwise
-           re-collapse the card or clip long values. */
+        /*
+         * These win on specificity (0,1,1) over the single-class
+         * utilities they override (px-6, whitespace-nowrap, text-end at
+         * 0,1,0) — Tailwind's @layer is a build-time construct, not a
+         * native cascade layer, so ordinary specificity decides and the
+         * desktop utilities on each cell do not have to be stripped.
+         */
         .dash-table-stacked td {
             @apply flex items-start justify-between gap-4 px-0 py-1.5;
             white-space: normal;
@@ -139,8 +162,10 @@
             min-width: 0;
         }
 
-        /* Actions get their own full-width row at the foot of the card. */
-        .dash-table-stacked td:not([data-label]) {
+        /* Actions get their own full-width row at the foot of the card.
+           :not([colspan]) keeps the empty-state cell out of it — that one
+           is a single centred message, not a card footer. */
+        .dash-table-stacked td:not([data-label]):not([colspan]) {
             @apply mt-2 flex-wrap justify-start gap-x-4 border-t border-border-default pt-2;
         }
 

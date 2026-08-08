@@ -23,7 +23,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-border-default">
+                <table class="dash-table-stacked min-w-full divide-y divide-border-default">
                     <thead class="bg-bg-soft">
                         <tr>
                             <th class="px-6 py-3 text-start text-xs font-medium text-text-secondary uppercase">{{ __('dashboard.sections.order_column') }}</th>
@@ -36,16 +36,16 @@
                     <tbody class="bg-white divide-y divide-border-default">
                         @forelse ($sections as $section)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $section->sort_order }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $section->key }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">{{ $section->title }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $section->is_active ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
+                                <td data-label="{{ __('dashboard.sections.order_column') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $section->sort_order }}</td>
+                                <td data-label="{{ __('dashboard.sections.key_column') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $section->key }}</td>
+                                <td data-label="{{ __('dashboard.common.title') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-main">{{ $section->title }}</td>
+                                <td data-label="{{ __('dashboard.common.active') }}" class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $section->is_active ? __('dashboard.common.yes') : __('dashboard.common.no') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-end text-sm space-x-2 rtl:space-x-reverse">
-                                    <a href="{{ route('dashboard.pages.sections.edit', [$page, $section]) }}" class="text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
+                                    <a href="{{ route('dashboard.pages.sections.edit', [$page, $section]) }}" class="dash-action text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
                                     <form action="{{ route('dashboard.pages.sections.destroy', [$page, $section]) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('dashboard.sections.confirm_delete') }}');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
+                                        <button type="submit" class="dash-action text-red-600 hover:text-red-900">{{ __('dashboard.common.delete') }}</button>
                                     </form>
                                 </td>
                             </tr>

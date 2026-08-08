@@ -55,10 +55,10 @@
                             {{-- rawurlencode: a subject line with & or # would
                                  otherwise truncate the mailto. --}}
                             <a href="mailto:{{ $message->email }}?subject={{ rawurlencode(__('dashboard.contact_messages.title')) }}"
-                                class="text-primary-green hover:text-dark-green">{{ __('dashboard.contact_messages.reply') }}</a>
+                                class="dash-action text-primary-green hover:text-dark-green">{{ __('dashboard.contact_messages.reply') }}</a>
                         @endif
 
-                        <a href="{{ route('dashboard.leads.show', $message) }}" class="text-primary-green hover:text-dark-green">
+                        <a href="{{ route('dashboard.leads.show', $message) }}" class="dash-action text-primary-green hover:text-dark-green">
                             {{ __('dashboard.contact_messages.view_lead') }}
                         </a>
 
