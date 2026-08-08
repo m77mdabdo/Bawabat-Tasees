@@ -14,7 +14,18 @@ class LeadController extends Controller
     public function index(Request $request): View
     {
         $leads = Lead::query()
-            ->with('requestedService')
+            // wonConversionEvents drives the "converted" badge; eager
+            // loading it keeps the index at two queries instead of one
+            // per row.
+            ->with(['requestedService', 'wonConversionEvents'])
+            ->when(
+                $request->input('conversion') === 'converted',
+                fn ($query) => $query->converted()
+            )
+            ->when(
+                $request->input('conversion') === 'not_converted',
+                fn ($query) => $query->notConverted()
+            )
             ->when($request->filled('type'), fn ($query) => $query->where('type', $request->input('type')))
             ->when($request->filled('source_platform'), fn ($query) => $query->where('source_platform', $request->input('source_platform')))
             ->when($request->filled('requested_service_id'), fn ($query) => $query->where('requested_service_id', $request->input('requested_service_id')))
@@ -33,7 +44,7 @@ class LeadController extends Controller
 
     public function show(Lead $lead): View
     {
-        $lead->load('requestedService');
+        $lead->load(['requestedService', 'conversionEvents', 'wonConversionEvents']);
 
         return view('dashboard.leads.show', ['lead' => $lead]);
     }

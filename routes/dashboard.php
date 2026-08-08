@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Dashboard\ArticleController;
 use App\Http\Controllers\Dashboard\CommentController;
+use App\Http\Controllers\Dashboard\ConversionEventController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\DashboardHomeController;
 use App\Http\Controllers\Dashboard\FaqController;
@@ -34,6 +35,13 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         Route::resource('pages.sections', PageSectionController::class)->except('show');
 
         Route::resource('leads', LeadController::class)->only(['index', 'show', 'destroy']);
+
+        // Conversions are always logged against a specific lead, so they
+        // hang off the lead rather than being a top-level resource.
+        Route::post('leads/{lead}/conversions', [ConversionEventController::class, 'store'])
+            ->name('leads.conversions.store');
+        Route::delete('leads/{lead}/conversions/{conversionEvent}', [ConversionEventController::class, 'destroy'])
+            ->name('leads.conversions.destroy');
 
         Route::resource('comments', CommentController::class)->only(['index', 'destroy']);
         Route::patch('comments/{comment}/approve', [CommentController::class, 'approve'])->name('comments.approve');

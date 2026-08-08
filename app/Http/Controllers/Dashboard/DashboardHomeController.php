@@ -27,6 +27,8 @@ class DashboardHomeController extends Controller
             'leadsToday' => $this->stats->leadsTodayCount(),
             'leadsThisWeek' => $this->stats->leadsThisWeekCount(),
             'totalLeads' => $this->stats->totalLeadsCount(),
+            'convertedLeads' => $this->stats->convertedLeadsCount(),
+            'conversionValue' => $this->stats->conversionValueTotal(),
             'pendingComments' => $this->stats->pendingCommentsCount(),
         ]);
     }

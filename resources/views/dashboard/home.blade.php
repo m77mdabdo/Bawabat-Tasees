@@ -27,6 +27,8 @@
         ['label' => __('dashboard.home.leads_today'), 'value' => $leadsToday, 'href' => route('dashboard.leads.index')],
         ['label' => __('dashboard.home.leads_this_week'), 'value' => $leadsThisWeek, 'href' => route('dashboard.leads.index')],
         ['label' => __('dashboard.home.total_leads'), 'value' => $totalLeads, 'href' => route('dashboard.leads.index')],
+        ['label' => __('dashboard.home.converted_leads'), 'value' => $convertedLeads, 'href' => route('dashboard.leads.index', ['conversion' => 'converted'])],
+        ['label' => __('dashboard.home.conversion_value'), 'value' => number_format($conversionValue, 2), 'href' => route('dashboard.leads.index', ['conversion' => 'converted'])],
     ];
 @endphp
 

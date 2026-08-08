@@ -197,6 +197,8 @@ return [
     ],
 
     'flash' => [
+        'conversion_logged' => 'تم تسجيل التحويل بنجاح.',
+        'conversion_deleted' => 'تم حذف التحويل.',
         'service_created' => 'تم إنشاء الخدمة.',
         'service_updated' => 'تم تحديث الخدمة.',
         'service_deleted' => 'تم حذف الخدمة.',
@@ -256,6 +258,8 @@ return [
     ],
 
     'home' => [
+        'converted_leads' => 'العملاء المحوّلون',
+        'conversion_value' => 'إجمالي قيمة التحويلات',
         'heading' => 'لوحة التحكم',
         'needs_attention' => 'يحتاج انتباهك',
         'content_overview' => 'نظرة عامة على المحتوى',
@@ -374,6 +378,33 @@ return [
         'og_image_hint' => 'تظهر عند مشاركة الرابط على وسائل التواصل. المقاس المفضل 1200×630 بكسل.',
         'canonical_url' => 'الرابط الأساسي (Canonical)',
         'canonical_url_hint' => 'اتركه فارغاً ليستخدم رابط الصفحة الحالي.',
+    ],
+
+    'conversions' => [
+        'section_heading' => 'التحويلات',
+        'section_hint' => 'سجّل ما نتج عن هذا العميل المحتمل: اجتماع، عقد موقّع، أو دفعة مستلمة.',
+        'log_button' => 'تسجيل تحويل',
+        'event_type' => 'نوع التحويل',
+        'value' => 'القيمة',
+        'currency' => 'العملة',
+        'occurred_at' => 'تاريخ الحدوث',
+        'notes' => 'ملاحظات',
+        'delete' => 'حذف',
+        'delete_confirm' => 'هل أنت متأكد من حذف هذا التحويل؟',
+        'empty' => 'لم يُسجَّل أي تحويل لهذا العميل حتى الآن.',
+        'converted_badge' => 'تم التحويل',
+        'total_value' => 'إجمالي القيمة',
+        'types' => [
+            'qualified' => 'عميل مؤهل',
+            'meeting_booked' => 'تم حجز اجتماع',
+            'contract_signed' => 'تم توقيع العقد',
+            'payment_received' => 'تم استلام الدفعة',
+            'other' => 'أخرى',
+        ],
+        'filter_any' => 'كل العملاء',
+        'filter_converted' => 'المحوّلون فقط',
+        'filter_not_converted' => 'غير المحوّلين فقط',
+        'filter_label' => 'حالة التحويل',
     ],
 
     'coming_soon' => [
