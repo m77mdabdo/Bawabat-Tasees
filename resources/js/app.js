@@ -1,4 +1,3 @@
-import './bootstrap';
 import './attribution';
 
 import Alpine from 'alpinejs';
