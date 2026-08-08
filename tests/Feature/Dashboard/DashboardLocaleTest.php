@@ -148,17 +148,16 @@ class DashboardLocaleTest extends TestCase
         // per-request, which would silently freeze this page in Arabic
         // regardless of the toggle.
         //
-        // Reports used to be the subject here; it is now a real section,
-        // so this uses one of the remaining placeholders and the real
-        // Reports page is covered by the test below.
+        // Reports and Settings used to be the subject here; both are now
+        // real sections, so this uses one of the remaining placeholders.
         $admin = $this->makeAdmin();
         $admin->update(['locale' => 'en']);
 
-        $response = $this->actingAs($admin)->get(route('dashboard.settings.index'));
+        $response = $this->actingAs($admin)->get(route('dashboard.lead-sources.index'));
 
         $response->assertOk();
         $response->assertSee('coming soon');
-        $response->assertDontSee('قسم الإعدادات');
+        $response->assertDontSee('قسم مصادر العملاء');
     }
 
     public function test_reports_and_campaigns_pages_respect_the_admins_locale(): void

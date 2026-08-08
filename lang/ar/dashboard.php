@@ -197,6 +197,7 @@ return [
     ],
 
     'flash' => [
+        'settings_updated' => 'تم حفظ إعدادات الموقع بنجاح.',
         'menu_item_created' => 'تمت إضافة العنصر بنجاح.',
         'menu_item_updated' => 'تم تحديث العنصر بنجاح.',
         'menu_item_deleted' => 'تم حذف العنصر.',
@@ -541,13 +542,52 @@ return [
         ],
     ],
 
+    'settings' => [
+        'title' => 'إعدادات الموقع',
+        'subtitle' => 'البيانات العامة التي تظهر في مختلف أنحاء الموقع.',
+        'save' => 'حفظ الإعدادات',
+        'current_logo' => 'الشعار الحالي',
+        'logo_hint' => 'اتركه فارغاً للإبقاء على الشعار الحالي. المقاس المفضل 512×512 بكسل.',
+        'optional_hint' => 'اتركه فارغاً لإخفائه من الموقع.',
+        'groups' => [
+            'general' => 'عام',
+            'contact' => 'بيانات التواصل',
+            'whatsapp' => 'واتساب',
+            'social' => 'روابط التواصل الاجتماعي',
+            'seo_defaults' => 'إعدادات SEO الافتراضية',
+        ],
+        'group_hints' => [
+            'general' => 'اسم الموقع وشعاره ووصفه المختصر.',
+            'contact' => 'تظهر في الصفحة الرئيسية وصفحة تواصل معنا.',
+            'whatsapp' => 'الرقم المستخدم في زر واتساب العائم.',
+            'social' => 'تظهر في تذييل الموقع. الحقول الفارغة لا تظهر إطلاقاً.',
+            'seo_defaults' => 'تُستخدم عندما لا يكون للصفحة عنوان أو وصف خاص بها.',
+        ],
+        'fields' => [
+            'site_name' => 'اسم الموقع',
+            'site_tagline' => 'الوصف المختصر',
+            'site_logo' => 'شعار الموقع',
+            'contact_phone' => 'رقم الهاتف',
+            'contact_email' => 'البريد الإلكتروني',
+            'contact_address' => 'العنوان',
+            'contact_whatsapp' => 'رقم واتساب',
+            'social_facebook' => 'فيسبوك',
+            'social_instagram' => 'إنستغرام',
+            'social_twitter' => 'إكس (تويتر)',
+            'social_linkedin' => 'لينكدإن',
+            'social_youtube' => 'يوتيوب',
+            'social_tiktok' => 'تيك توك',
+            'social_snapchat' => 'سناب شات',
+            'default_meta_title' => 'عنوان الميتا الافتراضي',
+            'default_meta_description' => 'وصف الميتا الافتراضي',
+        ],
+    ],
+
     'coming_soon' => [
         'lead_sources_title' => 'مصادر العملاء',
         'lead_sources_message' => 'قسم مصادر العملاء — قيد التطوير، قريبًا.',
         'contact_messages_title' => 'رسائل التواصل',
         'contact_messages_message' => 'قسم رسائل التواصل — قيد التطوير، قريبًا.',
-        'settings_title' => 'الإعدادات',
-        'settings_message' => 'قسم الإعدادات — قيد التطوير، قريبًا.',
     ],
 
     'auth' => [

@@ -23,7 +23,7 @@ class HomeController extends Controller
             'contactPhone' => $settings->string('contact_phone'),
             'contactWhatsapp' => $settings->string('contact_whatsapp'),
             'contactEmail' => $settings->string('contact_email'),
-            'contactAddress' => $settings->string('contact_address'),
+            'contactAddress' => $settings->translated('contact_address'),
             'homeServices' => Service::active()->orderByDesc('is_flagship')->orderBy('sort_order')->take(6)->get(),
             'aboutPage' => $aboutPage,
             'aboutExcerpt' => $aboutPage ? $this->firstParagraph($aboutPage->body) : null,

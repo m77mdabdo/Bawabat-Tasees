@@ -46,7 +46,7 @@ class DemoDataSeparationTest extends TestCase
         $this->assertGreaterThan(0, Page::count());
         $this->assertGreaterThan(0, Article::count());
         $this->assertGreaterThan(0, SeoMeta::count());
-        $this->assertDatabaseCount('settings', 10);
+        $this->assertDatabaseCount('settings', 16);
         $this->assertDatabaseCount('lead_sources', 11);
         $this->assertDatabaseCount('tracking_settings', 6);
     }

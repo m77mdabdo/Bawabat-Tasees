@@ -49,9 +49,14 @@ class AppServiceProvider extends ServiceProvider
         // render purely to populate a menu that has since become a plain
         // link to the services index.
         View::composer('layouts.public', function ($view) {
+            $settings = app(SettingsRepository::class);
+
             $view->with([
-                'navWhatsapp' => app(SettingsRepository::class)->string('contact_whatsapp'),
+                'navWhatsapp' => $settings->string('contact_whatsapp'),
                 'menu' => $this->publicMenu(),
+                'siteName' => $settings->translated('site_name') ?? __('site.brand.name'),
+                'siteLogo' => $settings->string('site_logo'),
+                'socialLinks' => $this->socialLinks($settings),
             ]);
         });
     }
@@ -71,5 +76,27 @@ class AppServiceProvider extends ServiceProvider
             ->ordered()
             ->with(['visibleChildren'])
             ->get();
+    }
+
+    /**
+     * Configured social links only, keyed by platform. The settings table
+     * holds a row per platform whether or not it is set, so the blanks are
+     * dropped here rather than in the view.
+     *
+     * @return array<string, string>
+     */
+    private function socialLinks(SettingsRepository $settings): array
+    {
+        $links = [];
+
+        foreach (['facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'tiktok', 'snapchat'] as $platform) {
+            $url = $settings->string('social_'.$platform);
+
+            if ($url !== null) {
+                $links[$platform] = $url;
+            }
+        }
+
+        return $links;
     }
 }

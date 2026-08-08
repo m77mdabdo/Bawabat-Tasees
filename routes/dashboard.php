@@ -15,6 +15,7 @@ use App\Http\Controllers\Dashboard\PageController;
 use App\Http\Controllers\Dashboard\PageSectionController;
 use App\Http\Controllers\Dashboard\ReportController;
 use App\Http\Controllers\Dashboard\ServiceController;
+use App\Http\Controllers\Dashboard\SettingsController;
 use App\Http\Controllers\Dashboard\TestimonialController;
 use App\Http\Controllers\Dashboard\TrackingSettingController;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,12 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         Route::patch('comments/{comment}/approve', [CommentController::class, 'approve'])->name('comments.approve');
         Route::patch('comments/{comment}/reject', [CommentController::class, 'reject'])->name('comments.reject');
 
+        // Site-wide settings: a fixed-key form like tracking-settings,
+        // not a CRUD resource — rows are seeded, never created or deleted
+        // from the dashboard.
+        Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
+        Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+
         // Single fixed-key settings form, not a list/CRUD resource — only
         // 6 rows exist and are never created/deleted from the dashboard.
         Route::get('tracking-settings', [TrackingSettingController::class, 'edit'])->name('tracking-settings.edit');
@@ -76,7 +83,7 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         // 'dashboardlocale' middleware runs, so an eager __() call here
         // would always resolve in the app's boot-time locale ('ar')
         // regardless of the admin's toggle.
-        $comingSoonSlugs = ['lead-sources', 'contact-messages', 'settings'];
+        $comingSoonSlugs = ['lead-sources', 'contact-messages'];
 
         foreach ($comingSoonSlugs as $slug) {
             $key = str_replace('-', '_', $slug);

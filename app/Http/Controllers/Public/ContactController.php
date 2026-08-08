@@ -23,7 +23,7 @@ class ContactController extends Controller
             'contactPhone' => $this->settings->string('contact_phone'),
             'contactWhatsapp' => $this->settings->string('contact_whatsapp'),
             'contactEmail' => $this->settings->string('contact_email'),
-            'contactAddress' => $this->settings->string('contact_address'),
+            'contactAddress' => $this->settings->translated('contact_address'),
         ]);
     }
 

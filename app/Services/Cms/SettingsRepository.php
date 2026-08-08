@@ -42,6 +42,41 @@ class SettingsRepository
     }
 
     /**
+     * A bilingual setting in the current locale, falling back to Arabic —
+     * the same fallback rule HasTranslations applies to model fields, so
+     * a setting with no English value shows its Arabic one rather than
+     * rendering blank.
+     *
+     * Tolerates a plain string too, so a value that has not yet been
+     * converted to the {ar, en} shape still renders.
+     */
+    public function translated(string $key, ?string $locale = null): ?string
+    {
+        $value = $this->get($key);
+
+        if (is_string($value)) {
+            return trim($value) !== '' ? $value : null;
+        }
+
+        if (! is_array($value)) {
+            return null;
+        }
+
+        $locale ??= app()->getLocale();
+        $fallback = config('app.fallback_locale', 'ar');
+
+        foreach ([$locale, $fallback] as $candidate) {
+            $candidateValue = $value[$candidate] ?? null;
+
+            if (is_string($candidateValue) && trim($candidateValue) !== '') {
+                return $candidateValue;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return Collection<string, mixed>
      */
     public function all(): Collection

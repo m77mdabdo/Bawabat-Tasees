@@ -127,13 +127,12 @@ class DashboardHomeTest extends TestCase
 
     public static function comingSoonRoutes(): array
     {
-        // campaigns and reports are no longer here — both became real
-        // sections, covered by CampaignControllerTest and
-        // ReportControllerTest instead.
+        // campaigns, reports and settings are no longer here — all three
+        // became real sections, covered by CampaignControllerTest,
+        // ReportControllerTest and SettingsControllerTest instead.
         return [
             'lead-sources' => ['dashboard.lead-sources.index', 'قسم مصادر العملاء'],
             'contact-messages' => ['dashboard.contact-messages.index', 'قسم رسائل التواصل'],
-            'settings' => ['dashboard.settings.index', 'قسم الإعدادات'],
         ];
     }
 

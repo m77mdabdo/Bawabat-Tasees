@@ -21,7 +21,7 @@ class SeedersTest extends TestCase
 
         $this->assertSame(1, User::where('is_admin', true)->count());
         $this->assertSame(11, LeadSource::count());
-        $this->assertSame(10, Setting::count());
+        $this->assertSame(16, Setting::count());
         $this->assertSame(6, TrackingSetting::count());
         $this->assertSame(0, TrackingSetting::where('is_active', true)->count());
     }
@@ -33,7 +33,7 @@ class SeedersTest extends TestCase
 
         $this->assertSame(1, User::where('is_admin', true)->count());
         $this->assertSame(11, LeadSource::count());
-        $this->assertSame(10, Setting::count());
+        $this->assertSame(16, Setting::count());
         $this->assertSame(6, TrackingSetting::count());
     }
 

@@ -194,6 +194,7 @@ return [
     ],
 
     'flash' => [
+        'settings_updated' => 'Site settings saved.',
         'menu_item_created' => 'Navigation item created.',
         'menu_item_updated' => 'Navigation item updated.',
         'menu_item_deleted' => 'Navigation item deleted.',
@@ -538,13 +539,52 @@ return [
         ],
     ],
 
+    'settings' => [
+        'title' => 'Site settings',
+        'subtitle' => 'The global details shown across the site.',
+        'save' => 'Save settings',
+        'current_logo' => 'Current logo',
+        'logo_hint' => 'Leave empty to keep the current logo. Preferred size 512x512 pixels.',
+        'optional_hint' => 'Leave empty to hide it from the site.',
+        'groups' => [
+            'general' => 'General',
+            'contact' => 'Contact details',
+            'whatsapp' => 'WhatsApp',
+            'social' => 'Social links',
+            'seo_defaults' => 'SEO defaults',
+        ],
+        'group_hints' => [
+            'general' => 'The site name, logo and short tagline.',
+            'contact' => 'Shown on the homepage and the contact page.',
+            'whatsapp' => 'The number used by the floating WhatsApp button.',
+            'social' => 'Shown in the site footer. Empty fields are not rendered at all.',
+            'seo_defaults' => 'Used when a page has no title or description of its own.',
+        ],
+        'fields' => [
+            'site_name' => 'Site name',
+            'site_tagline' => 'Tagline',
+            'site_logo' => 'Site logo',
+            'contact_phone' => 'Phone number',
+            'contact_email' => 'Email address',
+            'contact_address' => 'Address',
+            'contact_whatsapp' => 'WhatsApp number',
+            'social_facebook' => 'Facebook',
+            'social_instagram' => 'Instagram',
+            'social_twitter' => 'X (Twitter)',
+            'social_linkedin' => 'LinkedIn',
+            'social_youtube' => 'YouTube',
+            'social_tiktok' => 'TikTok',
+            'social_snapchat' => 'Snapchat',
+            'default_meta_title' => 'Default meta title',
+            'default_meta_description' => 'Default meta description',
+        ],
+    ],
+
     'coming_soon' => [
         'lead_sources_title' => 'Lead Sources',
         'lead_sources_message' => 'Lead sources — coming soon.',
         'contact_messages_title' => 'Contact Messages',
         'contact_messages_message' => 'Contact messages — coming soon.',
-        'settings_title' => 'Settings',
-        'settings_message' => 'Settings — coming soon.',
     ],
 
     'auth' => [

@@ -108,7 +108,7 @@
             {{ __('dashboard.sidebar.reports') }}
         </x-dashboard.nav-link>
 
-        <x-dashboard.nav-link :href="route('dashboard.settings.index')" :active="request()->routeIs('dashboard.settings.*')">
+        <x-dashboard.nav-link :href="route('dashboard.settings.edit')" :active="request()->routeIs('dashboard.settings.*')">
             <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                 <circle cx="12" cy="12" r="3" />
                 <circle cx="12" cy="12" r="8" stroke-dasharray="2 3" />

@@ -182,13 +182,17 @@
         <footer class="bg-dark-green text-white">
             <div class="max-w-7xl mx-auto px-4 pb-24 pt-12 sm:px-6 lg:px-8">
                 <img
-                    src="{{ asset('images/brand/logo-full-white-256.png') }}"
-                    alt="{{ __('site.brand.name') }}"
+                    src="{{ $siteLogo ? Illuminate\Support\Facades\Storage::url($siteLogo) : asset('images/brand/logo-full-white-256.png') }}"
+                    alt="{{ $siteName }}"
                     class="h-10 w-auto mb-4"
                 >
                 <p class="text-sm text-white/70">
-                    &copy; {{ now()->year }} {{ __('site.brand.name') }}. {{ __('site.footer.rights') }}
+                    &copy; {{ now()->year }} {{ $siteName }}. {{ __('site.footer.rights') }}
                 </p>
+
+                {{-- Renders only the socials an admin has actually filled
+                     in; see components/public/social-links. --}}
+                <x-public.social-links :links="$socialLinks" />
 
                 <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
                     <a href="{{ lroute('pages.privacy-policy') }}" class="text-white/70 underline hover:text-white">
