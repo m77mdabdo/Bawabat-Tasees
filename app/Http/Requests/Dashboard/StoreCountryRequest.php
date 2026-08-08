@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Dashboard;
 
+use App\Http\Requests\Concerns\HasSeoMetaRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCountryRequest extends FormRequest
 {
+    use HasSeoMetaRules;
+
     /**
      * Route-level ['auth', 'admin'] middleware already gates every
      * dashboard route, so authorization here is intentionally a pass-through.
@@ -30,6 +33,6 @@ class StoreCountryRequest extends FormRequest
             'notes' => ['nullable', 'array'],
             'notes.ar' => ['nullable', 'string', 'max:2000'],
             'notes.en' => ['nullable', 'string', 'max:2000'],
-        ];
+        ] + $this->seoMetaRules();
     }
 }

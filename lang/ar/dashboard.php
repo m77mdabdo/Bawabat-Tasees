@@ -363,6 +363,19 @@ return [
         'example_tiktok' => 'مثال: XXXXXXXXXXXXXXXXXX',
     ],
 
+    'seo' => [
+        'section_heading' => 'تحسين محركات البحث (SEO)',
+        'section_hint' => 'اختياري. إذا تُرك فارغاً، يستخدم الموقع عنوان المحتوى ومقتطفه تلقائياً.',
+        'meta_title_ar' => 'عنوان الميتا (عربي)',
+        'meta_title_en' => 'عنوان الميتا (إنجليزي)',
+        'meta_description_ar' => 'وصف الميتا (عربي)',
+        'meta_description_en' => 'وصف الميتا (إنجليزي)',
+        'og_image' => 'صورة المشاركة (Open Graph)',
+        'og_image_hint' => 'تظهر عند مشاركة الرابط على وسائل التواصل. المقاس المفضل 1200×630 بكسل.',
+        'canonical_url' => 'الرابط الأساسي (Canonical)',
+        'canonical_url_hint' => 'اتركه فارغاً ليستخدم رابط الصفحة الحالي.',
+    ],
+
     'coming_soon' => [
         'campaigns_title' => 'الحملات',
         'campaigns_message' => 'قسم الحملات التسويقية — قيد التطوير، قريبًا.',

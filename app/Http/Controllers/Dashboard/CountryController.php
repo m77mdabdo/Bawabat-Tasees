@@ -7,13 +7,15 @@ use App\Http\Requests\Dashboard\StoreCountryRequest;
 use App\Http\Requests\Dashboard\UpdateCountryRequest;
 use App\Models\Country;
 use App\Services\Cms\ContentPublishingService;
+use App\Services\Seo\SeoMetaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class CountryController extends Controller
 {
     public function __construct(
-        private readonly ContentPublishingService $contentPublishingService
+        private readonly ContentPublishingService $contentPublishingService,
+        private readonly SeoMetaService $seoMetaService,
     ) {}
 
     public function index(): View
@@ -30,7 +32,7 @@ class CountryController extends Controller
 
     public function store(StoreCountryRequest $request): RedirectResponse
     {
-        $data = $request->safe()->except(['flag_image']);
+        $data = $request->safe()->except(['flag_image', 'seo', 'seo_og_image']);
 
         if ($request->hasFile('flag_image')) {
             $data['flag_image'] = $this->contentPublishingService->storeImage(
@@ -39,7 +41,13 @@ class CountryController extends Controller
             );
         }
 
-        Country::create($data);
+        $country = Country::create($data);
+
+        $this->seoMetaService->persist(
+            $country,
+            $request->validated('seo', []),
+            $request->file('seo_og_image')
+        );
 
         return redirect()
             ->route('dashboard.countries.index')
@@ -53,7 +61,7 @@ class CountryController extends Controller
 
     public function update(UpdateCountryRequest $request, Country $country): RedirectResponse
     {
-        $data = $request->safe()->except(['flag_image']);
+        $data = $request->safe()->except(['flag_image', 'seo', 'seo_og_image']);
 
         if ($request->hasFile('flag_image')) {
             $data['flag_image'] = $this->contentPublishingService->replaceImage(
@@ -65,6 +73,12 @@ class CountryController extends Controller
 
         $country->update($data);
 
+        $this->seoMetaService->persist(
+            $country,
+            $request->validated('seo', []),
+            $request->file('seo_og_image')
+        );
+
         return redirect()
             ->route('dashboard.countries.index')
             ->with('status', __('dashboard.flash.country_updated'));
@@ -72,6 +86,11 @@ class CountryController extends Controller
 
     public function destroy(Country $country): RedirectResponse
     {
+        // Country hard-deletes, so its SeoMeta row (and any uploaded
+        // OG image) would otherwise be orphaned — morphOne has no
+        // DB-level cascade.
+        $this->seoMetaService->purge($country);
+
         $country->delete();
 
         return redirect()

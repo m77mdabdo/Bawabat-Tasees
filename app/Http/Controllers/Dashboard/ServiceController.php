@@ -7,13 +7,15 @@ use App\Http\Requests\Dashboard\StoreServiceRequest;
 use App\Http\Requests\Dashboard\UpdateServiceRequest;
 use App\Models\Service;
 use App\Services\Cms\ContentPublishingService;
+use App\Services\Seo\SeoMetaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class ServiceController extends Controller
 {
     public function __construct(
-        private readonly ContentPublishingService $contentPublishingService
+        private readonly ContentPublishingService $contentPublishingService,
+        private readonly SeoMetaService $seoMetaService,
     ) {}
 
     public function index(): View
@@ -30,7 +32,7 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request): RedirectResponse
     {
-        $data = $request->safe()->except(['cover_image']);
+        $data = $request->safe()->except(['cover_image', 'seo', 'seo_og_image']);
 
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $this->contentPublishingService->storeImage(
@@ -39,7 +41,13 @@ class ServiceController extends Controller
             );
         }
 
-        Service::create($data);
+        $service = Service::create($data);
+
+        $this->seoMetaService->persist(
+            $service,
+            $request->validated('seo', []),
+            $request->file('seo_og_image')
+        );
 
         return redirect()
             ->route('dashboard.services.index')
@@ -53,7 +61,7 @@ class ServiceController extends Controller
 
     public function update(UpdateServiceRequest $request, Service $service): RedirectResponse
     {
-        $data = $request->safe()->except(['cover_image']);
+        $data = $request->safe()->except(['cover_image', 'seo', 'seo_og_image']);
 
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $this->contentPublishingService->replaceImage(
@@ -64,6 +72,12 @@ class ServiceController extends Controller
         }
 
         $service->update($data);
+
+        $this->seoMetaService->persist(
+            $service,
+            $request->validated('seo', []),
+            $request->file('seo_og_image')
+        );
 
         return redirect()
             ->route('dashboard.services.index')

@@ -13,7 +13,9 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('dashboard.pages.update', $page) }}">
+                {{-- enctype added when the SEO section introduced the first
+                     file upload (the Open Graph image) to this form. --}}
+                <form method="POST" action="{{ route('dashboard.pages.update', $page) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -77,6 +79,8 @@
                                 <span class="ms-2 text-sm text-gray-600">{{ __('dashboard.pages.published_label') }}</span>
                             </label>
                         </div>
+
+                        @include('dashboard._seo-fields', ['seoOwner' => $page])
                     </div>
 
                     <div class="flex items-center justify-end gap-4 mt-6">
