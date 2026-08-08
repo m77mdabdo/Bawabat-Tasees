@@ -484,6 +484,8 @@ return [
     ],
 
     'auth' => [
+        'show_password' => 'إظهار كلمة المرور',
+        'hide_password' => 'إخفاء كلمة المرور',
         'email' => 'البريد الإلكتروني',
         'password' => 'كلمة المرور',
         'remember_me' => 'تذكرني',

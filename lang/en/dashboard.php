@@ -481,6 +481,8 @@ return [
     ],
 
     'auth' => [
+        'show_password' => 'Show password',
+        'hide_password' => 'Hide password',
         'email' => 'Email',
         'password' => 'Password',
         'remember_me' => 'Remember me',

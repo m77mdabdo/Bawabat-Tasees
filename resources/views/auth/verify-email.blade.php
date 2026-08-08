@@ -1,31 +1,19 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
+    <p class="text-sm leading-relaxed text-text-secondary">
         {{ __('dashboard.auth.verify_email_intro') }}
-    </div>
+    </p>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('dashboard.auth.verify_email_sent') }}
-        </div>
+        <x-auth-session-status class="mt-6" :status="__('dashboard.auth.verify_email_sent')" />
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
-        <form method="POST" action="{{ route('verification.send') }}">
-            @csrf
+    <form method="POST" action="{{ route('verification.send') }}" class="mt-6">
+        @csrf
+        <x-auth.button>{{ __('dashboard.auth.resend_verification_email') }}</x-auth.button>
+    </form>
 
-            <div>
-                <x-primary-button>
-                    {{ __('dashboard.auth.resend_verification_email') }}
-                </x-primary-button>
-            </div>
-        </form>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('dashboard.auth.logout') }}
-            </button>
-        </form>
-    </div>
+    <form method="POST" action="{{ route('logout') }}" class="mt-4 text-center">
+        @csrf
+        <x-auth.link-button>{{ __('dashboard.auth.logout') }}</x-auth.link-button>
+    </form>
 </x-guest-layout>
