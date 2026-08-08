@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             TestimonialSeeder::class,
             ArticleSeeder::class,
+            // Last of the content seeders: it derives its values from the
+            // Pages and Articles the seeders above have just created.
+            SeoMetaSeeder::class,
         ]);
 
         // The content seeders above author Arabic only — English comes
