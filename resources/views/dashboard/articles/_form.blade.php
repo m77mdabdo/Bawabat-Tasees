@@ -14,7 +14,7 @@
         @if ($isEdit && $article->cover_image)
             <img src="{{ Illuminate\Support\Facades\Storage::url($article->cover_image) }}" alt="" class="h-20 mb-2 rounded">
         @endif
-        <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-gray-700">
+        <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-text-main">
         <x-input-error :messages="$errors->get('cover_image')" class="mt-2" />
     </div>
 
@@ -34,12 +34,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <x-input-label for="excerpt_ar" :value="__('dashboard.articles.excerpt_ar')" />
-            <textarea id="excerpt_ar" name="excerpt[ar]" dir="rtl" rows="2" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('excerpt.ar', $isEdit ? $article->getTranslation('excerpt', 'ar') : '') }}</textarea>
+            <textarea id="excerpt_ar" name="excerpt[ar]" dir="rtl" rows="2" class="mt-1 block w-full border-border-default focus:border-primary-green focus:ring-primary-green rounded-md shadow-sm">{{ old('excerpt.ar', $isEdit ? $article->getTranslation('excerpt', 'ar') : '') }}</textarea>
             <x-input-error :messages="$errors->get('excerpt.ar')" class="mt-2" />
         </div>
         <div>
             <x-input-label for="excerpt_en" :value="__('dashboard.articles.excerpt_en')" />
-            <textarea id="excerpt_en" name="excerpt[en]" rows="2" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('excerpt.en', $isEdit ? $article->getTranslation('excerpt', 'en') : '') }}</textarea>
+            <textarea id="excerpt_en" name="excerpt[en]" rows="2" class="mt-1 block w-full border-border-default focus:border-primary-green focus:ring-primary-green rounded-md shadow-sm">{{ old('excerpt.en', $isEdit ? $article->getTranslation('excerpt', 'en') : '') }}</textarea>
             <x-input-error :messages="$errors->get('excerpt.en')" class="mt-2" />
         </div>
     </div>
@@ -47,12 +47,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <x-input-label for="body_ar" :value="__('dashboard.articles.body_ar_hint')" />
-            <textarea id="body_ar" name="body[ar]" dir="rtl" rows="10" class="mt-1 block w-full font-mono text-base sm:text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('body.ar', $isEdit ? $article->getTranslation('body', 'ar') : '') }}</textarea>
+            <textarea id="body_ar" name="body[ar]" dir="rtl" rows="10" class="mt-1 block w-full font-mono text-base sm:text-sm border-border-default focus:border-primary-green focus:ring-primary-green rounded-md shadow-sm">{{ old('body.ar', $isEdit ? $article->getTranslation('body', 'ar') : '') }}</textarea>
             <x-input-error :messages="$errors->get('body.ar')" class="mt-2" />
         </div>
         <div>
             <x-input-label for="body_en" :value="__('dashboard.articles.body_en_hint')" />
-            <textarea id="body_en" name="body[en]" rows="10" class="mt-1 block w-full font-mono text-base sm:text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('body.en', $isEdit ? $article->getTranslation('body', 'en') : '') }}</textarea>
+            <textarea id="body_en" name="body[en]" rows="10" class="mt-1 block w-full font-mono text-base sm:text-sm border-border-default focus:border-primary-green focus:ring-primary-green rounded-md shadow-sm">{{ old('body.en', $isEdit ? $article->getTranslation('body', 'en') : '') }}</textarea>
             <x-input-error :messages="$errors->get('body.en')" class="mt-2" />
         </div>
     </div>
@@ -66,8 +66,8 @@
     <div class="flex items-center gap-6">
         <label class="inline-flex items-center">
             <input type="hidden" name="is_published" value="0">
-            <input type="checkbox" name="is_published" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm" {{ old('is_published', $isEdit ? $article->is_published : false) ? 'checked' : '' }}>
-            <span class="ms-2 text-sm text-gray-600">{{ __('dashboard.articles.published_label') }}</span>
+            <input type="checkbox" name="is_published" value="1" class="rounded border-border-default text-primary-green shadow-sm" {{ old('is_published', $isEdit ? $article->is_published : false) ? 'checked' : '' }}>
+            <span class="ms-2 text-sm text-text-secondary">{{ __('dashboard.articles.published_label') }}</span>
         </label>
     </div>
 

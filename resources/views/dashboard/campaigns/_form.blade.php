@@ -14,7 +14,7 @@
         <div>
             <x-input-label for="platform" :value="__('dashboard.campaigns.platform')" />
             <select id="platform" name="platform"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">
                 <option value="">{{ __('dashboard.campaigns.platform_none') }}</option>
                 @foreach (App\Models\Campaign::PLATFORMS as $platform)
                     <option value="{{ $platform }}" @selected(old('platform', $isEdit ? $campaign->platform : '') === $platform)>
@@ -73,16 +73,16 @@
     <div>
         <x-input-label for="notes" :value="__('dashboard.campaigns.notes')" />
         <textarea id="notes" name="notes" rows="3"
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes', $isEdit ? $campaign->notes : '') }}</textarea>
+            class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">{{ old('notes', $isEdit ? $campaign->notes : '') }}</textarea>
         <x-input-error :messages="$errors->get('notes')" class="mt-2" />
     </div>
 
     <div class="flex items-center gap-6">
         <label class="inline-flex items-center">
             <input type="hidden" name="is_active" value="0">
-            <input type="checkbox" name="is_active" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm"
+            <input type="checkbox" name="is_active" value="1" class="rounded border-border-default text-primary-green shadow-sm"
                 {{ old('is_active', $isEdit ? $campaign->is_active : true) ? 'checked' : '' }}>
-            <span class="ms-2 text-sm text-gray-600">{{ __('dashboard.campaigns.active_label') }}</span>
+            <span class="ms-2 text-sm text-text-secondary">{{ __('dashboard.campaigns.active_label') }}</span>
         </label>
     </div>
 </div>

@@ -21,7 +21,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('dashboard.settings.title') }}</h2>
+            <h2 class="font-semibold text-xl text-text-main leading-tight">{{ __('dashboard.settings.title') }}</h2>
             <p class="mt-1 text-sm text-text-secondary">{{ __('dashboard.settings.subtitle') }}</p>
         </div>
     </x-slot>
@@ -78,7 +78,7 @@
                                                 alt="{{ __('dashboard.settings.current_logo') }}" class="mb-2 mt-1 h-16 w-auto">
                                         @endif
                                         <input id="{{ $key }}" name="{{ $key }}" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml"
-                                            class="mt-1 block w-full text-sm text-gray-700">
+                                            class="mt-1 block w-full text-sm text-text-main">
                                         <p class="mt-1 text-xs text-text-secondary">{{ __('dashboard.settings.logo_hint') }}</p>
                                         <x-input-error :messages="$errors->get($key)" class="mt-2" />
                                     </div>

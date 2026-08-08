@@ -7,8 +7,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $campaign->name }}</h2>
-            <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="text-sm text-indigo-600 hover:underline">{{ __('dashboard.common.edit') }}</a>
+            <h2 class="font-semibold text-xl text-text-main leading-tight">{{ $campaign->name }}</h2>
+            <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="text-sm text-primary-green hover:underline">{{ __('dashboard.common.edit') }}</a>
         </div>
     </x-slot>
 
@@ -84,7 +84,7 @@
                                         <td class="px-4 py-2 text-sm text-text-secondary">{{ $lead->source_platform ?? '—' }}</td>
                                         <td class="px-4 py-2 text-sm text-text-secondary">{{ $lead->created_at->format('Y-m-d') }}</td>
                                         <td class="px-4 py-2 text-end text-sm">
-                                            <a href="{{ route('dashboard.leads.show', $lead) }}" class="text-indigo-600 hover:underline">{{ __('dashboard.leads.view') }}</a>
+                                            <a href="{{ route('dashboard.leads.show', $lead) }}" class="text-primary-green hover:underline">{{ __('dashboard.leads.view') }}</a>
                                         </td>
                                     </tr>
                                 @endforeach

@@ -29,13 +29,13 @@
             <div>
                 <x-input-label for="seo_meta_description_ar" :value="__('dashboard.seo.meta_description_ar')" />
                 <textarea id="seo_meta_description_ar" name="seo[meta_description][ar]" dir="rtl" rows="3"
-                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('seo.meta_description.ar', $seo?->getTranslation('meta_description', 'ar', false)) }}</textarea>
+                    class="mt-1 block w-full border-border-default focus:border-primary-green focus:ring-primary-green rounded-md shadow-sm">{{ old('seo.meta_description.ar', $seo?->getTranslation('meta_description', 'ar', false)) }}</textarea>
                 <x-input-error :messages="$errors->get('seo.meta_description.ar')" class="mt-2" />
             </div>
             <div>
                 <x-input-label for="seo_meta_description_en" :value="__('dashboard.seo.meta_description_en')" />
                 <textarea id="seo_meta_description_en" name="seo[meta_description][en]" rows="3"
-                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('seo.meta_description.en', $seo?->getTranslation('meta_description', 'en', false)) }}</textarea>
+                    class="mt-1 block w-full border-border-default focus:border-primary-green focus:ring-primary-green rounded-md shadow-sm">{{ old('seo.meta_description.en', $seo?->getTranslation('meta_description', 'en', false)) }}</textarea>
                 <x-input-error :messages="$errors->get('seo.meta_description.en')" class="mt-2" />
             </div>
         </div>
@@ -46,7 +46,7 @@
                 <img src="{{ Illuminate\Support\Facades\Storage::url($seo->og_image) }}" alt="" class="h-20 mb-2 rounded">
             @endif
             <input id="seo_og_image" name="seo_og_image" type="file" accept="image/jpeg,image/png,image/webp"
-                class="mt-1 block w-full text-sm text-gray-700">
+                class="mt-1 block w-full text-sm text-text-main">
             <p class="mt-1 text-xs text-text-secondary">{{ __('dashboard.seo.og_image_hint') }}</p>
             <x-input-error :messages="$errors->get('seo_og_image')" class="mt-2" />
         </div>

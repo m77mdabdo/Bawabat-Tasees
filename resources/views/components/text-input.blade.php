@@ -1,3 +1,6 @@
 @props(['disabled' => false])
 
-<input @disabled($disabled) {{ $attributes->merge(['class' => 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm']) }}>
+{{-- Brand palette, replacing the Breeze defaults. Shared by every
+     dashboard and profile form, so this one file sets the look of all of
+     them. --}}
+<input @disabled($disabled) {{ $attributes->merge(['class' => 'rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green']) }}>

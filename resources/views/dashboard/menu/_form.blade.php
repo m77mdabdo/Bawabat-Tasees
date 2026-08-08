@@ -24,7 +24,7 @@
     <div>
         <x-input-label for="link_type" :value="__('dashboard.menu.link_type')" />
         <select id="link_type" name="link_type" x-model="linkType"
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">
             @foreach (App\Models\MenuItem::LINK_TYPES as $type)
                 <option value="{{ $type }}" @selected($linkType === $type)>
                     {{ __('dashboard.menu.link_types.'.$type) }}
@@ -39,7 +39,7 @@
     <div x-show="linkType === 'route'" x-cloak>
         <x-input-label for="route_name" :value="__('dashboard.menu.route_name')" />
         <select id="route_name" name="route_name"
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">
             <option value="">{{ __('dashboard.menu.route_placeholder') }}</option>
             @foreach ($routes as $name => $friendly)
                 <option value="{{ $name }}" @selected(old('route_name', $isEdit ? $item->route_name : '') === $name)>
@@ -62,7 +62,7 @@
         <div x-show="linkType !== 'none'" x-cloak>
             <x-input-label for="target" :value="__('dashboard.menu.target')" />
             <select id="target" name="target"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">
                 @foreach (App\Models\MenuItem::TARGETS as $target)
                     <option value="{{ $target }}" @selected(old('target', $isEdit ? $item->target : '_self') === $target)>
                         {{ __('dashboard.menu.targets.'.$target) }}
@@ -75,7 +75,7 @@
         <div>
             <x-input-label for="parent_id" :value="__('dashboard.menu.parent')" />
             <select id="parent_id" name="parent_id"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">
                 <option value="">{{ __('dashboard.menu.parent_none') }}</option>
                 @foreach ($parents as $parent)
                     <option value="{{ $parent->id }}" @selected((string) old('parent_id', $isEdit ? $item->parent_id : '') === (string) $parent->id)>
@@ -90,9 +90,9 @@
     <div class="flex items-center gap-6">
         <label class="inline-flex items-center">
             <input type="hidden" name="is_visible" value="0">
-            <input type="checkbox" name="is_visible" value="1" class="rounded border-gray-300 text-primary-green shadow-sm focus:ring-primary-green"
+            <input type="checkbox" name="is_visible" value="1" class="rounded border-border-default text-primary-green shadow-sm focus:ring-primary-green"
                 {{ old('is_visible', $isEdit ? $item->is_visible : true) ? 'checked' : '' }}>
-            <span class="ms-2 text-sm text-gray-600">{{ __('dashboard.menu.visible_label') }}</span>
+            <span class="ms-2 text-sm text-text-secondary">{{ __('dashboard.menu.visible_label') }}</span>
         </label>
     </div>
 </div>

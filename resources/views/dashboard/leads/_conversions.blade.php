@@ -70,7 +70,7 @@
                 <div>
                     <x-input-label for="event_type" :value="__('dashboard.conversions.event_type')" />
                     <select id="event_type" name="event_type" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">
                         @foreach (App\Models\ConversionEvent::TYPES as $type)
                             <option value="{{ $type }}" @selected(old('event_type') === $type)>
                                 {{ __('dashboard.conversions.types.'.$type) }}
@@ -105,7 +105,7 @@
             <div class="mt-4">
                 <x-input-label for="notes" :value="__('dashboard.conversions.notes')" />
                 <textarea id="notes" name="notes" rows="2"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes') }}</textarea>
+                    class="mt-1 block w-full rounded-md border-border-default shadow-sm focus:border-primary-green focus:ring-primary-green">{{ old('notes') }}</textarea>
                 <x-input-error :messages="$errors->get('notes')" class="mt-2" />
             </div>
 

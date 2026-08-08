@@ -16,10 +16,10 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('dashboard.menu.title') }}</h2>
+                <h2 class="font-semibold text-xl text-text-main leading-tight">{{ __('dashboard.menu.title') }}</h2>
                 <p class="mt-1 text-sm text-text-secondary">{{ __('dashboard.menu.subtitle') }}</p>
             </div>
-            <a href="{{ route('dashboard.menu.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+            <a href="{{ route('dashboard.menu.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-green border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-dark-green">
                 {{ __('dashboard.menu.add') }}
             </a>
         </div>
@@ -103,7 +103,7 @@
                                             title="{{ __('dashboard.menu.parent_none') }}">⇤</button>
                                     </div>
 
-                                    <a :href="row.edit" class="text-sm text-indigo-600 hover:text-indigo-900">{{ __('dashboard.common.edit') }}</a>
+                                    <a :href="row.edit" class="text-sm text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
 
                                     <input type="hidden" :name="`items[${index}][id]`" :value="row.id">
                                     <input type="hidden" :name="`items[${index}][parent_id]`" :value="row.parent_id ?? ''">
