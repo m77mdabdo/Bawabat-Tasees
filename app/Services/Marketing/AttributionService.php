@@ -2,6 +2,7 @@
 
 namespace App\Services\Marketing;
 
+use App\Models\Campaign;
 use App\Models\LeadSource;
 use Illuminate\Http\Request;
 
@@ -39,6 +40,8 @@ class AttributionService
             'utm_content' => $latestTouch['utm_content'] ?? null,
             'utm_term' => $latestTouch['utm_term'] ?? null,
             'campaign_id' => $latestTouch['campaign_id'] ?? null,
+            'linked_campaign_id' => $this->resolveCampaign($latestTouch)?->getKey(),
+            'campaign_name' => $this->resolveCampaign($latestTouch)?->name,
             'adset_id' => $latestTouch['adset_id'] ?? null,
             'ad_id' => $latestTouch['ad_id'] ?? null,
             'gclid' => $latestTouch['gclid'] ?? null,
@@ -80,5 +83,46 @@ class AttributionService
         );
 
         return $match?->key ?? $utmSource;
+    }
+
+    /**
+     * Resolves the incoming EXTERNAL campaign id to an internal Campaign
+     * record, so reporting can join on an indexed FK instead of matching
+     * free-text strings at query time.
+     *
+     * Matching is on campaigns.external_campaign_id (unique), falling
+     * back to utm_campaign for platforms that only pass the campaign name
+     * through the URL. No match simply means no link — the raw
+     * campaign_id string is still stored exactly as before, so this
+     * cannot break the existing attribution flow.
+     *
+     * Memoised because resolve() asks for both the key and the name.
+     */
+    private ?Campaign $resolvedCampaign = null;
+
+    private bool $campaignResolved = false;
+
+    private function resolveCampaign(?array $latestTouch): ?Campaign
+    {
+        if ($this->campaignResolved) {
+            return $this->resolvedCampaign;
+        }
+
+        $this->campaignResolved = true;
+
+        $candidates = array_filter([
+            $latestTouch['campaign_id'] ?? null,
+            $latestTouch['utm_campaign'] ?? null,
+        ], fn ($value) => is_string($value) && trim($value) !== '');
+
+        foreach ($candidates as $candidate) {
+            $match = Campaign::where('external_campaign_id', trim($candidate))->first();
+
+            if ($match) {
+                return $this->resolvedCampaign = $match;
+            }
+        }
+
+        return $this->resolvedCampaign = null;
     }
 }
