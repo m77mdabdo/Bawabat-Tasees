@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Dashboard\ArticleController;
+use App\Http\Controllers\Dashboard\CampaignController;
 use App\Http\Controllers\Dashboard\CommentController;
 use App\Http\Controllers\Dashboard\ConversionEventController;
 use App\Http\Controllers\Dashboard\CountryController;
@@ -25,6 +26,7 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         Route::resource('faqs', FaqController::class)->except('show');
         Route::resource('testimonials', TestimonialController::class)->except('show');
         Route::resource('articles', ArticleController::class)->except('show');
+        Route::resource('campaigns', CampaignController::class);
         Route::resource('media', MediaController::class)
             ->only(['index', 'store', 'destroy'])
             ->parameters(['media' => 'media']);
@@ -64,7 +66,7 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         // 'dashboardlocale' middleware runs, so an eager __() call here
         // would always resolve in the app's boot-time locale ('ar')
         // regardless of the admin's toggle.
-        $comingSoonSlugs = ['campaigns', 'lead-sources', 'contact-messages', 'reports', 'settings'];
+        $comingSoonSlugs = ['lead-sources', 'contact-messages', 'reports', 'settings'];
 
         foreach ($comingSoonSlugs as $slug) {
             $key = str_replace('-', '_', $slug);

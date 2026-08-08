@@ -127,8 +127,9 @@ class DashboardHomeTest extends TestCase
 
     public static function comingSoonRoutes(): array
     {
+        // campaigns is no longer here — it became a real CRUD section, so
+        // it is covered by CampaignControllerTest instead.
         return [
-            'campaigns' => ['dashboard.campaigns.index', 'قسم الحملات التسويقية'],
             'lead-sources' => ['dashboard.lead-sources.index', 'قسم مصادر العملاء'],
             'contact-messages' => ['dashboard.contact-messages.index', 'قسم رسائل التواصل'],
             'reports' => ['dashboard.reports.index', 'قسم التقارير'],

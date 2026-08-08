@@ -27,6 +27,7 @@ class Lead extends Model
         'source_platform',
         'campaign_name',
         'campaign_id',
+        'linked_campaign_id',
         'adset_name',
         'adset_id',
         'ad_name',
@@ -67,6 +68,16 @@ class Lead extends Model
     public function requestedService(): BelongsTo
     {
         return $this->belongsTo(Service::class, 'requested_service_id')->withTrashed();
+    }
+
+    /**
+     * The internal Campaign record this lead resolved to, if any.
+     * Separate from the raw campaign_id string written by attribution —
+     * see the 2026_08_08_160000 migration.
+     */
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(Campaign::class, 'linked_campaign_id');
     }
 
     /**
