@@ -386,19 +386,28 @@ Should be `daily` with `LOG_LEVEL=error` (or `warning`).
 
 ### Pre-launch checklist
 
-- [ ] `APP_ENV=production`, `APP_DEBUG=false`
-- [ ] Real `ADMIN_EMAIL` / `ADMIN_PASSWORD`
-- [ ] `SESSION_SECURE_COOKIE=true`, HTTPS enforced
-- [ ] `LOG_STACK=daily`, `LOG_LEVEL=error`
-- [ ] Security headers middleware deployed
-- [ ] Real contact details + social links (needs the Settings UI)
-- [ ] `sitemap.xml` + `Sitemap:` line in `robots.txt`
-- [ ] Custom 404/500 pages
+Items marked ✅ were completed in Batch A (2026-08-08).
+
+- [ ] Copy `.env.example` to the production `.env` and fill real values —
+      it now ships `APP_ENV=production`, `APP_DEBUG=false`,
+      `SESSION_SECURE_COOKIE=true`, `LOG_STACK=daily`, `LOG_LEVEL=warning`
+      and empty `ADMIN_*` ✅ *(defaults prepared; the deploy still has to
+      use them)*
+- [ ] Real `ADMIN_EMAIL` / `ADMIN_PASSWORD` in the production `.env`
+- [ ] HTTPS enforced at the web server / load balancer
+- [x] ✅ Security headers middleware deployed (`app/Http/Middleware/SecurityHeaders.php`)
+- [ ] Real contact details + social links — **still blocked on the
+      Settings UI (Batch B)**; the site currently shows seeded placeholders
+- [x] ✅ `sitemap.xml` generated + absolute `Sitemap:` line in `robots.txt`
+- [x] ✅ Branded bilingual 404 / 403 / 419 / 500 / 503 pages
 - [ ] Demo data NOT loaded (`DemoDataSeeder` is opt-in; verify 0
       testimonials/campaigns/leads/conversions in production)
 - [ ] Legal pages reviewed by a lawyer (seeded copy is starter text)
-- [ ] `php artisan config:cache` + `route:cache` (route caching needs the
-      closure fix above)
+- [ ] `php artisan config:cache` + `route:cache` (route caching still
+      needs the coming-soon closure fix, backlog #15)
+- [ ] Tighten the CSP from Report-Only to enforcing (needs a nonce-based
+      script-src and Alpine's CSP build — see the comment in
+      `SecurityHeaders.php`)
 
 ---
 

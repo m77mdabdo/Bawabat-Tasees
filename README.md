@@ -167,8 +167,12 @@ php artisan content:translate-to-english   # safe to re-run; skips existing Engl
 
 ## Before launch
 
-- Set real `ADMIN_EMAIL` / `ADMIN_PASSWORD`, and `APP_ENV=production` with
-  `APP_DEBUG=false`.
+- Copy `.env.example` — it ships production-safe defaults
+  (`APP_ENV=production`, `APP_DEBUG=false`, `SESSION_SECURE_COOKIE=true`,
+  `LOG_STACK=daily`, `LOG_LEVEL=warning`) — then set real
+  `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+- Serve over HTTPS: the session cookie is secure-only in production, and
+  HSTS is only sent over https.
 - Delete any demo data that reached the environment (Testimonials,
   Campaigns, Leads).
 - Replace the seeded contact/social placeholder values in Settings.
