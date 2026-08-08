@@ -5,7 +5,7 @@
 @endphp
 
 <div class="mt-6">
-    <x-card>
+    <x-card class="p-4 sm:p-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h3 class="text-sm font-semibold text-text-main">

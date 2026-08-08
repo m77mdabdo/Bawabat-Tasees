@@ -18,7 +18,7 @@
                 <div class="p-4 bg-green-100 text-green-800 rounded-md">{{ session('status') }}</div>
             @endif
 
-            <div class="grid grid-cols-2 gap-4 lg:grid-cols-5">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
                 @foreach ([
                     ['label' => __('dashboard.campaigns.leads_count'), 'value' => number_format($leadsCount)],
                     ['label' => __('dashboard.campaigns.conversions_count'), 'value' => number_format($conversionsCount)],
@@ -26,14 +26,14 @@
                     ['label' => __('dashboard.campaigns.spend'), 'value' => $campaign->spend !== null ? number_format($spend, 2) : '—'],
                     ['label' => __('dashboard.campaigns.roi'), 'value' => $roi !== null ? number_format($roi, 2).'×' : '—'],
                 ] as $tile)
-                    <x-card>
+                    <x-card class="p-4 sm:p-6">
                         <p class="text-xs text-text-secondary">{{ $tile['label'] }}</p>
-                        <p class="mt-1 text-2xl font-semibold text-text-main" dir="ltr">{{ $tile['value'] }}</p>
+                        <p class="mt-1 break-words text-xl font-semibold tabular-nums text-text-main sm:text-2xl" dir="ltr">{{ $tile['value'] }}</p>
                     </x-card>
                 @endforeach
             </div>
 
-            <x-card>
+            <x-card class="p-4 sm:p-6">
                 <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     @foreach ([
                         ['label' => __('dashboard.campaigns.platform'), 'value' => $campaign->platform ? __('dashboard.campaigns.platforms.'.$campaign->platform) : null],
@@ -54,7 +54,7 @@
                 @endif
             </x-card>
 
-            <x-card>
+            <x-card class="p-4 sm:p-6">
                 <h3 class="text-sm font-semibold text-text-main">{{ __('dashboard.campaigns.linked_leads') }}</h3>
 
                 @if ($campaign->leads->isEmpty())

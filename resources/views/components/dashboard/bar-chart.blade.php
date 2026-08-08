@@ -33,8 +33,8 @@
             @endphp
             <li>
                 <div class="flex items-baseline justify-between gap-3 text-sm">
-                    <span class="min-w-0 truncate text-text-main">{{ $row['label'] }}</span>
-                    <span class="shrink-0 font-semibold text-text-main" dir="ltr">
+                    <span class="min-w-0 flex-1 truncate text-text-main" title="{{ $row['label'] }}">{{ $row['label'] }}</span>
+                    <span class="shrink-0 font-semibold tabular-nums text-text-main" dir="ltr">
                         {{ $format === 'money' ? number_format($value, 2) : number_format($value) }}
                     </span>
                 </div>

@@ -44,12 +44,12 @@
             <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-text-secondary">
                 {{ __('dashboard.home.needs_attention') }}
             </h3>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 @foreach ($attentionItems as $item)
                     <a href="{{ $item['href'] }}" class="block">
                         <x-card class="p-6 {{ $item['value'] > 0 ? 'border-luxury-gold/40' : '' }}">
                             <p class="text-sm font-medium text-text-secondary">{{ $item['label'] }}</p>
-                            <p class="mt-2 text-3xl font-bold {{ $item['value'] > 0 ? 'text-gold-deep' : 'text-text-main' }}">
+                            <p class="mt-2 break-words text-2xl font-bold tabular-nums sm:text-3xl {{ $item['value'] > 0 ? 'text-gold-deep' : 'text-text-main' }}">
                                 {{ $item['value'] }}
                             </p>
                         </x-card>
@@ -62,12 +62,12 @@
             <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-text-secondary">
                 {{ __('dashboard.home.content_overview') }}
             </h3>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 @foreach ($overviewItems as $item)
                     <a href="{{ $item['href'] }}" class="block">
                         <x-card class="p-6">
                             <p class="text-sm font-medium text-text-secondary">{{ $item['label'] }}</p>
-                            <p class="mt-2 text-3xl font-bold text-primary-green">{{ $item['value'] }}</p>
+                            <p class="mt-2 break-words text-2xl font-bold tabular-nums text-primary-green sm:text-3xl">{{ $item['value'] }}</p>
                         </x-card>
                     </a>
                 @endforeach
@@ -78,12 +78,12 @@
             <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-text-secondary">
                 {{ __('dashboard.home.leads_overview') }}
             </h3>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 @foreach ($leadItems as $item)
                     <a href="{{ $item['href'] }}" class="block">
                         <x-card class="p-6">
                             <p class="text-sm font-medium text-text-secondary">{{ $item['label'] }}</p>
-                            <p class="mt-2 text-3xl font-bold text-primary-green">{{ $item['value'] }}</p>
+                            <p class="mt-2 break-words text-2xl font-bold tabular-nums text-primary-green sm:text-3xl">{{ $item['value'] }}</p>
                         </x-card>
                     </a>
                 @endforeach
