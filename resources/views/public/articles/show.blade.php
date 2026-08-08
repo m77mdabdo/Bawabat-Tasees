@@ -1,4 +1,4 @@
-<x-public-layout :title="$article->title . ' — ' . __('site.brand.name')">
+<x-public-layout :title="$article->title . ' — ' . __('site.brand.name')" :seo-model="$article">
     <article>
         @if ($article->cover_image)
             <div class="h-64 w-full overflow-hidden sm:h-96">

@@ -1,4 +1,4 @@
-<x-public-layout :title="$service->name . ' — ' . __('site.brand.name')">
+<x-public-layout :title="$service->name . ' — ' . __('site.brand.name')" :seo-model="$service">
     @if ($service->cover_image)
         <div class="relative h-64 w-full overflow-hidden sm:h-80">
             <img

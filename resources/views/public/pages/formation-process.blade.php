@@ -1,4 +1,4 @@
-<x-public-layout :title="$page->title . ' — ' . __('site.brand.name')">
+<x-public-layout :title="$page->title . ' — ' . __('site.brand.name')" :seo-model="$page">
     <section class="bg-dark-green py-16">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold text-white sm:text-4xl">

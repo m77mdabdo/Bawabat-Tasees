@@ -4,7 +4,19 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ $title ?? __('site.brand.name') }}</title>
+        {{--
+            Emits <title>, meta description, canonical, Open Graph and
+            Twitter card tags. Values resolve through SeoTagService:
+            the record's own SeoMeta row first (admin-authored, per-locale),
+            then the :title/:description passed by the view, then the
+            record's own content, then the seo_defaults settings.
+        --}}
+        <x-seo-tags
+            :model="$seoModel ?? null"
+            :title="$title ?? null"
+            :description="$seoDescription ?? null"
+            :type="$seoType ?? null"
+        />
 
         <link rel="icon" type="image/x-icon" href="{{ asset('images/brand/favicon.ico') }}">
         <link rel="apple-touch-icon" href="{{ asset('images/brand/apple-touch-icon.png') }}">
