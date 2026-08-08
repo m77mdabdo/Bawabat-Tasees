@@ -107,7 +107,7 @@
                         <button
                             type="button"
                             @click="mobileOpen = true"
-                            class="text-text-main hover:text-primary-green lg:hidden"
+                            class="-me-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-text-main transition hover:text-primary-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green lg:hidden"
                             aria-label="{{ __('site.nav.open_menu') }}"
                         >
                             <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -140,7 +140,7 @@
             >
                 <div class="flex h-20 shrink-0 items-center justify-between border-b border-border-default px-6">
                     <img src="{{ asset('images/brand/logo-full-color-256.png') }}" alt="{{ __('site.brand.name') }}" class="h-9 w-auto">
-                    <button type="button" @click="mobileOpen = false" class="text-text-secondary hover:text-text-main" aria-label="{{ __('site.nav.close_menu') }}">
+                    <button type="button" @click="mobileOpen = false" class="-me-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-text-secondary transition hover:text-text-main focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green" aria-label="{{ __('site.nav.close_menu') }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                             <path d="M6 6l12 12M6 18L18 6" />
                         </svg>

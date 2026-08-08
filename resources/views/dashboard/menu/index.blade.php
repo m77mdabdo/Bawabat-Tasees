@@ -88,22 +88,28 @@
                                         </span>
                                     </template>
 
+                                    {{-- 44x44 minimum: these were ~24px, four
+                                         of them side by side, which is a
+                                         mis-tap waiting to happen on a phone. --}}
+                                    @php
+                                        $reorderBtn = 'inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded text-text-secondary transition hover:bg-bg-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green disabled:opacity-30';
+                                    @endphp
                                     <div class="flex items-center gap-1">
                                         <button type="button" @click="moveUp(index)" :disabled="index === 0"
-                                            class="rounded p-1 text-text-secondary hover:bg-bg-soft disabled:opacity-30"
+                                            class="{{ $reorderBtn }}"
                                             title="{{ __('dashboard.menu.move_up') }}" aria-label="{{ __('dashboard.menu.move_up') }}">▲</button>
                                         <button type="button" @click="moveDown(index)" :disabled="index === rows.length - 1"
-                                            class="rounded p-1 text-text-secondary hover:bg-bg-soft disabled:opacity-30"
+                                            class="{{ $reorderBtn }}"
                                             title="{{ __('dashboard.menu.move_down') }}" aria-label="{{ __('dashboard.menu.move_down') }}">▼</button>
                                         <button type="button" @click="indent(index)" :disabled="! canIndent(index)"
-                                            class="rounded p-1 text-text-secondary hover:bg-bg-soft disabled:opacity-30"
-                                            title="{{ __('dashboard.menu.parent') }}">⇥</button>
+                                            class="{{ $reorderBtn }}"
+                                            title="{{ __('dashboard.menu.parent') }}" aria-label="{{ __('dashboard.menu.parent') }}">⇥</button>
                                         <button type="button" @click="outdent(index)" :disabled="! row.parent_id"
-                                            class="rounded p-1 text-text-secondary hover:bg-bg-soft disabled:opacity-30"
-                                            title="{{ __('dashboard.menu.parent_none') }}">⇤</button>
+                                            class="{{ $reorderBtn }}"
+                                            title="{{ __('dashboard.menu.parent_none') }}" aria-label="{{ __('dashboard.menu.parent_none') }}">⇤</button>
                                     </div>
 
-                                    <a :href="row.edit" class="text-sm text-primary-green hover:text-dark-green">{{ __('dashboard.common.edit') }}</a>
+                                    <a :href="row.edit" class="inline-flex min-h-[44px] items-center px-2 text-sm text-primary-green hover:text-dark-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green">{{ __('dashboard.common.edit') }}</a>
 
                                     <input type="hidden" :name="`items[${index}][id]`" :value="row.id">
                                     <input type="hidden" :name="`items[${index}][parent_id]`" :value="row.parent_id ?? ''">
@@ -127,7 +133,7 @@
                                 <form method="POST" action="{{ route('dashboard.menu.visibility', $menuItem) }}">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="rounded-md border border-border-default px-3 py-1 text-xs font-medium text-text-main hover:border-primary-green hover:text-primary-green">
+                                    <button type="submit" class="inline-flex min-h-[44px] items-center rounded-md border border-border-default px-4 text-xs font-medium text-text-main transition hover:border-primary-green hover:text-primary-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green">
                                         {{ $menuItem->is_visible ? __('dashboard.menu.hide') : __('dashboard.menu.show') }}
                                     </button>
                                 </form>
@@ -136,7 +142,7 @@
                                     onsubmit="return confirm('{{ $menuItem->is_system ? __('dashboard.menu.confirm_delete_system') : __('dashboard.menu.confirm_delete') }}');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-xs font-semibold text-red-600 hover:underline">
+                                    <button type="submit" class="inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-red-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
                                         {{ __('dashboard.common.delete') }}
                                     </button>
                                 </form>

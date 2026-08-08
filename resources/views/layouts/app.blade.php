@@ -27,7 +27,7 @@
                     <button
                         type="button"
                         @click="sidebarOpen = true"
-                        class="text-text-secondary hover:text-text-main lg:hidden"
+                        class="-ms-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-text-secondary transition hover:text-text-main focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green lg:hidden"
                         aria-label="{{ __('dashboard.topbar.open_menu') }}"
                     >
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
