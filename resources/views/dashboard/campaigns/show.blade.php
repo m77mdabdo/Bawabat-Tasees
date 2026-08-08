@@ -8,7 +8,7 @@
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="min-w-0 break-words font-semibold text-xl text-text-main leading-tight">{{ $campaign->name }}</h2>
-            <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="text-sm text-primary-green hover:underline">{{ __('dashboard.common.edit') }}</a>
+            <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="dash-action text-sm text-primary-green hover:underline">{{ __('dashboard.common.edit') }}</a>
         </div>
     </x-slot>
 
@@ -63,7 +63,7 @@
                     </p>
                 @else
                     <div class="mt-4 overflow-x-auto">
-                        <table class="min-w-full divide-y divide-border-default">
+                        <table class="dash-table-stacked min-w-full divide-y divide-border-default">
                             <thead>
                                 <tr>
                                     <th class="px-4 py-2 text-start text-xs font-medium uppercase text-text-secondary">{{ __('dashboard.leads.name') }}</th>
@@ -75,16 +75,16 @@
                             <tbody class="divide-y divide-border-default">
                                 @foreach ($campaign->leads as $lead)
                                     <tr>
-                                        <td class="px-4 py-2 text-sm text-text-main">
+                                        <td data-label="{{ __('dashboard.leads.name') }}" class="px-4 py-2 text-sm text-text-main">
                                             {{ $lead->full_name }}
                                             @if ($lead->isConverted())
                                                 <span class="ms-2 rounded-full bg-primary-green/10 px-2 py-0.5 text-xs font-semibold text-primary-green">{{ __('dashboard.conversions.converted_badge') }}</span>
                                             @endif
                                         </td>
-                                        <td class="px-4 py-2 text-sm text-text-secondary">{{ $lead->source_platform ?? '—' }}</td>
-                                        <td class="px-4 py-2 text-sm text-text-secondary">{{ $lead->created_at->format('Y-m-d') }}</td>
+                                        <td data-label="{{ __('dashboard.leads.source') }}" class="px-4 py-2 text-sm text-text-secondary">{{ $lead->source_platform ?? '—' }}</td>
+                                        <td data-label="{{ __('dashboard.leads.received_at') }}" class="px-4 py-2 text-sm text-text-secondary">{{ $lead->created_at->format('Y-m-d') }}</td>
                                         <td class="px-4 py-2 text-end text-sm">
-                                            <a href="{{ route('dashboard.leads.show', $lead) }}" class="text-primary-green hover:underline">{{ __('dashboard.leads.view') }}</a>
+                                            <a href="{{ route('dashboard.leads.show', $lead) }}" class="dash-action text-primary-green hover:underline">{{ __('dashboard.leads.view') }}</a>
                                         </td>
                                     </tr>
                                 @endforeach
