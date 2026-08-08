@@ -33,6 +33,21 @@ return [
         'switch_to_arabic' => 'العربية',
     ],
 
+    'errors' => [
+        'back_home' => 'Back to home',
+        'contact_us' => 'Contact us',
+        'not_found_title' => 'Page not found',
+        'not_found_message' => 'The page you asked for is not available or has moved. Check the address, or head back to the homepage.',
+        'server_error_title' => 'Something went wrong',
+        'server_error_message' => 'Sorry — that is a problem on our side. It has been logged and we are looking into it. Please try again shortly.',
+        'forbidden_title' => 'You do not have access',
+        'forbidden_message' => 'This page needs permissions your account does not have.',
+        'expired_title' => 'Your session expired',
+        'expired_message' => 'The page expired for security reasons. Please refresh and try again.',
+        'maintenance_title' => 'Down for maintenance',
+        'maintenance_message' => 'We are making some updates. We will be back shortly.',
+    ],
+
     'footer' => [
         'rights' => 'All rights reserved.',
         'privacy_link' => 'Privacy Policy',
