@@ -263,6 +263,7 @@ return [
 
     'topbar' => [
         'open_menu' => 'Open menu',
+        'close_menu' => 'Close menu',
         'profile' => 'Profile',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'عربي',

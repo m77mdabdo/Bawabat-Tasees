@@ -3,14 +3,50 @@
     $marketingActive = request()->routeIs('dashboard.campaigns.*', 'dashboard.lead-sources.*', 'dashboard.tracking-settings.*');
 @endphp
 
+{{--
+    data-open drives two things that a transform alone cannot, both
+    scoped to below `lg` in app.css (.dash-drawer):
+
+    1. Pre-Alpine paint. `:class` has not run yet on first paint, so
+       without a state already in the markup the drawer renders OPEN
+       across the content on a phone until Alpine boots. It cannot be
+       fixed by also putting `-translate-x-full` in the static class
+       list — Tailwind emits `translate-x-0` BEFORE `translate-x-full`,
+       so the closed class would win the cascade and the drawer could
+       never open.
+
+    2. Tab order. A drawer that is merely translated off-screen is
+       still focusable, so a keyboard user on a phone tabs through a
+       menu they cannot see. visibility:hidden removes it from the tab
+       order and from the accessibility tree, and is delayed by the
+       animation duration so the slide-out still plays.
+--}}
 <aside
+    data-open="false"
+    :data-open="sidebarOpen ? 'true' : 'false'"
     :class="sidebarOpen ? 'translate-x-0' : 'max-lg:rtl:translate-x-full max-lg:ltr:-translate-x-full'"
-    class="fixed inset-y-0 end-0 z-40 flex w-72 shrink-0 flex-col bg-dark-green transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
+    @keydown.escape.window="sidebarOpen = false"
+    class="dash-drawer fixed inset-y-0 end-0 z-40 flex w-72 max-w-[85vw] shrink-0 flex-col bg-dark-green transition-transform duration-200 ease-in-out lg:static lg:max-w-none lg:translate-x-0"
 >
-    <div class="flex h-20 shrink-0 items-center border-b border-white/10 px-6">
-        <a href="{{ route('dashboard') }}">
+    <div class="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-6">
+        <a href="{{ route('dashboard') }}" class="min-w-0">
             <img src="{{ asset('images/brand/logo-full-white-256.png') }}" alt="{{ __('site.brand.name') }}" class="h-9 w-auto">
         </a>
+
+        {{-- Without this the only way to dismiss the drawer without
+             navigating is tapping the backdrop, which is invisible as
+             an affordance. Hidden at lg, where the sidebar is static
+             and there is nothing to close. --}}
+        <button
+            type="button"
+            @click="sidebarOpen = false"
+            class="-me-2 ms-auto inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-md text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-light-gold lg:hidden"
+            aria-label="{{ __('dashboard.topbar.close_menu') }}"
+        >
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+        </button>
     </div>
 
     <nav class="flex-1 space-y-1 overflow-y-auto px-4 py-6">

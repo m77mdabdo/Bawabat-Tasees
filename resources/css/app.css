@@ -15,6 +15,143 @@
 }
 
 /*
+ * ---------------------------------------------------------------------
+ * Dashboard responsive foundation
+ * ---------------------------------------------------------------------
+ * Everything here is scoped to the dashboard shell (or to an explicit
+ * dashboard class) so the public site is untouched. `lg` is 1024px, the
+ * same breakpoint at which the sidebar stops being a drawer.
+ */
+@layer components {
+    /*
+     * 100dvh, not 100vh: on iOS Safari 100vh is taller than the visible
+     * viewport, so the bottom of a fixed-height shell sits permanently
+     * under the browser chrome. Declared here rather than as
+     * h-screen/h-dvh classes because Tailwind emits .h-dvh BEFORE
+     * .h-screen, which would make the vh rule win.
+     */
+    .dashboard-shell {
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    /*
+     * The drawer is moved off-screen with a transform, and a transformed
+     * element is still visible to the accessibility tree and still
+     * focusable — a keyboard user on a phone tabs through a menu that
+     * isn't on screen. visibility:hidden fixes both, delayed by the
+     * animation duration so the slide-out still plays. It also covers
+     * the first paint, before Alpine has applied any :class at all.
+     */
+    @media (max-width: 1023px) {
+        .dash-drawer[data-open='false'] {
+            visibility: hidden;
+            transition:
+                transform 200ms ease-in-out,
+                visibility 0s linear 200ms;
+        }
+    }
+
+    /*
+     * Touch targets. Every native control inside the dashboard gets the
+     * 44px minimum; anchors styled as actions are inline, where
+     * min-height does nothing, so those carry .dash-action instead.
+     *
+     * Checkboxes and radios are deliberately excluded — stretching the
+     * box itself would misalign it against its label. They are given
+     * room by the padded <label> that wraps them.
+     */
+    .dashboard-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+        min-height: 44px;
+    }
+
+    .dashboard-shell :is(button, [type='submit'], [type='button']) {
+        min-height: 44px;
+    }
+
+    /* Inline action links in table rows and card footers. */
+    .dash-action {
+        @apply inline-flex min-h-[44px] items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green;
+    }
+
+    /*
+     * Stacked-card tables.
+     *
+     * Below `md` the table collapses to one card per row: the header row
+     * is hidden and each cell prints its own label from data-label. The
+     * desktop table is completely untouched — there is no duplicated
+     * markup and no second query, which is why this is CSS rather than a
+     * mobile-only partial.
+     *
+     * A cell with no data-label (the actions column, a full-width
+     * message body) spans the card without a label gutter.
+     */
+    @media (max-width: 767px) {
+        .dash-table-stacked,
+        .dash-table-stacked tbody,
+        .dash-table-stacked tr,
+        .dash-table-stacked td {
+            display: block;
+            width: 100%;
+        }
+
+        .dash-table-stacked thead {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        .dash-table-stacked tr {
+            @apply border-b border-border-default px-4 py-3;
+        }
+
+        .dash-table-stacked tr:last-child {
+            @apply border-b-0;
+        }
+
+        /* Row-level utilities from the desktop table would otherwise
+           re-collapse the card or clip long values. */
+        .dash-table-stacked td {
+            @apply flex items-start justify-between gap-4 px-0 py-1.5;
+            white-space: normal;
+            text-align: start;
+        }
+
+        .dash-table-stacked td[data-label]::before {
+            content: attr(data-label);
+            @apply shrink-0 text-xs font-medium uppercase text-text-secondary;
+        }
+
+        /* The label column is fixed-ish so values line up down the card;
+           the value takes the rest and wraps. */
+        .dash-table-stacked td[data-label]::before {
+            flex: 0 0 40%;
+            max-width: 40%;
+        }
+
+        .dash-table-stacked td > * {
+            min-width: 0;
+        }
+
+        /* Actions get their own full-width row at the foot of the card. */
+        .dash-table-stacked td:not([data-label]) {
+            @apply mt-2 flex-wrap justify-start gap-x-4 border-t border-border-default pt-2;
+        }
+
+        /* The empty-state cell is a single centred message, not a card. */
+        .dash-table-stacked td[colspan] {
+            @apply justify-center py-6 text-center;
+        }
+    }
+}
+
+/*
  * Styles the sanitized Article body HTML. Scoped narrowly to exactly the
  * tags HtmlSanitizerService allows through (p, h2-h4, ul/ol/li, strong,
  * em, a, img, blockquote) rather than pulling in @tailwindcss/typography

@@ -266,6 +266,7 @@ return [
 
     'topbar' => [
         'open_menu' => 'فتح القائمة',
+        'close_menu' => 'إغلاق القائمة',
         'profile' => 'الملف الشخصي',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'عربي',

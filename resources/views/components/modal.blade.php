@@ -60,12 +60,15 @@ $maxWidth = [
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
     >
-        <div class="absolute inset-0 bg-bg-soft0 opacity-75"></div>
+        {{-- bg-text-main: `bg-bg-soft0` was not a real class, so the
+                 backdrop rendered fully transparent and the modal
+                 appeared to float over live, still-clickable content. --}}
+            <div class="absolute inset-0 bg-text-main opacity-75"></div>
     </div>
 
     <div
         x-show="show"
-        class="mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto"
+        class="relative mb-6 w-full bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"

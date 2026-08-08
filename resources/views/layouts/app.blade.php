@@ -18,10 +18,20 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ sidebarOpen: false }" class="flex h-screen overflow-hidden bg-bg-soft">
+        {{--
+            The shell's height is set in app.css (100vh with a 100dvh
+            override), not with h-screen/h-dvh here: Tailwind emits
+            .h-dvh BEFORE .h-screen, so the vh rule would win the
+            cascade and the dvh class would do nothing.
+
+            overflow-x-hidden on the scroll pane below is the last line
+            of defence against one wide child (a table, a long unbroken
+            URL) making the whole dashboard scroll sideways on a phone.
+        --}}
+        <div x-data="{ sidebarOpen: false }" class="dashboard-shell flex overflow-hidden bg-bg-soft">
             <x-dashboard.sidebar />
 
-            <div class="flex min-w-0 flex-1 flex-col overflow-y-auto">
+            <div class="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
                 <!-- Top bar -->
                 <header class="sticky top-0 z-20 flex h-20 shrink-0 items-center border-b border-border-default bg-white px-4 sm:px-6 lg:px-8">
                     <button
@@ -49,25 +59,35 @@
                         hamburger's visibility: end-of-row is the LEFT
                         in `dir="rtl"` and the RIGHT in `dir="ltr"`.
                     --}}
-                    <div class="ms-auto flex items-center gap-4">
+                    <div class="ms-auto flex shrink-0 items-center gap-2 sm:gap-4">
                         <form method="POST" action="{{ route('dashboard.locale.update') }}">
                             @csrf
                             @method('PATCH')
                             <button
                                 type="submit"
-                                class="rounded-md border border-border-default px-3 py-1.5 text-sm font-medium text-text-secondary transition hover:border-luxury-gold hover:text-text-main"
+                                class="inline-flex min-h-[44px] items-center rounded-md border border-border-default px-3 text-sm font-medium text-text-secondary transition hover:border-luxury-gold hover:text-text-main focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green"
                             >
                                 {{ app()->getLocale() === 'ar' ? __('dashboard.topbar.switch_to_english') : __('dashboard.topbar.switch_to_arabic') }}
                             </button>
                         </form>
 
-                        <x-dropdown align="left" width="48">
+                        {{--
+                            align="right" (end-0), NOT "left". This
+                            trigger sits at the row's inline END, so
+                            pinning the panel's start edge to it throws
+                            the 12rem panel off-screen at 375px — off
+                            the right in `ltr`, off the left in `rtl`.
+                            end-0 anchors it to the same edge as the
+                            trigger, so it opens inward in both
+                            directions.
+                        --}}
+                        <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
-                                <button type="button" class="flex items-center gap-3">
-                                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gold-deep text-sm font-semibold text-white">
+                                <button type="button" class="flex min-h-[44px] max-w-[12rem] items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-deep text-sm font-semibold text-white">
                                         {{ mb_substr(Auth::user()->name, 0, 1) }}
                                     </span>
-                                    <span class="hidden text-sm font-medium text-text-main sm:block">
+                                    <span class="hidden truncate text-sm font-medium text-text-main sm:block">
                                         {{ Auth::user()->name }}
                                     </span>
                                 </button>
@@ -94,13 +114,13 @@
 
                 <!-- Page Heading -->
                 @isset($header)
-                    <div class="border-b border-border-default bg-white px-4 py-6 sm:px-6 lg:px-8">
+                    <div class="min-w-0 border-b border-border-default bg-white px-4 py-6 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 @endisset
 
                 <!-- Page Content -->
-                <main class="flex-1 px-4 py-8 sm:px-6 lg:px-8">
+                <main class="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-8">
                     {{ $slot }}
                 </main>
             </div>

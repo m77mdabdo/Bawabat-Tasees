@@ -187,7 +187,14 @@ class DashboardLocaleTest extends TestCase
 
         $html = $this->actingAs($admin)->get(route('dashboard'))->getContent();
 
-        $this->assertStringContainsString('ms-auto flex items-center gap-4', $html);
+        // Matched on the decision (ms-auto on a flex cluster) rather
+        // than on one literal class string, so tuning the responsive
+        // gap does not read as a regression here.
+        $this->assertMatchesRegularExpression(
+            '/class="ms-auto flex [^"]*items-center/',
+            $html,
+            'the admin-controls cluster must be pushed to the logical end with ms-auto'
+        );
         $this->assertDoesNotMatchRegularExpression(
             '/<header[^>]*justify-between[^>]*>/',
             $html,
