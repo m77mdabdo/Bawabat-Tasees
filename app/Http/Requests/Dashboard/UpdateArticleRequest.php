@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\Dashboard;
 
+use App\Http\Requests\Concerns\HasSeoMetaRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateArticleRequest extends FormRequest
 {
+    use HasSeoMetaRules;
+
     /**
      * Route-level ['auth', 'admin'] middleware already gates every
      * dashboard route, so authorization here is intentionally a pass-through.
@@ -38,6 +41,6 @@ class UpdateArticleRequest extends FormRequest
             'body' => ['required', 'array'],
             'body.ar' => ['required', 'string', 'max:50000'],
             'body.en' => ['nullable', 'string', 'max:50000'],
-        ];
+        ] + $this->seoMetaRules();
     }
 }

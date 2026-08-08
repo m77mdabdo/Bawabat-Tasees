@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\UpdatePageRequest;
 use App\Models\Page;
 use App\Services\Cms\HtmlSanitizerService;
+use App\Services\Seo\SeoMetaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -13,6 +14,7 @@ class PageController extends Controller
 {
     public function __construct(
         private readonly HtmlSanitizerService $htmlSanitizerService,
+        private readonly SeoMetaService $seoMetaService,
     ) {}
 
     /**
@@ -35,7 +37,15 @@ class PageController extends Controller
 
     public function update(UpdatePageRequest $request, Page $page): RedirectResponse
     {
-        $page->update($this->sanitize($request->validated()));
+        $page->update($this->sanitize(
+            collect($request->validated())->except(['seo', 'seo_og_image'])->all()
+        ));
+
+        $this->seoMetaService->persist(
+            $page,
+            $request->validated('seo', []),
+            $request->file('seo_og_image')
+        );
 
         return redirect()
             ->route('dashboard.pages.edit', $page)

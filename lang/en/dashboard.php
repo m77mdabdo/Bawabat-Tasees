@@ -360,6 +360,19 @@ return [
         'example_tiktok' => 'e.g.: XXXXXXXXXXXXXXXXXX',
     ],
 
+    'seo' => [
+        'section_heading' => 'Search Engine Optimisation (SEO)',
+        'section_hint' => 'Optional. If left blank, the site automatically uses the content\'s own title and excerpt.',
+        'meta_title_ar' => 'Meta title (Arabic)',
+        'meta_title_en' => 'Meta title (English)',
+        'meta_description_ar' => 'Meta description (Arabic)',
+        'meta_description_en' => 'Meta description (English)',
+        'og_image' => 'Share image (Open Graph)',
+        'og_image_hint' => 'Shown when the link is shared on social media. Preferred size 1200x630 pixels.',
+        'canonical_url' => 'Canonical URL',
+        'canonical_url_hint' => 'Leave blank to use the current page URL.',
+    ],
+
     'coming_soon' => [
         'campaigns_title' => 'Campaigns',
         'campaigns_message' => 'Marketing campaigns — coming soon.',

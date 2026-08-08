@@ -8,6 +8,7 @@ use App\Http\Requests\Dashboard\UpdateArticleRequest;
 use App\Models\Article;
 use App\Services\Cms\ContentPublishingService;
 use App\Services\Cms\HtmlSanitizerService;
+use App\Services\Seo\SeoMetaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -16,6 +17,7 @@ class ArticleController extends Controller
     public function __construct(
         private readonly ContentPublishingService $contentPublishingService,
         private readonly HtmlSanitizerService $htmlSanitizerService,
+        private readonly SeoMetaService $seoMetaService,
     ) {}
 
     public function index(): View
@@ -32,7 +34,7 @@ class ArticleController extends Controller
 
     public function store(StoreArticleRequest $request): RedirectResponse
     {
-        $data = $this->sanitize($request->safe()->except(['cover_image']));
+        $data = $this->sanitize($request->safe()->except(['cover_image', 'seo', 'seo_og_image']));
 
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $this->contentPublishingService->storeImage(
@@ -41,7 +43,13 @@ class ArticleController extends Controller
             );
         }
 
-        Article::create($data);
+        $article = Article::create($data);
+
+        $this->seoMetaService->persist(
+            $article,
+            $request->validated('seo', []),
+            $request->file('seo_og_image')
+        );
 
         return redirect()
             ->route('dashboard.articles.index')
@@ -55,7 +63,7 @@ class ArticleController extends Controller
 
     public function update(UpdateArticleRequest $request, Article $article): RedirectResponse
     {
-        $data = $this->sanitize($request->safe()->except(['cover_image']));
+        $data = $this->sanitize($request->safe()->except(['cover_image', 'seo', 'seo_og_image']));
 
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $this->contentPublishingService->replaceImage(
@@ -66,6 +74,12 @@ class ArticleController extends Controller
         }
 
         $article->update($data);
+
+        $this->seoMetaService->persist(
+            $article,
+            $request->validated('seo', []),
+            $request->file('seo_og_image')
+        );
 
         return redirect()
             ->route('dashboard.articles.index')

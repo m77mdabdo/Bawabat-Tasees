@@ -57,4 +57,6 @@
             <span class="ms-2 text-sm text-gray-600">{{ __('dashboard.common.active') }}</span>
         </label>
     </div>
+
+    @include('dashboard._seo-fields', ['seoOwner' => $isEdit ? $country : null])
 </div>

@@ -70,4 +70,6 @@
             <span class="ms-2 text-sm text-gray-600">{{ __('dashboard.articles.published_label') }}</span>
         </label>
     </div>
+
+    @include('dashboard._seo-fields', ['seoOwner' => $isEdit ? $article : null])
 </div>

@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Dashboard;
 
+use App\Http\Requests\Concerns\HasSeoMetaRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreServiceRequest extends FormRequest
 {
+    use HasSeoMetaRules;
+
     /**
      * Route-level ['auth', 'admin'] middleware already gates every
      * dashboard route, so authorization here is intentionally a pass-through.
@@ -44,6 +47,6 @@ class StoreServiceRequest extends FormRequest
             'process' => ['required', 'array'],
             'process.ar' => ['required', 'string', 'max:20000'],
             'process.en' => ['nullable', 'string', 'max:20000'],
-        ];
+        ] + $this->seoMetaRules();
     }
 }
