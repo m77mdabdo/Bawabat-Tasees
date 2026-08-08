@@ -48,7 +48,7 @@
     </head>
     <body class="font-sans text-text-main antialiased">
         <header
-            x-data="{ scrolled: false, mobileOpen: false, servicesOpen: false }"
+            x-data="{ scrolled: false, mobileOpen: false }"
             @scroll.window="scrolled = window.scrollY > 40"
             :class="scrolled ? 'shadow-md border-border-default' : 'border-transparent'"
             class="sticky top-0 z-30 border-b bg-white transition-shadow"
@@ -76,46 +76,21 @@
                             {{ __('site.nav.home') }}
                         </a>
 
-                        <div class="relative" @mouseenter="servicesOpen = true" @mouseleave="servicesOpen = false">
-                            <button
-                                type="button"
-                                @click="servicesOpen = ! servicesOpen"
-                                class="flex items-center gap-1 text-text-main hover:text-primary-green"
-                            >
-                                {{ __('site.nav.services') }}
-                                <svg class="h-4 w-4 transition-transform" :class="{ 'rotate-180': servicesOpen }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M6 9l6 6 6-6" />
-                                </svg>
-                            </button>
-
-                            <div
-                                x-show="servicesOpen"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-y-1"
-                                x-transition:enter-end="opacity-100 translate-y-0"
-                                class="absolute start-0 top-full z-40 mt-2 w-64 rounded-lg border border-border-default bg-white py-2 shadow-lg"
-                                style="display: none;"
-                            >
-                                @forelse ($navServices as $navService)
-                                    <a
-                                        href="{{ lroute('services.show', $navService) }}"
-                                        class="block px-4 py-2 text-sm text-text-main hover:bg-bg-soft hover:text-primary-green"
-                                    >
-                                        {{ $navService->name }}
-                                    </a>
-                                @empty
-                                    <p class="px-4 py-2 text-sm text-text-secondary">
-                                        {{ __('site.nav.no_services') }}
-                                    </p>
-                                @endforelse
-
-                                <div class="mt-1 border-t border-border-default pt-1">
-                                    <a href="{{ lroute('services.index') }}" class="block px-4 py-2 text-sm font-semibold text-primary-green hover:bg-bg-soft">
-                                        {{ __('site.nav.all_services') }}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        {{-- Plain link, not a dropdown: the services index page
+                             already lists every service, so an extra menu layer
+                             was a click between the visitor and that page.
+                             Highlighted on the index AND on a single service's
+                             page, since both live under this nav item. --}}
+                        <a
+                            href="{{ lroute('services.index') }}"
+                            @class([
+                                'hover:text-primary-green',
+                                'text-primary-green font-semibold' => in_array(current_route_base_name(), ['services.index', 'services.show'], true),
+                                'text-text-main' => ! in_array(current_route_base_name(), ['services.index', 'services.show'], true),
+                            ])
+                        >
+                            {{ __('site.nav.services') }}
+                        </a>
 
                         <a href="{{ lroute('countries.index') }}" class="text-text-main hover:text-primary-green">
                             {{ __('site.nav.countries') }}
@@ -198,7 +173,7 @@
                     </a>
 
                     <a href="{{ lroute('home') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.home') }}</a>
-                    <a href="{{ lroute('services.index') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.services') }}</a>
+                    <a href="{{ lroute('services.index') }}" @class(['block rounded-md px-3 py-2.5 hover:bg-bg-soft', 'bg-bg-soft text-primary-green font-semibold' => in_array(current_route_base_name(), ['services.index', 'services.show'], true), 'text-text-main' => ! in_array(current_route_base_name(), ['services.index', 'services.show'], true)])>{{ __('site.nav.services') }}</a>
                     <a href="{{ lroute('countries.index') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.countries') }}</a>
                     <a href="{{ lroute('articles.index') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.blog') }}</a>
                     <a href="{{ lroute('pages.about') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.about') }}</a>

@@ -23,8 +23,6 @@ return [
     'nav' => [
         'home' => 'Home',
         'services' => 'Services',
-        'all_services' => 'All Services',
-        'no_services' => 'No services are currently available.',
         'countries' => 'Countries',
         'blog' => 'Blog',
         'about' => 'About Us',

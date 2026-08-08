@@ -17,8 +17,6 @@ return [
     'nav' => [
         'home' => 'الرئيسية',
         'services' => 'خدماتنا',
-        'all_services' => 'كل الخدمات',
-        'no_services' => 'لا توجد خدمات متاحة حالياً.',
         'countries' => 'الدول',
         'blog' => 'المدونة',
         'about' => 'من نحن',
