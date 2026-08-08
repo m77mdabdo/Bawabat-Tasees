@@ -475,14 +475,10 @@ return [
     ],
 
     'coming_soon' => [
-        'campaigns_title' => 'الحملات',
-        'campaigns_message' => 'قسم الحملات التسويقية — قيد التطوير، قريبًا.',
         'lead_sources_title' => 'مصادر العملاء',
         'lead_sources_message' => 'قسم مصادر العملاء — قيد التطوير، قريبًا.',
         'contact_messages_title' => 'رسائل التواصل',
         'contact_messages_message' => 'قسم رسائل التواصل — قيد التطوير، قريبًا.',
-        'reports_title' => 'التقارير',
-        'reports_message' => 'قسم التقارير — قيد التطوير، قريبًا.',
         'settings_title' => 'الإعدادات',
         'settings_message' => 'قسم الإعدادات — قيد التطوير، قريبًا.',
     ],
