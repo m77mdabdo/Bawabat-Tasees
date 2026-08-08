@@ -10,6 +10,7 @@ use App\Http\Controllers\Dashboard\FaqController;
 use App\Http\Controllers\Dashboard\LeadController;
 use App\Http\Controllers\Dashboard\LocaleController;
 use App\Http\Controllers\Dashboard\MediaController;
+use App\Http\Controllers\Dashboard\MenuItemController;
 use App\Http\Controllers\Dashboard\PageController;
 use App\Http\Controllers\Dashboard\PageSectionController;
 use App\Http\Controllers\Dashboard\ReportController;
@@ -37,6 +38,13 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         // admin-creatable — only index/edit/update, no create/destroy.
         Route::resource('pages', PageController::class)->only(['index', 'edit', 'update']);
         Route::resource('pages.sections', PageSectionController::class)->except('show');
+
+        // Navigation manager. reorder is POST (it writes) and sits above
+        // the resource so "menu/reorder" is not swallowed by
+        // "menu/{menu}".
+        Route::post('menu/reorder', [MenuItemController::class, 'reorder'])->name('menu.reorder');
+        Route::patch('menu/{menu}/visibility', [MenuItemController::class, 'toggleVisibility'])->name('menu.visibility');
+        Route::resource('menu', MenuItemController::class)->except('show')->parameters(['menu' => 'menu']);
 
         Route::resource('leads', LeadController::class)->only(['index', 'show', 'destroy']);
 

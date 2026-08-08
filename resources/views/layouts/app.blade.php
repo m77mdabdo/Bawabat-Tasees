@@ -105,5 +105,9 @@
                 </main>
             </div>
         </div>
+        {{-- Page-specific scripts (e.g. the navigation reorder helper).
+             Pushed before Alpine initialises so x-data can resolve the
+             function it names. --}}
+        @stack('scripts')
     </body>
 </html>
