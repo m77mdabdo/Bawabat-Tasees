@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl text-text-main leading-tight">{{ __('dashboard.campaigns.title') }}</h2>
+            <h2 class="min-w-0 break-words font-semibold text-xl text-text-main leading-tight">{{ __('dashboard.campaigns.title') }}</h2>
             <a href="{{ route('dashboard.campaigns.create') }}" class="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-md border border-transparent bg-primary-green px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-dark-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2">
                 {{ __('dashboard.campaigns.add') }}
             </a>

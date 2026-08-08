@@ -7,7 +7,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl text-text-main leading-tight">{{ $campaign->name }}</h2>
+            <h2 class="min-w-0 break-words font-semibold text-xl text-text-main leading-tight">{{ $campaign->name }}</h2>
             <a href="{{ route('dashboard.campaigns.edit', $campaign) }}" class="text-sm text-primary-green hover:underline">{{ __('dashboard.common.edit') }}</a>
         </div>
     </x-slot>

@@ -29,7 +29,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">
+        <h2 class="min-w-0 break-words font-semibold text-xl text-text-main leading-tight">
             {{ __('dashboard.tracking_settings.heading') }}
         </h2>
     </x-slot>

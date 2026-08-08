@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-main leading-tight">{{ __('dashboard.menu.edit') }}</h2>
+        <h2 class="min-w-0 break-words font-semibold text-xl text-text-main leading-tight">{{ __('dashboard.menu.edit') }}</h2>
     </x-slot>
 
     <div class="py-12">

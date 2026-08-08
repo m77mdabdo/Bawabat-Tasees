@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl text-text-main leading-tight">
+            <h2 class="min-w-0 break-words font-semibold text-xl text-text-main leading-tight">
                 {{ __('dashboard.pages.sections_link') }} — {{ $page->title }}
             </h2>
             <div class="flex flex-wrap items-center gap-3">
