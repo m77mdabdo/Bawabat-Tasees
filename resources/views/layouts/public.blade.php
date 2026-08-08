@@ -206,5 +206,9 @@
         </footer>
 
         <x-whatsapp-float-button :number="$navWhatsapp" />
+
+        {{-- Stacked above the WhatsApp button when that one is rendering,
+             so the two floats never overlap. --}}
+        <x-back-to-top-button :stacked="(bool) $navWhatsapp" />
     </body>
 </html>

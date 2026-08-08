@@ -23,6 +23,7 @@ return [
         'contact' => 'تواصل معنا',
         'open_menu' => 'فتح القائمة',
         'close_menu' => 'إغلاق القائمة',
+        'back_to_top' => 'العودة إلى الأعلى',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'العربية',
     ],

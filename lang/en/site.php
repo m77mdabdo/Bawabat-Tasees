@@ -29,6 +29,7 @@ return [
         'contact' => 'Contact Us',
         'open_menu' => 'Open menu',
         'close_menu' => 'Close menu',
+        'back_to_top' => 'Back to top',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'العربية',
     ],
