@@ -1,4 +1,4 @@
-<x-public-layout :title="__('site.contact.heading') . ' — ' . __('site.brand.name')">
+<x-public-layout :title="__('site.contact.heading') . ' — ' . __('site.brand.name')" :seo-description="__('site.contact.subheading')">
     <section class="bg-bg-soft py-16 sm:py-24">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">

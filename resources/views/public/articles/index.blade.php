@@ -1,4 +1,4 @@
-<x-public-layout :title="__('site.articles.index_eyebrow') . ' — ' . __('site.brand.name')">
+<x-public-layout :title="__('site.articles.index_eyebrow') . ' — ' . __('site.brand.name')" :seo-description="__('site.articles.index_subheading')">
     <section class="bg-bg-soft py-16 sm:py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-2xl">

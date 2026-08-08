@@ -1,4 +1,4 @@
-<x-public-layout>
+<x-public-layout :seo-description="__('site.home.hero_subheading')">
     <section class="relative h-[85vh] min-h-[560px] w-full overflow-hidden">
         <video
             class="absolute inset-0 h-full w-full object-cover"
