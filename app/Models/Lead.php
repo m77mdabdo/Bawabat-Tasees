@@ -49,9 +49,39 @@ class Lead extends Model
         'consented_at',
     ];
 
+    /**
+     * Inbox read-state for type = 'contact' rows. Deliberately absent
+     * from $fillable: it is never part of a public submission, and the
+     * only writer is ContactMessageService.
+     */
+    public const TYPE_CONTACT = 'contact';
+
+    /**
+     * Mirrors the column default so a just-created Lead reports false
+     * rather than null in the same request — without this, the inbox
+     * badge and the handled/unhandled toggle both read null off a model
+     * that has not been re-fetched.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'is_handled' => false,
+    ];
+
+    public function scopeContactMessages(Builder $query): Builder
+    {
+        return $query->where('type', self::TYPE_CONTACT);
+    }
+
+    public function scopeUnhandled(Builder $query): Builder
+    {
+        return $query->where('is_handled', false);
+    }
+
     protected function casts(): array
     {
         return [
+            'is_handled' => 'boolean',
             'owns_external_company' => 'boolean',
             'first_touch' => 'array',
             'latest_touch' => 'array',

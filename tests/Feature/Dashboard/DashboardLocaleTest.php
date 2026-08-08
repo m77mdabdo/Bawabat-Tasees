@@ -139,27 +139,6 @@ class DashboardLocaleTest extends TestCase
         $response->assertSee('dir="rtl"', false);
     }
 
-    public function test_coming_soon_placeholder_pages_respect_the_admins_locale(): void
-    {
-        // Route closures for these placeholders build their __() calls
-        // once, when routes/dashboard.php loads (before any request-
-        // scoped middleware runs) — this guards against that call being
-        // eagerly evaluated in the boot-time locale instead of lazily
-        // per-request, which would silently freeze this page in Arabic
-        // regardless of the toggle.
-        //
-        // Reports, Settings and Lead Sources used to be the subject here;
-        // all are now real sections, so this uses the last placeholder.
-        $admin = $this->makeAdmin();
-        $admin->update(['locale' => 'en']);
-
-        $response = $this->actingAs($admin)->get(route('dashboard.contact-messages.index'));
-
-        $response->assertOk();
-        $response->assertSee('coming soon');
-        $response->assertDontSee('قسم رسائل التواصل');
-    }
-
     public function test_reports_and_campaigns_pages_respect_the_admins_locale(): void
     {
         $admin = $this->makeAdmin();

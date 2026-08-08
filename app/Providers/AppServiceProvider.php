@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\MenuItem;
 use App\Services\Cms\SettingsRepository;
+use App\Services\Crm\ContactMessageService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -58,6 +59,17 @@ class AppServiceProvider extends ServiceProvider
                 'siteLogo' => $settings->string('site_logo'),
                 'socialLinks' => $this->socialLinks($settings),
             ]);
+        });
+
+        // The unread badge on the Contact Messages sidebar item. Composed
+        // onto the sidebar rather than passed from each controller,
+        // because every dashboard section renders it and none of them
+        // otherwise care about leads.
+        //
+        // One indexed COUNT per dashboard page render
+        // (leads_type_is_handled_index).
+        View::composer('components.dashboard.sidebar', function ($view) {
+            $view->with('unhandledContactMessages', app(ContactMessageService::class)->unhandledCount());
         });
     }
 

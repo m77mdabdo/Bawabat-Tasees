@@ -621,7 +621,6 @@ return [
         'handled' => 'تمت المعالجة',
         'mark_handled' => 'وضع كمُعالجة',
         'mark_unhandled' => 'إرجاع كغير مُعالجة',
-        'handled_at' => 'عولجت في',
         'reply' => 'الرد بالبريد',
         'view_lead' => 'عرض السجل الكامل',
         'no_message' => 'لم يُرفق نص رسالة.',
@@ -631,12 +630,6 @@ return [
         'source' => 'المصدر',
     ],
 
-    'coming_soon' => [
-        'lead_sources_title' => 'مصادر العملاء',
-        'lead_sources_message' => 'قسم مصادر العملاء — قيد التطوير، قريبًا.',
-        'contact_messages_title' => 'رسائل التواصل',
-        'contact_messages_message' => 'قسم رسائل التواصل — قيد التطوير، قريبًا.',
-    ],
 
     'auth' => [
         'show_password' => 'إظهار كلمة المرور',

@@ -108,33 +108,6 @@ class DashboardHomeTest extends TestCase
             ->assertSeeInOrder(['مقالات غير منشورة', '1']);
     }
 
-    #[DataProvider('comingSoonRoutes')]
-    public function test_coming_soon_placeholder_returns_200_for_admin(string $routeName, string $expectedMessage): void
-    {
-        $admin = $this->makeAdmin();
-
-        $response = $this->actingAs($admin)->get(route($routeName));
-
-        $response->assertOk();
-        $response->assertSee($expectedMessage);
-    }
-
-    #[DataProvider('comingSoonRoutes')]
-    public function test_coming_soon_placeholder_redirects_guest(string $routeName): void
-    {
-        $this->get(route($routeName))->assertRedirect(route('login'));
-    }
-
-    public static function comingSoonRoutes(): array
-    {
-        // campaigns, reports and settings are no longer here — all three
-        // became real sections, covered by CampaignControllerTest,
-        // ReportControllerTest and SettingsControllerTest instead.
-        return [
-            'contact-messages' => ['dashboard.contact-messages.index', 'قسم رسائل التواصل'],
-        ];
-    }
-
     /**
      * Spot-check existing CRUD screens still render correctly inside the
      * new sidebar shell — this task must not break already-working pages.

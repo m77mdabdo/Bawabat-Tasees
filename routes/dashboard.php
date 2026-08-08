@@ -4,6 +4,7 @@ use App\Http\Controllers\Dashboard\ArticleController;
 use App\Http\Controllers\Dashboard\CampaignController;
 use App\Http\Controllers\Dashboard\CommentController;
 use App\Http\Controllers\Dashboard\ConversionEventController;
+use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\DashboardHomeController;
 use App\Http\Controllers\Dashboard\FaqController;
@@ -84,23 +85,15 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->gr
         // SetDashboardLocale) — never accepts a user id.
         Route::patch('locale', [LocaleController::class, 'update'])->name('locale.update');
 
-        // Placeholders — none of these sections are built yet. Each
-        // renders a clean branded placeholder, never a 404/500, so the
-        // sidebar never links to something broken. The __() calls are
-        // kept INSIDE the closure (not evaluated eagerly above the
-        // loop) — route files load once per request, before the
-        // 'dashboardlocale' middleware runs, so an eager __() call here
-        // would always resolve in the app's boot-time locale ('ar')
-        // regardless of the admin's toggle.
-        $comingSoonSlugs = ['contact-messages'];
-
-        foreach ($comingSoonSlugs as $slug) {
-            $key = str_replace('-', '_', $slug);
-
-            Route::get($slug, fn () => view('dashboard.coming-soon', [
-                'title' => __("dashboard.coming_soon.{$key}_title"),
-                'message' => __("dashboard.coming_soon.{$key}_message"),
-            ]))->name("{$slug}.index");
-        }
+        // Contact Messages. A focused inbox over the SAME leads table —
+        // contact submissions are leads with type = 'contact' (see
+        // ContactController@store), not a separate store.
+        //
+        // The name dashboard.contact-messages.index is unchanged from the
+        // placeholder it replaces: the sidebar links to it by name
+        // (components/dashboard/sidebar.blade.php:96), so renaming it
+        // would 500 every dashboard page.
+        Route::get('contact-messages', [ContactMessageController::class, 'index'])->name('contact-messages.index');
+        Route::patch('contact-messages/{lead}/handled', [ContactMessageController::class, 'handle'])->name('contact-messages.handled');
     });
 });

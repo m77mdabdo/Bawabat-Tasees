@@ -99,6 +99,12 @@
                 <path d="M3 7l9 6 9-6" />
             </svg>
             {{ __('dashboard.sidebar.contact_messages') }}
+            @if (($unhandledContactMessages ?? 0) > 0)
+                {{-- aria-label so a screen reader hears what the number
+                     counts, not a bare digit after the link text. --}}
+                <span class="ms-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-light-gold px-2 py-0.5 text-xs font-semibold text-dark-green"
+                    aria-label="{{ __('dashboard.contact_messages.unhandled') }}">{{ $unhandledContactMessages }}</span>
+            @endif
         </x-dashboard.nav-link>
 
         <x-dashboard.nav-link :href="route('dashboard.reports.index')" :active="request()->routeIs('dashboard.reports.*')">

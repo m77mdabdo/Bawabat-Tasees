@@ -618,7 +618,6 @@ return [
         'handled' => 'Handled',
         'mark_handled' => 'Mark as handled',
         'mark_unhandled' => 'Mark as unhandled',
-        'handled_at' => 'Handled at',
         'reply' => 'Reply by email',
         'view_lead' => 'View full record',
         'no_message' => 'No message body was submitted.',
@@ -628,12 +627,6 @@ return [
         'source' => 'Source',
     ],
 
-    'coming_soon' => [
-        'lead_sources_title' => 'Lead Sources',
-        'lead_sources_message' => 'Lead sources — coming soon.',
-        'contact_messages_title' => 'Contact Messages',
-        'contact_messages_message' => 'Contact messages — coming soon.',
-    ],
 
     'auth' => [
         'show_password' => 'Show password',
