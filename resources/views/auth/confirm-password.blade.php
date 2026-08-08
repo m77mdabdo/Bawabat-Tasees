@@ -1,27 +1,26 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
+    <p class="text-sm leading-relaxed text-text-secondary">
         {{ __('dashboard.auth.confirm_password_intro') }}
-    </div>
+    </p>
 
-    <form method="POST" action="{{ route('password.confirm') }}">
+    <form method="POST" action="{{ route('password.confirm') }}" class="mt-6 space-y-5">
         @csrf
 
-        <!-- Password -->
         <div>
-            <x-input-label for="password" :value="__('dashboard.auth.password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            <x-auth.label for="password" :value="__('dashboard.auth.password')" />
+            <x-auth.input
+                id="password"
+                name="password"
+                type="password"
+                icon="lock"
+                class="mt-1.5"
+                :has-error="$errors->has('password')"
+                required
+                autocomplete="current-password"
+            />
+            <x-auth.error :messages="$errors->get('password')" />
         </div>
 
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('dashboard.auth.confirm') }}
-            </x-primary-button>
-        </div>
+        <x-auth.button>{{ __('dashboard.auth.confirm') }}</x-auth.button>
     </form>
 </x-guest-layout>

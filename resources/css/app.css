@@ -1,6 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Alpine's x-cloak needs a matching rule to actually hide anything —
+   without it the password-toggle's "hide" icon flashes on load. */
+[x-cloak] {
+    display: none !important;
+}
+
 
 @layer base {
     body {

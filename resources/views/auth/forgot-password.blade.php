@@ -1,25 +1,33 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
+    <p class="text-sm leading-relaxed text-text-secondary">
         {{ __('dashboard.auth.forgot_password_intro') }}
-    </div>
+    </p>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="mt-6" :status="session('status')" />
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="mt-6 space-y-5">
         @csrf
 
-        <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('dashboard.auth.email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-auth.label for="email" :value="__('dashboard.auth.email')" />
+            <x-auth.input
+                id="email"
+                name="email"
+                type="email"
+                icon="email"
+                class="mt-1.5"
+                :value="old('email')"
+                :has-error="$errors->has('email')"
+                required
+                autofocus
+            />
+            <x-auth.error :messages="$errors->get('email')" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('dashboard.auth.send_reset_link') }}
-            </x-primary-button>
-        </div>
+        <x-auth.button>{{ __('dashboard.auth.send_reset_link') }}</x-auth.button>
+
+        <p class="text-center">
+            <x-auth.link href="{{ route('login') }}">{{ __('dashboard.auth.login') }}</x-auth.link>
+        </p>
     </form>
 </x-guest-layout>
