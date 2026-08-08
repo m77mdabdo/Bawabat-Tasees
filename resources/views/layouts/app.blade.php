@@ -64,7 +64,7 @@
                         <x-dropdown align="left" width="48">
                             <x-slot name="trigger">
                                 <button type="button" class="flex items-center gap-3">
-                                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-luxury-gold text-sm font-semibold text-white">
+                                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gold-deep text-sm font-semibold text-white">
                                         {{ mb_substr(Auth::user()->name, 0, 1) }}
                                     </span>
                                     <span class="hidden text-sm font-medium text-text-main sm:block">

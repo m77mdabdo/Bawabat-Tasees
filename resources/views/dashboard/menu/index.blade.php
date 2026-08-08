@@ -77,7 +77,7 @@
                                     <span class="min-w-0 flex-1 truncate text-sm font-medium text-text-main" x-text="row.label"></span>
 
                                     <template x-if="row.system">
-                                        <span class="rounded-full bg-luxury-gold/10 px-2 py-0.5 text-xs font-semibold text-luxury-gold">
+                                        <span class="rounded-full bg-luxury-gold/10 px-2 py-0.5 text-xs font-semibold text-gold-deep">
                                             {{ __('dashboard.menu.system_badge') }}
                                         </span>
                                     </template>

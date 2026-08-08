@@ -11,7 +11,7 @@
         @endif
 
         <div class="max-w-3xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-            <time class="text-sm font-medium text-luxury-gold" datetime="{{ $article->published_at->toIso8601String() }}">
+            <time class="text-sm font-medium text-gold-deep" datetime="{{ $article->published_at->toIso8601String() }}">
                 {{ $article->published_at->locale(app()->getLocale())->translatedFormat('d F Y') }}
             </time>
 

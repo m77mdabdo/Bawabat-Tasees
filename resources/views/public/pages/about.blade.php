@@ -101,7 +101,7 @@
     <section class="py-16 sm:py-24">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-                <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.about.tour_eyebrow') }}</span>
+                <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.about.tour_eyebrow') }}</span>
                 <h2 class="mt-2 text-2xl font-bold text-text-main sm:text-3xl">{{ __('site.about.tour_heading') }}</h2>
             </div>
 

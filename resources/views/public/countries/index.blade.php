@@ -2,7 +2,7 @@
     <section class="bg-bg-soft py-16 sm:py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-2xl">
-                <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">
+                <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">
                     {{ __('site.countries.eyebrow') }}
                 </span>
                 <h1 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">

@@ -73,7 +73,7 @@
                     >
 
                     <div>
-                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">
+                        <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">
                             {{ __('site.home.about_eyebrow') }}
                         </span>
                         <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">
@@ -101,7 +101,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
                     <div class="max-w-2xl">
-                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.services_eyebrow') }}</span>
+                        <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.home.services_eyebrow') }}</span>
                         <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.services_heading') }}</h2>
                     </div>
                     <a href="{{ lroute('services.index') }}" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary-green hover:text-primary-green/80">
@@ -128,7 +128,7 @@
 
                             <div class="flex flex-1 flex-col p-6">
                                 @if ($service->is_flagship)
-                                    <span class="mb-3 inline-flex w-fit items-center rounded-full bg-luxury-gold/10 px-3 py-1 text-xs font-semibold text-luxury-gold">
+                                    <span class="mb-3 inline-flex w-fit items-center rounded-full bg-luxury-gold/10 px-3 py-1 text-xs font-semibold text-gold-deep">
                                         {{ __('site.common.flagship_badge') }}
                                     </span>
                                 @endif
@@ -164,7 +164,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
                     <div class="max-w-2xl">
-                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.why_invest_eyebrow') }}</span>
+                        <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.home.why_invest_eyebrow') }}</span>
                         <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.why_invest_heading') }}</h2>
                     </div>
                     <a href="{{ lroute('pages.why-invest') }}" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary-green hover:text-primary-green/80">
@@ -211,7 +211,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
                     <div class="max-w-2xl">
-                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.formation_eyebrow') }}</span>
+                        <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.home.formation_eyebrow') }}</span>
                         <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.formation_heading') }}</h2>
                     </div>
                     <a href="{{ lroute('pages.formation-process') }}" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary-green hover:text-primary-green/80">
@@ -239,7 +239,7 @@
         <section class="py-16 sm:py-24">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl text-center">
-                    <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.testimonials_eyebrow') }}</span>
+                    <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.home.testimonials_eyebrow') }}</span>
                     <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.testimonials_heading') }}</h2>
                 </div>
 
@@ -308,7 +308,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
                     <div>
-                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.countries_eyebrow') }}</span>
+                        <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.home.countries_eyebrow') }}</span>
                         <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.countries_heading') }}</h2>
                     </div>
                     <a href="{{ lroute('countries.index') }}" class="inline-flex items-center gap-1 font-medium text-primary-green hover:text-primary-green/80">
@@ -346,7 +346,7 @@
         <section class="py-16 sm:py-24">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center">
-                    <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.faqs_eyebrow') }}</span>
+                    <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.home.faqs_eyebrow') }}</span>
                     <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.faqs_heading') }}</h2>
                 </div>
 
@@ -375,7 +375,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
                     <div class="max-w-2xl">
-                        <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">{{ __('site.home.articles_eyebrow') }}</span>
+                        <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">{{ __('site.home.articles_eyebrow') }}</span>
                         <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">{{ __('site.home.articles_heading') }}</h2>
                     </div>
                     <a href="{{ lroute('articles.index') }}" class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary-green hover:text-primary-green/80">
@@ -440,7 +440,7 @@
     <section id="contact" class="py-16 sm:py-24">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-                <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">
+                <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">
                     {{ __('site.contact.eyebrow') }}
                 </span>
                 <h2 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">

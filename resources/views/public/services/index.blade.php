@@ -2,7 +2,7 @@
     <section class="bg-bg-soft py-16 sm:py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-2xl">
-                <span class="text-sm font-semibold uppercase tracking-wide text-luxury-gold">
+                <span class="text-sm font-semibold uppercase tracking-wide text-gold-deep">
                     {{ __('site.services.index_eyebrow') }}
                 </span>
                 <h1 class="mt-2 text-3xl font-bold text-text-main sm:text-4xl">
@@ -39,7 +39,7 @@
 
                             <div class="flex flex-1 flex-col p-6">
                                 @if ($service->is_flagship)
-                                    <span class="mb-3 inline-flex w-fit items-center rounded-full bg-luxury-gold/10 px-3 py-1 text-xs font-semibold text-luxury-gold">
+                                    <span class="mb-3 inline-flex w-fit items-center rounded-full bg-luxury-gold/10 px-3 py-1 text-xs font-semibold text-gold-deep">
                                         {{ __('site.common.flagship_badge') }}
                                     </span>
                                 @endif

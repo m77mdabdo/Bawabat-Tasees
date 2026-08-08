@@ -72,7 +72,7 @@
                                 @elseif ($comment->status === 'rejected')
                                     <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">{{ __('dashboard.comments.status_rejected') }}</span>
                                 @else
-                                    <span class="inline-flex items-center rounded-full bg-luxury-gold/10 px-2.5 py-0.5 text-xs font-semibold text-luxury-gold">{{ __('dashboard.comments.status_pending') }}</span>
+                                    <span class="inline-flex items-center rounded-full bg-luxury-gold/10 px-2.5 py-0.5 text-xs font-semibold text-gold-deep">{{ __('dashboard.comments.status_pending') }}</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $comment->created_at->format('Y-m-d H:i') }}</td>
@@ -89,7 +89,7 @@
                                         <form action="{{ route('dashboard.comments.reject', $comment) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="text-luxury-gold hover:text-luxury-gold/70">{{ __('dashboard.comments.reject') }}</button>
+                                            <button type="submit" class="text-gold-deep hover:text-gold-deep/70">{{ __('dashboard.comments.reject') }}</button>
                                         </form>
                                     @endif
                                     <form action="{{ route('dashboard.comments.destroy', $comment) }}" method="POST" onsubmit="return confirm('{{ __('dashboard.comments.confirm_delete') }}');">

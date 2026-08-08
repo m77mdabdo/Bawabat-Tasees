@@ -49,7 +49,7 @@
                     <a href="{{ $item['href'] }}" class="block">
                         <x-card class="p-6 {{ $item['value'] > 0 ? 'border-luxury-gold/40' : '' }}">
                             <p class="text-sm font-medium text-text-secondary">{{ $item['label'] }}</p>
-                            <p class="mt-2 text-3xl font-bold {{ $item['value'] > 0 ? 'text-luxury-gold' : 'text-text-main' }}">
+                            <p class="mt-2 text-3xl font-bold {{ $item['value'] > 0 ? 'text-gold-deep' : 'text-text-main' }}">
                                 {{ $item['value'] }}
                             </p>
                         </x-card>

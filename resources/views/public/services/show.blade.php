@@ -10,7 +10,7 @@
             <div class="absolute inset-0 flex items-center">
                 <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
                     @if ($service->is_flagship)
-                        <span class="mb-3 inline-flex w-fit items-center rounded-full bg-luxury-gold/90 px-3 py-1 text-xs font-semibold text-white">
+                        <span class="mb-3 inline-flex w-fit items-center rounded-full bg-gold-deep px-3 py-1 text-xs font-semibold text-white">
                             {{ __('site.common.flagship_badge') }}
                         </span>
                     @endif
@@ -24,7 +24,7 @@
         <section class="bg-dark-green py-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 @if ($service->is_flagship)
-                    <span class="mb-3 inline-flex w-fit items-center rounded-full bg-luxury-gold/90 px-3 py-1 text-xs font-semibold text-white">
+                    <span class="mb-3 inline-flex w-fit items-center rounded-full bg-gold-deep px-3 py-1 text-xs font-semibold text-white">
                         {{ __('site.common.flagship_badge') }}
                     </span>
                 @endif
