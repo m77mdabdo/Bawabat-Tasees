@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ConversionEvent extends Model
 {
+    use HasFactory;
+
     /**
      * The event types an admin can log from the dashboard. Kept here
      * rather than in a DB table because they are a fixed vocabulary the
