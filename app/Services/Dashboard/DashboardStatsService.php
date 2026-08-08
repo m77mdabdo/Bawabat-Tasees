@@ -4,6 +4,7 @@ namespace App\Services\Dashboard;
 
 use App\Models\Article;
 use App\Models\Comment;
+use App\Models\ConversionEvent;
 use App\Models\Country;
 use App\Models\Faq;
 use App\Models\Lead;
@@ -82,5 +83,24 @@ class DashboardStatsService
     public function pendingCommentsCount(): int
     {
         return Comment::pending()->count();
+    }
+
+    public function convertedLeadsCount(): int
+    {
+        return Lead::converted()->count();
+    }
+
+    /**
+     * Summed across every logged conversion, not just the won types — a
+     * part-payment recorded against a lead still represents real revenue.
+     */
+    public function conversionValueTotal(): float
+    {
+        return (float) ConversionEvent::sum('value');
+    }
+
+    public function conversionEventsCount(): int
+    {
+        return ConversionEvent::count();
     }
 }

@@ -29,6 +29,10 @@ class DatabaseSeeder extends Seeder
             // Last of the content seeders: it derives its values from the
             // Pages and Articles the seeders above have just created.
             SeoMetaSeeder::class,
+            // Creates a clearly-labelled SAMPLE lead + conversions so the
+            // conversions UI and dashboard totals are not empty on a fresh
+            // install. Delete before launch — see the seeder's docblock.
+            ConversionEventSeeder::class,
         ]);
 
         // The content seeders above author Arabic only — English comes

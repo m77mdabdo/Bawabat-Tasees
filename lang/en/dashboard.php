@@ -194,6 +194,8 @@ return [
     ],
 
     'flash' => [
+        'conversion_logged' => 'Conversion logged successfully.',
+        'conversion_deleted' => 'Conversion deleted.',
         'service_created' => 'Service created.',
         'service_updated' => 'Service updated.',
         'service_deleted' => 'Service deleted.',
@@ -253,6 +255,8 @@ return [
     ],
 
     'home' => [
+        'converted_leads' => 'Converted leads',
+        'conversion_value' => 'Total conversion value',
         'heading' => 'Dashboard',
         'needs_attention' => 'Needs Your Attention',
         'content_overview' => 'Content Overview',
@@ -371,6 +375,33 @@ return [
         'og_image_hint' => 'Shown when the link is shared on social media. Preferred size 1200x630 pixels.',
         'canonical_url' => 'Canonical URL',
         'canonical_url_hint' => 'Leave blank to use the current page URL.',
+    ],
+
+    'conversions' => [
+        'section_heading' => 'Conversions',
+        'section_hint' => 'Record what this lead resulted in: a meeting, a signed contract, or a payment received.',
+        'log_button' => 'Log conversion',
+        'event_type' => 'Conversion type',
+        'value' => 'Value',
+        'currency' => 'Currency',
+        'occurred_at' => 'Occurred at',
+        'notes' => 'Notes',
+        'delete' => 'Delete',
+        'delete_confirm' => 'Are you sure you want to delete this conversion?',
+        'empty' => 'No conversions have been logged for this lead yet.',
+        'converted_badge' => 'Converted',
+        'total_value' => 'Total value',
+        'types' => [
+            'qualified' => 'Qualified',
+            'meeting_booked' => 'Meeting booked',
+            'contract_signed' => 'Contract signed',
+            'payment_received' => 'Payment received',
+            'other' => 'Other',
+        ],
+        'filter_any' => 'All leads',
+        'filter_converted' => 'Converted only',
+        'filter_not_converted' => 'Not converted only',
+        'filter_label' => 'Conversion status',
     ],
 
     'coming_soon' => [

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -68,8 +69,44 @@ class Lead extends Model
         return $this->belongsTo(Service::class, 'requested_service_id')->withTrashed();
     }
 
+    /**
+     * Newest first — the lead show page reads this as a timeline, and
+     * ordering here keeps every caller consistent.
+     */
     public function conversionEvents(): HasMany
     {
-        return $this->hasMany(ConversionEvent::class);
+        return $this->hasMany(ConversionEvent::class)->orderByDesc('occurred_at');
+    }
+
+    /**
+     * Only the event types that represent a completed sale, so a lead
+     * that merely booked a meeting is not shown as won.
+     */
+    public function wonConversionEvents(): HasMany
+    {
+        return $this->conversionEvents()->whereIn('event_type', ConversionEvent::WON_TYPES);
+    }
+
+    public function scopeConverted(Builder $query): Builder
+    {
+        return $query->whereHas(
+            'conversionEvents',
+            fn (Builder $events) => $events->whereIn('event_type', ConversionEvent::WON_TYPES)
+        );
+    }
+
+    public function scopeNotConverted(Builder $query): Builder
+    {
+        return $query->whereDoesntHave(
+            'conversionEvents',
+            fn (Builder $events) => $events->whereIn('event_type', ConversionEvent::WON_TYPES)
+        );
+    }
+
+    public function isConverted(): bool
+    {
+        return $this->relationLoaded('wonConversionEvents')
+            ? $this->wonConversionEvents->isNotEmpty()
+            : $this->wonConversionEvents()->exists();
     }
 }

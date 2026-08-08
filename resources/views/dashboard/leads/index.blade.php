@@ -53,6 +53,15 @@
                 </div>
 
                 <div>
+                    <label for="conversion" class="block text-xs font-medium text-text-secondary">{{ __('dashboard.conversions.filter_label') }}</label>
+                    <select name="conversion" id="conversion" class="mt-1 block w-full rounded-md border-border-default text-sm focus:border-primary-green focus:ring-primary-green">
+                        <option value="">{{ __('dashboard.conversions.filter_any') }}</option>
+                        <option value="converted" @selected(request('conversion') === 'converted')>{{ __('dashboard.conversions.filter_converted') }}</option>
+                        <option value="not_converted" @selected(request('conversion') === 'not_converted')>{{ __('dashboard.conversions.filter_not_converted') }}</option>
+                    </select>
+                </div>
+
+                <div>
                     <label for="date_from" class="block text-xs font-medium text-text-secondary">{{ __('dashboard.leads.date_from') }}</label>
                     <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="mt-1 block w-full rounded-md border-border-default text-sm focus:border-primary-green focus:ring-primary-green">
                 </div>
@@ -90,7 +99,12 @@
                 <tbody class="divide-y divide-border-default bg-white">
                     @forelse ($leads as $lead)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">{{ $lead->full_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">
+                                {{ $lead->full_name }}
+                                @if ($lead->isConverted())
+                                    <span class="ms-2 rounded-full bg-primary-green/10 px-2 py-0.5 text-xs font-semibold text-primary-green">{{ __('dashboard.conversions.converted_badge') }}</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->phone }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->requestedService?->name ?? '—' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-text-secondary">{{ $lead->source_platform ?? '—' }}</td>

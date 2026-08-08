@@ -84,6 +84,8 @@
         </x-card>
     </div>
 
+    @include('dashboard.leads._conversions', ['lead' => $lead])
+
     <div class="mt-6">
         <form action="{{ route('dashboard.leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('{{ __('dashboard.leads.confirm_archive') }}');">
             @csrf
