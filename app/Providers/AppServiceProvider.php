@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\MenuItem;
 use App\Models\Setting;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Translatable\Facades\Translatable;
@@ -47,7 +49,25 @@ class AppServiceProvider extends ServiceProvider
         View::composer('layouts.public', function ($view) {
             $view->with([
                 'navWhatsapp' => Setting::where('key', 'contact_whatsapp')->value('value'),
+                'menu' => $this->publicMenu(),
             ]);
         });
+    }
+
+    /**
+     * The visible, ordered navbar tree.
+     *
+     * Two queries total (parents + their children), not one per item.
+     * Children are eager-loaded already filtered to visible ones, so a
+     * hidden child can never leak into a rendered dropdown.
+     */
+    private function publicMenu(): Collection
+    {
+        return MenuItem::query()
+            ->topLevel()
+            ->visible()
+            ->ordered()
+            ->with(['visibleChildren'])
+            ->get();
     }
 }

@@ -71,39 +71,22 @@
                         >
                     </a>
 
+                    {{-- Rendered from menu_items (see AppServiceProvider's
+                         layouts.public composer), not hardcoded. An item with
+                         visible children becomes a dropdown; one without is a
+                         plain link — which is how "خدماتنا" stays a direct
+                         link to the services index. --}}
                     <nav class="hidden items-center gap-6 text-sm font-medium lg:flex">
-                        <a href="{{ lroute('home') }}" class="text-text-main hover:text-primary-green">
-                            {{ __('site.nav.home') }}
-                        </a>
-
-                        {{-- Plain link, not a dropdown: the services index page
-                             already lists every service, so an extra menu layer
-                             was a click between the visitor and that page.
-                             Highlighted on the index AND on a single service's
-                             page, since both live under this nav item. --}}
-                        <a
-                            href="{{ lroute('services.index') }}"
-                            @class([
-                                'hover:text-primary-green',
-                                'text-primary-green font-semibold' => in_array(current_route_base_name(), ['services.index', 'services.show'], true),
-                                'text-text-main' => ! in_array(current_route_base_name(), ['services.index', 'services.show'], true),
-                            ])
-                        >
-                            {{ __('site.nav.services') }}
-                        </a>
-
-                        <a href="{{ lroute('countries.index') }}" class="text-text-main hover:text-primary-green">
-                            {{ __('site.nav.countries') }}
-                        </a>
-                        <a href="{{ lroute('articles.index') }}" class="text-text-main hover:text-primary-green">
-                            {{ __('site.nav.blog') }}
-                        </a>
-                        <a href="{{ lroute('pages.about') }}" class="text-text-main hover:text-primary-green">
-                            {{ __('site.nav.about') }}
-                        </a>
-                        <a href="{{ lroute('contact') }}" class="text-text-main hover:text-primary-green">
-                            {{ __('site.nav.contact') }}
-                        </a>
+                        @forelse ($menu as $item)
+                            <x-public.nav-item :item="$item" />
+                        @empty
+                            {{-- Guard rail: an empty or fully hidden menu must
+                                 still leave a way home rather than rendering a
+                                 navbar with no navigation at all. --}}
+                            <a href="{{ lroute('home') }}" class="text-text-main hover:text-primary-green">
+                                {{ __('site.nav.home') }}
+                            </a>
+                        @endforelse
                     </nav>
 
                     <div class="flex items-center gap-4">
@@ -172,12 +155,11 @@
                         {{ app()->getLocale() === 'ar' ? __('site.nav.switch_to_english') : __('site.nav.switch_to_arabic') }}
                     </a>
 
-                    <a href="{{ lroute('home') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.home') }}</a>
-                    <a href="{{ lroute('services.index') }}" @class(['block rounded-md px-3 py-2.5 hover:bg-bg-soft', 'bg-bg-soft text-primary-green font-semibold' => in_array(current_route_base_name(), ['services.index', 'services.show'], true), 'text-text-main' => ! in_array(current_route_base_name(), ['services.index', 'services.show'], true)])>{{ __('site.nav.services') }}</a>
-                    <a href="{{ lroute('countries.index') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.countries') }}</a>
-                    <a href="{{ lroute('articles.index') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.blog') }}</a>
-                    <a href="{{ lroute('pages.about') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.about') }}</a>
-                    <a href="{{ lroute('contact') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.contact') }}</a>
+                    @forelse ($menu as $item)
+                        <x-public.mobile-nav-item :item="$item" />
+                    @empty
+                        <a href="{{ lroute('home') }}" class="block rounded-md px-3 py-2.5 text-text-main hover:bg-bg-soft">{{ __('site.nav.home') }}</a>
+                    @endforelse
                 </nav>
             </div>
         </header>

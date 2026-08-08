@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Testimonial;
 use App\Models\TrackingSetting;
+use Database\Seeders\MenuItemSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -192,6 +193,9 @@ class HomeTest extends TestCase
 
     public function test_navbar_has_services_countries_and_blog_labels(): void
     {
+        // The navbar is data-driven now — seed the system menu.
+        $this->seed(MenuItemSeeder::class);
+
         $response = $this->get('/');
 
         $response->assertOk();
@@ -208,6 +212,9 @@ class HomeTest extends TestCase
      */
     public function test_services_navbar_item_is_a_direct_link_with_no_dropdown(): void
     {
+        // The navbar is data-driven now — seed the system menu.
+        $this->seed(MenuItemSeeder::class);
+
         Service::create([
             'slug' => 'company-formation',
             'name' => ['ar' => 'تأسيس الشركات', 'en' => 'Company Formation'],
@@ -230,6 +237,9 @@ class HomeTest extends TestCase
 
     public function test_services_navbar_link_is_locale_aware(): void
     {
+        // The navbar is data-driven now — seed the system menu.
+        $this->seed(MenuItemSeeder::class);
+
         $this->get('/')->assertOk()
             ->assertSee('href="'.route('services.index').'"', escape: false);
 
@@ -239,6 +249,9 @@ class HomeTest extends TestCase
 
     public function test_services_navbar_link_is_highlighted_on_services_pages(): void
     {
+        // The navbar is data-driven now — seed the system menu.
+        $this->seed(MenuItemSeeder::class);
+
         $service = Service::create([
             'slug' => 'company-formation',
             'name' => ['ar' => 'تأسيس الشركات'],
@@ -253,11 +266,17 @@ class HomeTest extends TestCase
         $this->get(route('services.show', $service))->assertOk()
             ->assertSee('text-primary-green font-semibold', escape: false);
 
-        // …and absent on an unrelated page.
-        $this->assertStringNotContainsString(
-            'text-primary-green font-semibold',
-            $this->get(route('contact'))->assertOk()->getContent()
-        );
+        // …and absent on an unrelated page. Asserted against the SERVICES
+        // anchor specifically: now that the navbar is data-driven, /contact
+        // legitimately highlights its own Contact item, so a blanket
+        // "no highlight anywhere" check would be wrong.
+        $contactHtml = $this->get(route('contact'))->assertOk()->getContent();
+        $header = substr($contactHtml, 0, strpos($contactHtml, '</header>'));
+
+        preg_match('#<a[^>]*href="'.preg_quote(route('services.index'), '#').'"[^>]*>#', $header, $servicesAnchor);
+
+        $this->assertNotEmpty($servicesAnchor, 'Services link missing from the navbar.');
+        $this->assertStringNotContainsString('text-primary-green font-semibold', $servicesAnchor[0]);
     }
 
     /**
