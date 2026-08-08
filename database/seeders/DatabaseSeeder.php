@@ -32,6 +32,10 @@ class DatabaseSeeder extends Seeder
             // Creates a clearly-labelled SAMPLE lead + conversions so the
             // conversions UI and dashboard totals are not empty on a fresh
             // install. Delete before launch — see the seeder's docblock.
+            // Campaigns before conversions: ConversionEventSeeder's sample
+            // lead carries an external campaign id these records match, so
+            // the link resolves on a fresh seed.
+            CampaignSeeder::class,
             ConversionEventSeeder::class,
         ]);
 

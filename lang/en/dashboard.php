@@ -472,14 +472,10 @@ return [
     ],
 
     'coming_soon' => [
-        'campaigns_title' => 'Campaigns',
-        'campaigns_message' => 'Marketing campaigns — coming soon.',
         'lead_sources_title' => 'Lead Sources',
         'lead_sources_message' => 'Lead sources — coming soon.',
         'contact_messages_title' => 'Contact Messages',
         'contact_messages_message' => 'Contact messages — coming soon.',
-        'reports_title' => 'Reports',
-        'reports_message' => 'Reports — coming soon.',
         'settings_title' => 'Settings',
         'settings_message' => 'Settings — coming soon.',
     ],

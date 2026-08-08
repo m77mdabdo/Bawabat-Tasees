@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Campaign;
 use App\Models\ConversionEvent;
 use App\Models\Lead;
 use Illuminate\Database\Seeder;
@@ -52,19 +53,84 @@ class ConversionEventSeeder extends Seeder
 
     private function sampleLead(): Lead
     {
-        return Lead::updateOrCreate(
+        // Resolved the same way AttributionService would at submission
+        // time — seeders write directly, so the link has to be made here.
+        $campaign = Campaign::where('external_campaign_id', 'sample_campaign')->first();
+
+        $lead = Lead::updateOrCreate(
             ['email' => self::SAMPLE_LEAD_EMAIL],
             [
                 'full_name' => 'عميل تجريبي (بيانات عينة)',
                 'phone' => '+966500000000',
                 'type' => 'consultation',
                 'source_platform' => 'google',
+                'campaign_id' => 'sample_campaign',
                 'utm_campaign' => 'sample_campaign',
+                'linked_campaign_id' => $campaign?->getKey(),
+                'campaign_name' => $campaign?->name,
                 'landing_page_url' => '/consultation',
                 'consent_given' => true,
                 'consented_at' => now()->subDays(30),
             ]
         );
+
+        $this->supportingLeads();
+
+        return $lead;
+    }
+
+    /**
+     * A few extra SAMPLE leads so the Reports charts have more than one
+     * bar — spread across platforms, types and dates, one of them on the
+     * second sample campaign.
+     */
+    private function supportingLeads(): void
+    {
+        $meta = Campaign::where('external_campaign_id', 'sample_meta_retargeting')->first();
+
+        $rows = [
+            ['email' => 'sample.lead2@example.test', 'name' => 'عميل تجريبي ٢ (بيانات عينة)', 'platform' => 'meta', 'type' => 'contact', 'days' => 12, 'campaign' => $meta],
+            ['email' => 'sample.lead3@example.test', 'name' => 'عميل تجريبي ٣ (بيانات عينة)', 'platform' => 'meta', 'type' => 'consultation', 'days' => 20, 'campaign' => $meta],
+            ['email' => 'sample.lead4@example.test', 'name' => 'عميل تجريبي ٤ (بيانات عينة)', 'platform' => 'organic', 'type' => 'contact', 'days' => 5, 'campaign' => null],
+            ['email' => 'sample.lead5@example.test', 'name' => 'عميل تجريبي ٥ (بيانات عينة)', 'platform' => 'google', 'type' => 'consultation', 'days' => 2, 'campaign' => null],
+        ];
+
+        foreach ($rows as $row) {
+            $lead = Lead::updateOrCreate(
+                ['email' => $row['email']],
+                [
+                    'full_name' => $row['name'],
+                    'phone' => '+966500000000',
+                    'type' => $row['type'],
+                    'source_platform' => $row['platform'],
+                    'linked_campaign_id' => $row['campaign']?->getKey(),
+                    'campaign_name' => $row['campaign']?->name,
+                    'consent_given' => true,
+                    'consented_at' => now()->subDays($row['days']),
+                ]
+            );
+
+            // created_at is not fillable (it is not a form field), so it
+            // has to be applied after the fact for a realistic spread.
+            $lead->created_at = now()->subDays($row['days']);
+            $lead->save();
+        }
+
+        // One won conversion on the meta campaign so revenue-by-campaign
+        // has more than a single row.
+        $second = Lead::where('email', 'sample.lead2@example.test')->first();
+
+        if ($second) {
+            ConversionEvent::updateOrCreate(
+                ['lead_id' => $second->getKey(), 'event_type' => 'payment_received'],
+                [
+                    'value' => 7400.00,
+                    'currency' => 'SAR',
+                    'notes' => 'بيانات عينة — دفعة أولى. (SAMPLE DATA)',
+                    'occurred_at' => now()->subDays(9),
+                ]
+            );
+        }
     }
 
     /**

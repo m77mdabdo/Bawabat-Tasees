@@ -147,15 +147,34 @@ class DashboardLocaleTest extends TestCase
         // eagerly evaluated in the boot-time locale instead of lazily
         // per-request, which would silently freeze this page in Arabic
         // regardless of the toggle.
+        //
+        // Reports used to be the subject here; it is now a real section,
+        // so this uses one of the remaining placeholders and the real
+        // Reports page is covered by the test below.
         $admin = $this->makeAdmin();
         $admin->update(['locale' => 'en']);
 
-        $response = $this->actingAs($admin)->get(route('dashboard.reports.index'));
+        $response = $this->actingAs($admin)->get(route('dashboard.settings.index'));
 
         $response->assertOk();
-        $response->assertSee('Reports');
         $response->assertSee('coming soon');
-        $response->assertDontSee('التقارير');
+        $response->assertDontSee('قسم الإعدادات');
+    }
+
+    public function test_reports_and_campaigns_pages_respect_the_admins_locale(): void
+    {
+        $admin = $this->makeAdmin();
+        $admin->update(['locale' => 'en']);
+
+        $this->actingAs($admin)->get(route('dashboard.reports.index'))
+            ->assertOk()
+            ->assertSee('Reports')
+            ->assertDontSee('التقارير');
+
+        $this->actingAs($admin)->get(route('dashboard.campaigns.index'))
+            ->assertOk()
+            ->assertSee('Campaigns')
+            ->assertDontSee('الحملات الإعلانية');
     }
 
     public function test_dashboard_html_dir_is_rtl_for_arabic_and_ltr_for_english_admins(): void
