@@ -57,6 +57,14 @@
             </x-dashboard.nav-link>
         </x-dashboard.nav-group>
 
+        <x-dashboard.nav-link :href="route('dashboard.menu.index')" :active="request()->routeIs('dashboard.menu.*')">
+            <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h10" />
+                <circle cx="18" cy="18" r="2.5" />
+            </svg>
+            {{ __('dashboard.sidebar.menu') }}
+        </x-dashboard.nav-link>
+
         <x-dashboard.nav-link :href="route('dashboard.leads.index')" :active="request()->routeIs('dashboard.leads.*')">
             <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                 <circle cx="9" cy="8" r="3" />
