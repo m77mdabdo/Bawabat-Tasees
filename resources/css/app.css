@@ -177,6 +177,159 @@
 }
 
 /*
+ * ---------------------------------------------------------------------
+ * Homepage services marquee
+ * ---------------------------------------------------------------------
+ * Used by exactly one component (components/public/service-marquee) on
+ * exactly one section of the homepage. The /services index keeps its
+ * static grid.
+ *
+ * THE GEOMETRY. The track holds two identical units and animates by 50%
+ * of its own width, so the frame at 100% is pixel-identical to the frame
+ * at 0% and the loop has no seam.
+ *
+ * The viewport is forced to `direction: ltr` regardless of the page's
+ * dir, and each card carries its own dir for its text. That is not
+ * cosmetic — `transform: translateX()` is PHYSICAL and does not mirror
+ * with dir, while an over-wide child overflows toward the inline end,
+ * which does. Left as-is, rtl would need a POSITIVE translate, and a
+ * positive transform creates real scrollable overflow inside an
+ * overflow-x:auto parent, so the manual swipe would gain phantom empty
+ * space in Arabic but not in English. Normalising the layout keeps the
+ * translate in [-50%, 0] in both locales and the two directions differ
+ * only by which end of that range they start from.
+ */
+@layer components {
+    /* Cards travel left: the row reads right-to-left (Arabic). */
+    @keyframes bt-marquee-left {
+        from {
+            transform: translate3d(0, 0, 0);
+        }
+        to {
+            transform: translate3d(-50%, 0, 0);
+        }
+    }
+
+    /* Cards travel right: the row reads left-to-right (English). */
+    @keyframes bt-marquee-right {
+        from {
+            transform: translate3d(-50%, 0, 0);
+        }
+        to {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+    .bt-marquee__viewport {
+        direction: ltr;
+        overflow-x: auto;
+        overflow-y: hidden;
+        /* Manual swipe stays available; the animation is paused for the
+           length of the gesture (see the component's touch handlers). */
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* Feathered edges so cards enter and leave rather than being cut
+           off against a hard container edge. Symmetric, so it needs no
+           direction handling. */
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 4rem, #000 calc(100% - 4rem), transparent);
+        mask-image: linear-gradient(to right, transparent, #000 4rem, #000 calc(100% - 4rem), transparent);
+    }
+
+    .bt-marquee__viewport::-webkit-scrollbar {
+        display: none;
+    }
+
+    .bt-marquee__track {
+        display: flex;
+        width: max-content;
+        /*
+         * NO `gap` HERE, deliberately — see the margin on __item.
+         *
+         * `gap` sits BETWEEN items, so a track of 2N items has 2N-1
+         * gaps, not 2N. Its width is then 2N·C + (2N-1)·G while one
+         * unit's true pitch is N·(C+G), and 50% of the track falls half
+         * a gap short of that. At a 24px gap the loop jumps 12px every
+         * single cycle — small enough to look like a stutter rather
+         * than an obvious bug, which is worse.
+         *
+         * Carrying the spacing on each item makes the track exactly
+         * 2N·(C+M), so 50% is exactly one unit and the seam is zero.
+         */
+        /* Transform-only animation on its own layer: the compositor can
+           run this without laying out or painting a frame, which is what
+           keeps it even at any speed. */
+        will-change: transform;
+        animation-duration: var(--bt-marquee-duration, 48s);
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        /* linear + no delay: any easing would make the seam visible as a
+           speed change at the loop point. */
+    }
+
+    [data-marquee-direction='rtl'] .bt-marquee__track {
+        animation-name: bt-marquee-left;
+    }
+
+    [data-marquee-direction='ltr'] .bt-marquee__track {
+        animation-name: bt-marquee-right;
+    }
+
+    /*
+     * Pause so a card can actually be read and clicked. :focus-within
+     * covers keyboard arrival, which is the case that matters most —
+     * tabbing onto a moving link is close to unusable. data-paused is
+     * the touch case, where there is no :hover at all.
+     */
+    .bt-marquee:hover .bt-marquee__track,
+    .bt-marquee:focus-within .bt-marquee__track,
+    .bt-marquee[data-paused='true'] .bt-marquee__track {
+        animation-play-state: paused;
+    }
+
+    /*
+     * margin-right, not gap and not margin-inline-end. Physical on
+     * purpose: the viewport is forced to direction:ltr so "right" is
+     * always the trailing side, whereas margin-inline-end would resolve
+     * against each CARD's own dir — and the cards carry dir="rtl" in
+     * Arabic, which would flip the spacing to the wrong side and break
+     * the pitch arithmetic above.
+     */
+    .bt-marquee__item {
+        flex: 0 0 auto;
+        width: 17rem;
+        margin-right: 1.5rem;
+    }
+
+    @media (min-width: 640px) {
+        .bt-marquee__item {
+            width: 19rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .bt-marquee__item {
+            width: 21rem;
+        }
+    }
+
+    /*
+     * Reduced motion: no animation at all, and the duplicate units are
+     * removed so what remains is the plain set of services as an
+     * ordinary horizontally scrollable row — not a static strip the
+     * user cannot reach the end of.
+     */
+    @media (prefers-reduced-motion: reduce) {
+        .bt-marquee__track {
+            animation: none;
+        }
+
+        .bt-marquee__clone {
+            display: none;
+        }
+    }
+}
+
+/*
  * Styles the sanitized Article body HTML. Scoped narrowly to exactly the
  * tags HtmlSanitizerService allows through (p, h2-h4, ul/ol/li, strong,
  * em, a, img, blockquote) rather than pulling in @tailwindcss/typography

@@ -109,49 +109,11 @@
                     </a>
                 </div>
 
-                <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach ($homeServices as $service)
-                        <x-card class="flex flex-col">
-                            <a href="{{ lroute('services.show', $service) }}" class="block">
-                                @if ($service->cover_image)
-                                    <img
-                                        src="{{ Illuminate\Support\Facades\Storage::url($service->cover_image) }}"
-                                        alt="{{ $service->name }}"
-                                        class="h-48 w-full object-cover"
-                                    >
-                                @else
-                                    <div class="flex h-48 w-full items-center justify-center bg-bg-soft">
-                                        <span class="text-4xl">🏢</span>
-                                    </div>
-                                @endif
-                            </a>
-
-                            <div class="flex flex-1 flex-col p-6">
-                                @if ($service->is_flagship)
-                                    <span class="mb-3 inline-flex w-fit items-center rounded-full bg-luxury-gold/10 px-3 py-1 text-xs font-semibold text-gold-deep">
-                                        {{ __('site.common.flagship_badge') }}
-                                    </span>
-                                @endif
-
-                                <h3 class="text-xl font-semibold text-text-main">
-                                    <a href="{{ lroute('services.show', $service) }}" class="hover:text-primary-green">
-                                        {{ $service->name }}
-                                    </a>
-                                </h3>
-
-                                <p class="mt-2 flex-1 text-sm text-text-secondary">
-                                    {{ Illuminate\Support\Str::limit($service->summary, 100) }}
-                                </p>
-
-                                <a
-                                    href="{{ lroute('services.show', $service) }}"
-                                    class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary-green hover:text-primary-green/80"
-                                >
-                                    {{ __('site.common.learn_more') }} <span aria-hidden="true">&larr;</span>
-                                </a>
-                            </div>
-                        </x-card>
-                    @endforeach
+                {{-- Homepage only. The /services index keeps its static
+                     grid — this is a teaser, not the place anyone browses
+                     the full catalogue. --}}
+                <div class="mt-10">
+                    <x-public.service-marquee :services="$homeServices" />
                 </div>
             </div>
         </section>
