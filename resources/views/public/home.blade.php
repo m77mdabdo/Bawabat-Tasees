@@ -109,11 +109,15 @@
                     </a>
                 </div>
 
-                {{-- Homepage only. The /services index keeps its static
-                     grid — this is a teaser, not the place anyone browses
-                     the full catalogue. --}}
+                {{-- Marquee A. Homepage only — the /services index keeps
+                     its static grid, because that is where someone
+                     actually browses the catalogue. --}}
                 <div class="mt-10">
-                    <x-public.service-marquee :services="$homeServices" />
+                    <x-public.marquee
+                        :items="$homeServices"
+                        direction="base"
+                        card="public.partials.marquee-cards.service"
+                    />
                 </div>
             </div>
         </section>
@@ -148,18 +152,15 @@
                     ];
                 @endphp
 
-                <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ($whyInvestSections as $section)
-                        <x-card class="p-6">
-                            <span class="text-3xl" aria-hidden="true">{{ $whyInvestIcons[$section->icon] ?? '⭐' }}</span>
-                            <h3 class="mt-4 font-semibold text-text-main">{{ $section->title }}</h3>
-                            @if ($section->description)
-                                <p class="mt-2 text-sm text-text-secondary">
-                                    {{ Illuminate\Support\Str::limit($section->description, 90) }}
-                                </p>
-                            @endif
-                        </x-card>
-                    @endforeach
+                {{-- Marquee B — reversed, so it shears against the
+                     services row above it. --}}
+                <div class="mt-10">
+                    <x-public.marquee
+                        :items="$whyInvestSections"
+                        direction="reverse"
+                        card="public.partials.marquee-cards.why-invest"
+                        :card-data="['icons' => $whyInvestIcons]"
+                    />
                 </div>
             </div>
         </section>
@@ -181,15 +182,16 @@
                     </a>
                 </div>
 
-                <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ($formationSections as $index => $section)
-                        <div class="flex items-center gap-4 rounded-xl border border-border-default bg-white p-5">
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-green text-sm font-bold text-white">
-                                {{ $index + 1 }}
-                            </span>
-                            <h3 class="font-semibold text-text-main">{{ $section->title }}</h3>
-                        </div>
-                    @endforeach
+                {{-- Marquee A again — back to the base direction, so the
+                     page alternates A / B / A down its length. Compact
+                     cards: these are one short line each. --}}
+                <div class="mt-10">
+                    <x-public.marquee
+                        :items="$formationSections"
+                        direction="base"
+                        size="compact"
+                        card="public.partials.marquee-cards.formation-step"
+                    />
                 </div>
             </div>
         </section>

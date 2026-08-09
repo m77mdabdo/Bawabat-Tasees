@@ -313,6 +313,28 @@
     }
 
     /*
+     * Compact cards for single-line content (the numbered formation
+     * steps). The margin is unchanged, so the pitch arithmetic above
+     * still holds — the only requirement is that every item in a given
+     * track shares one width, and a marquee never mixes sizes.
+     */
+    .bt-marquee__item--compact {
+        width: 14rem;
+    }
+
+    @media (min-width: 640px) {
+        .bt-marquee__item--compact {
+            width: 15rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .bt-marquee__item--compact {
+            width: 15rem;
+        }
+    }
+
+    /*
      * Reduced motion: no animation at all, and the duplicate units are
      * removed so what remains is the plain set of services as an
      * ordinary horizontally scrollable row — not a static strip the
