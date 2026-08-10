@@ -5,6 +5,9 @@
                 src="{{ Illuminate\Support\Facades\Storage::url($service->cover_image) }}"
                 alt="{{ $service->name }}"
                 class="h-full w-full object-cover"
+                {{-- The page hero, so this is the LCP element: eager, and
+                     flagged high-priority rather than lazy-loaded. --}}
+                fetchpriority="high"
             >
             <div class="absolute inset-0 bg-dark-green/50"></div>
             <div class="absolute inset-0 flex items-center">

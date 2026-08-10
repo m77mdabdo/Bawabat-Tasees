@@ -38,7 +38,7 @@
                                 {{ __('dashboard.media.video_label') }}
                             </div>
                         @else
-                            <img src="{{ Illuminate\Support\Facades\Storage::disk($item->disk)->url($item->path) }}" alt="{{ $item->alt_text }}" class="h-32 w-full object-cover">
+                            <img src="{{ Illuminate\Support\Facades\Storage::disk($item->disk)->url($item->path) }}" alt="{{ $item->alt_text }}" class="h-32 w-full object-cover" loading="lazy">
                         @endif
                         <div class="p-2 text-xs text-text-secondary space-y-1">
                             <div class="truncate" title="{{ $item->alt_text }}">{{ $item->alt_text ?: __('dashboard.media.no_alt_text') }}</div>

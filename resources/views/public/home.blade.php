@@ -1,8 +1,15 @@
 <x-public-layout :seo-description="__('site.home.hero_subheading')">
     <section class="relative h-[85vh] min-h-[560px] w-full overflow-hidden">
+        {{-- preload="metadata", not "none": this element autoplays, so the
+             browser has to fetch it regardless and "none" would only be a
+             hint it immediately overrides. "metadata" still stops it
+             buffering the whole 1.8MB ahead of time, and the poster covers
+             the gap. The click-to-play video on /about, which nothing forces
+             to load, does get preload="none". --}}
         <video
             class="absolute inset-0 h-full w-full object-cover"
             poster="{{ asset('images/hero-poster.jpg') }}"
+            preload="metadata"
             autoplay
             muted
             loop
@@ -69,6 +76,9 @@
                     <img
                         src="{{ asset('images/about/about-team-meeting.jpg') }}"
                         alt="{{ __('site.about.meeting_photo_alt') }}"
+                        width="1600"
+                        height="1066"
+                        loading="lazy"
                         class="h-72 w-full rounded-2xl object-cover shadow-sm sm:h-96"
                     >
 
@@ -288,6 +298,7 @@
                                     src="{{ Illuminate\Support\Facades\Storage::url($country->flag_image) }}"
                                     alt="{{ $country->name }}"
                                     class="h-10 w-10 shrink-0 rounded-full border border-border-default object-cover"
+                                    loading="lazy"
                                 >
                             @else
                                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-soft text-base">
@@ -356,6 +367,7 @@
                                         src="{{ Illuminate\Support\Facades\Storage::url($article->cover_image) }}"
                                         alt="{{ $article->title }}"
                                         class="h-48 w-full object-cover"
+                                        loading="lazy"
                                     >
                                 @else
                                     <div class="flex h-48 w-full items-center justify-center bg-white">

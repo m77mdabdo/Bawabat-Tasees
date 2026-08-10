@@ -43,7 +43,7 @@
         <div>
             <x-input-label for="seo_og_image" :value="__('dashboard.seo.og_image')" />
             @if ($seo?->og_image)
-                <img src="{{ Illuminate\Support\Facades\Storage::url($seo->og_image) }}" alt="" class="h-20 mb-2 rounded">
+                <img src="{{ Illuminate\Support\Facades\Storage::url($seo->og_image) }}" alt="" class="h-20 mb-2 rounded" loading="lazy">
             @endif
             <input id="seo_og_image" name="seo_og_image" type="file" accept="image/jpeg,image/png,image/webp"
                 class="mt-1 block w-full max-w-full py-2 text-sm text-text-main file:me-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0 file:bg-bg-soft file:px-4 file:text-sm file:font-medium file:text-text-main hover:file:bg-border-default">

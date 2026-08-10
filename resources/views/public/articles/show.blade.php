@@ -6,6 +6,9 @@
                     src="{{ Illuminate\Support\Facades\Storage::url($article->cover_image) }}"
                     alt="{{ $article->title }}"
                     class="h-full w-full object-cover"
+                    {{-- The page hero, so this is the LCP element: eager, and
+                         flagged high-priority rather than lazy-loaded. --}}
+                    fetchpriority="high"
                 >
             </div>
         @endif

@@ -59,14 +59,22 @@
                          still comfortably clear of the h-20 (80px) header's
                          edges (12px above/below) at every breakpoint. --}}
                     <a href="{{ lroute('home') }}" class="shrink-0">
+                        {{-- Intrinsic dimensions, so the header reserves its box before
+                             CSS lands. Deliberately NOT loading="lazy": both are above the
+                             fold on every page, and lazy-loading the LCP-adjacent logo only
+                             delays it. --}}
                         <img
                             src="{{ asset('images/brand/logo-full-color-256.png') }}"
                             alt="{{ __('site.brand.name') }}"
+                            width="256"
+                            height="236"
                             class="hidden sm:block h-14 w-auto"
                         >
                         <img
                             src="{{ asset('images/brand/logo-icon-color-128.png') }}"
                             alt="{{ __('site.brand.name') }}"
+                            width="128"
+                            height="128"
                             class="block sm:hidden h-14 w-auto"
                         >
                     </a>
@@ -139,7 +147,7 @@
                 style="display: none;"
             >
                 <div class="flex h-20 shrink-0 items-center justify-between border-b border-border-default px-6">
-                    <img src="{{ asset('images/brand/logo-full-color-256.png') }}" alt="{{ __('site.brand.name') }}" class="h-9 w-auto">
+                    <img src="{{ asset('images/brand/logo-full-color-256.png') }}" alt="{{ __('site.brand.name') }}" width="256" height="236" loading="lazy" class="h-9 w-auto">
                     <button type="button" @click="mobileOpen = false" class="-me-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-text-secondary transition hover:text-text-main focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green" aria-label="{{ __('site.nav.close_menu') }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                             <path d="M6 6l12 12M6 18L18 6" />
@@ -184,6 +192,12 @@
                 <img
                     src="{{ $siteLogo ? Illuminate\Support\Facades\Storage::url($siteLogo) : asset('images/brand/logo-full-white-256.png') }}"
                     alt="{{ $siteName }}"
+                    {{-- Dimensions only for the shipped fallback, whose intrinsic
+                         size we know. An uploaded logo's is unknowable here, and
+                         declaring the fallback's for it would reserve the wrong
+                         box for every admin who has replaced it. --}}
+                    @unless ($siteLogo) width="256" height="236" @endunless
+                    loading="lazy"
                     class="h-10 w-auto mb-4"
                 >
                 <p class="text-sm text-white/70">

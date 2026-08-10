@@ -30,7 +30,9 @@
 >
     <div class="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-6">
         <a href="{{ route('dashboard') }}" class="min-w-0">
-            <img src="{{ asset('images/brand/logo-full-white-256.png') }}" alt="{{ __('site.brand.name') }}" class="h-9 w-auto">
+            {{-- No loading="lazy": this is the first thing in the dashboard shell and
+                 lazy-loading above-the-fold artwork only delays it. --}}
+            <img src="{{ asset('images/brand/logo-full-white-256.png') }}" alt="{{ __('site.brand.name') }}" width="256" height="236" class="h-9 w-auto">
         </a>
 
         {{-- Without this the only way to dismiss the drawer without

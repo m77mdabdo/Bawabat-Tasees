@@ -35,6 +35,8 @@
                 <img
                     src="{{ asset('images/brand/logo-full-color-256.png') }}"
                     alt="{{ __('site.brand.name', [], $locale) }}"
+                    width="256"
+                    height="236"
                     class="mx-auto h-14 w-auto"
                 >
             </a>

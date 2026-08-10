@@ -19,9 +19,13 @@
     </head>
     <body class="font-sans text-text-main antialiased">
         <div class="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden py-6">
+            {{-- preload="metadata" for the same reason as the homepage hero:
+                 it autoplays, so "none" would be a hint the browser overrides
+                 on the spot. --}}
             <video
                 class="absolute inset-0 h-full w-full object-cover"
                 poster="{{ asset('images/login-poster.jpg') }}"
+                preload="metadata"
                 autoplay
                 muted
                 loop

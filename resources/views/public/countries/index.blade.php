@@ -28,6 +28,7 @@
                                     src="{{ Illuminate\Support\Facades\Storage::url($country->flag_image) }}"
                                     alt="{{ $country->name }}"
                                     class="h-12 w-12 shrink-0 rounded-full object-cover border border-border-default"
+                                    loading="lazy"
                                 >
                             @else
                                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-bg-soft text-lg">

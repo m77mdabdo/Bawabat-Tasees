@@ -65,7 +65,9 @@
                                         <x-input-label :for="$key" :value="__('dashboard.settings.fields.'.$key)" />
                                         @if ($values[$key] ?? null)
                                             <img src="{{ Illuminate\Support\Facades\Storage::url($values[$key]) }}"
-                                                alt="{{ __('dashboard.settings.current_logo') }}" class="mb-2 mt-1 h-16 w-auto">
+                                                alt="{{ __('dashboard.settings.current_logo') }}" class="mb-2 mt-1 h-16 w-auto"
+                                                loading="lazy"
+                                            >
                                         @endif
                                         {{-- No image/svg+xml: SVG is an executable document and
                                              would be served same-origin from /storage — see the

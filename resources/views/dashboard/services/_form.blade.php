@@ -18,7 +18,7 @@
     <div>
         <x-input-label for="cover_image" :value="__('dashboard.services.cover_image')" />
         @if ($isEdit && $service->cover_image)
-            <img src="{{ Illuminate\Support\Facades\Storage::url($service->cover_image) }}" alt="" class="h-20 mb-2 rounded">
+            <img src="{{ Illuminate\Support\Facades\Storage::url($service->cover_image) }}" alt="" class="h-20 mb-2 rounded" loading="lazy">
         @endif
         <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full max-w-full py-2 text-sm text-text-main file:me-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0 file:bg-bg-soft file:px-4 file:text-sm file:font-medium file:text-text-main hover:file:bg-border-default">
         <x-input-error :messages="$errors->get('cover_image')" class="mt-2" />

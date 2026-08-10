@@ -29,6 +29,7 @@
                                         src="{{ Illuminate\Support\Facades\Storage::url($article->cover_image) }}"
                                         alt="{{ $article->title }}"
                                         class="h-48 w-full object-cover"
+                                        loading="lazy"
                                     >
                                 @else
                                     <div class="flex h-48 w-full items-center justify-center bg-bg-soft">

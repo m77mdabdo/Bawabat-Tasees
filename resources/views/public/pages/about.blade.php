@@ -35,11 +35,17 @@
                 <img
                     src="{{ asset('images/about/about-team-meeting.jpg') }}"
                     alt="{{ __('site.about.meeting_photo_alt') }}"
+                    width="1600"
+                    height="1066"
+                    loading="lazy"
                     class="h-72 w-full rounded-2xl object-cover shadow-sm sm:h-96"
                 >
                 <img
                     src="{{ asset('images/about/about-office-building.jpg') }}"
                     alt="{{ __('site.about.office_photo_alt') }}"
+                    width="1600"
+                    height="1066"
+                    loading="lazy"
                     class="h-72 w-full rounded-2xl object-cover shadow-sm sm:mt-10 sm:h-96"
                 >
             </div>
@@ -116,6 +122,9 @@
                     <img
                         src="{{ asset('images/about/about-office-tour-poster.jpg') }}"
                         alt="{{ __('site.about.video_poster_alt') }}"
+                        width="1920"
+                        height="1080"
+                        loading="lazy"
                         class="h-72 w-full object-cover sm:h-[28rem]"
                     >
                     <span class="absolute inset-0 flex items-center justify-center bg-dark-green/30 transition group-hover:bg-dark-green/40">
@@ -127,10 +136,14 @@
                     </span>
                 </button>
 
+                {{-- preload="none": nothing plays this until the poster is
+                     clicked, so the 2MB was being fetched on every visit to
+                     /about for a video most visitors never start. --}}
                 <video
                     x-ref="aboutVideo"
                     x-show="playing"
                     style="display: none;"
+                    preload="none"
                     controls
                     playsinline
                     class="h-72 w-full bg-black object-cover sm:h-[28rem]"
