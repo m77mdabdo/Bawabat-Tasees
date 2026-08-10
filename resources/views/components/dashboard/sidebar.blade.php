@@ -20,13 +20,43 @@
        menu they cannot see. visibility:hidden removes it from the tab
        order and from the accessibility tree, and is delayed by the
        animation duration so the slide-out still plays.
+
+    ⚠️ NEEDS VISUAL CONFIRMATION — `start-0`, changed from `end-0`.
+
+    `end-0` is inset-inline-END: the right edge in ltr, the left edge in
+    rtl. The closed-state transform on the same element is
+    `ltr:-translate-x-full` / `rtl:translate-x-full`, which compiles to
+    -100% in ltr and +100% in rtl — and those are the signs that move a
+    drawer pinned at inline-START off-screen. Pinned at inline-END they
+    move it INWARD instead, so the panel was sliding out of the middle of
+    the screen rather than in from the edge.
+
+    Nothing was visibly broken, because the visibility:hidden rule above
+    hides the closed panel wherever the transform left it; the symptom was
+    the open/close animation playing from the wrong place, and the drawer
+    sitting on the opposite edge from where the desktop sidebar lives — at
+    `lg:static` this aside is the shell's FIRST flex child, so it renders
+    at the inline start (left in English, right in Arabic).
+
+    `start-0` makes the pin agree with both the transform and the desktop
+    position, and is the conservative fix: one token, no transform
+    changes. The public drawer already does the equivalent correctly with
+    a physical `right-0` + `translate-x-full`.
+
+    Confirm at 375px in BOTH locales: the drawer should slide in from the
+    same edge the desktop sidebar occupies — left in English, right in
+    Arabic — and never appear mid-screen.
 --}}
 <aside
     data-open="false"
     :data-open="sidebarOpen ? 'true' : 'false'"
     :class="sidebarOpen ? 'translate-x-0' : 'max-lg:rtl:translate-x-full max-lg:ltr:-translate-x-full'"
+    {{-- Holds focus in the drawer while it is open and hands it back to the
+         hamburger on close. Only ever active below lg, because that is the
+         only place sidebarOpen can become true — the trigger is lg:hidden. --}}
+    x-trap.noscroll="sidebarOpen"
     @keydown.escape.window="sidebarOpen = false"
-    class="dash-drawer fixed inset-y-0 end-0 z-40 flex w-72 max-w-[85vw] shrink-0 flex-col bg-dark-green transition-transform duration-200 ease-in-out lg:static lg:max-w-none lg:translate-x-0"
+    class="dash-drawer fixed inset-y-0 start-0 z-40 flex w-72 max-w-[85vw] shrink-0 flex-col bg-dark-green transition-transform duration-200 ease-in-out lg:static lg:max-w-none lg:translate-x-0"
 >
     <div class="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-6">
         <a href="{{ route('dashboard') }}" class="min-w-0">

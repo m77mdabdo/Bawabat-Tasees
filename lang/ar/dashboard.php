@@ -268,6 +268,8 @@ return [
         'open_menu' => 'فتح القائمة',
         'close_menu' => 'إغلاق القائمة',
         'profile' => 'الملف الشخصي',
+        'skip_to_content' => 'تخطَّ إلى المحتوى الرئيسي',
+        'menu_dialog_label' => 'قائمة لوحة التحكم',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'عربي',
     ],

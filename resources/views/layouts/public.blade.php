@@ -47,9 +47,26 @@
         <x-tracking-scripts />
     </head>
     <body class="font-sans text-text-main antialiased">
+        {{--
+            Skip link. Visually hidden until focused, so it costs the design
+            nothing and gives a keyboard user a way past the navbar and the
+            three marquees — which is otherwise a long walk before any of the
+            page content. WCAG 2.4.1.
+
+            z-[60] puts it above the drawer panel (z-50) so it stays reachable
+            in every state.
+        --}}
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary-green focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:outline-none focus:ring-2 focus:ring-white"
+        >
+            {{ __('site.nav.skip_to_content') }}
+        </a>
+
         <header
             x-data="{ scrolled: false, mobileOpen: false }"
-            @scroll.window="scrolled = window.scrollY > 40"
+            @scroll.window.passive="scrolled = window.scrollY > 40"
+            @keydown.escape.window="mobileOpen = false"
             :class="scrolled ? 'shadow-md border-border-default' : 'border-transparent'"
             class="sticky top-0 z-30 border-b bg-white transition-shadow"
         >
@@ -140,9 +157,24 @@
                 style="display: none;"
             ></div>
 
+            {{--
+                x-trap.noscroll holds focus inside the panel while it is open,
+                returns it to the hamburger on close, and stops the page behind
+                it scrolling under the finger. Without it, tabbing walked
+                straight out of the drawer into a page the visitor could not
+                see.
+
+                role/aria-modal are safe to hard-code here because this element
+                is lg:hidden — it is only ever a dialog, never a static
+                sidebar.
+            --}}
             <div
                 x-show="mobileOpen"
+                x-trap.noscroll="mobileOpen"
                 :class="mobileOpen ? 'translate-x-0' : 'translate-x-full'"
+                role="dialog"
+                aria-modal="true"
+                aria-label="{{ __('site.nav.menu_dialog_label') }}"
                 class="fixed inset-y-0 right-0 z-50 flex w-72 flex-col overflow-y-auto bg-white transition-transform duration-200 ease-in-out lg:hidden"
                 style="display: none;"
             >
@@ -172,7 +204,9 @@
             </div>
         </header>
 
-        <main>
+        {{-- tabindex="-1" so the skip link can actually move focus here;
+             without it the browser scrolls but focus stays on the link. --}}
+        <main id="main-content" tabindex="-1">
             {{ $slot }}
         </main>
 

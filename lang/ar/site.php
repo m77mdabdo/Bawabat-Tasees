@@ -24,8 +24,19 @@ return [
         'open_menu' => 'فتح القائمة',
         'close_menu' => 'إغلاق القائمة',
         'back_to_top' => 'العودة إلى الأعلى',
+        'skip_to_content' => 'تخطَّ إلى المحتوى الرئيسي',
+        'menu_dialog_label' => 'قائمة التنقل',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'العربية',
+    ],
+
+    // أدوات التحكم في العناصر المتحركة تلقائياً. كل عنصر متحرك يجب أن يكون
+    // قابلاً للإيقاف — راجع resources/js/motion.js.
+    'motion' => [
+        'pause_video' => 'إيقاف الفيديو الخلفي',
+        'play_video' => 'تشغيل الفيديو الخلفي',
+        'pause_slideshow' => 'إيقاف عرض الشهادات',
+        'play_slideshow' => 'تشغيل عرض الشهادات',
     ],
 
     'errors' => [

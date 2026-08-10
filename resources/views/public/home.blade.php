@@ -1,12 +1,17 @@
 <x-public-layout :seo-description="__('site.home.hero_subheading')">
-    <section class="relative h-[85vh] min-h-[560px] w-full overflow-hidden">
+    <section x-data="backgroundVideo" class="relative h-[85vh] min-h-[560px] w-full overflow-hidden">
         {{-- preload="metadata", not "none": this element autoplays, so the
              browser has to fetch it regardless and "none" would only be a
              hint it immediately overrides. "metadata" still stops it
              buffering the whole 1.8MB ahead of time, and the poster covers
              the gap. The click-to-play video on /about, which nothing forces
-             to load, does get preload="none". --}}
+             to load, does get preload="none".
+
+             `autoplay` stays in the markup so the design still works with
+             JavaScript off; resources/js/motion.js pauses it on init when
+             prefers-reduced-motion is set. --}}
         <video
+            x-ref="video"
             class="absolute inset-0 h-full w-full object-cover"
             poster="{{ asset('images/hero-poster.jpg') }}"
             preload="metadata"
@@ -20,6 +25,12 @@
         </video>
 
         <div class="absolute inset-0 bg-dark-green/70"></div>
+
+        <x-public.motion-toggle
+            :playing-label="__('site.motion.pause_video')"
+            :paused-label="__('site.motion.play_video')"
+            class="absolute bottom-4 end-4 z-20"
+        />
 
         <div class="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
             <span class="mb-4 inline-block rounded-full border border-light-gold/50 bg-white/10 px-4 py-1.5 text-sm font-medium text-light-gold">
@@ -218,9 +229,20 @@
                 </div>
 
                 @if ($testimonials->count() > 3)
+                    {{--
+                        The timer used to be a bare setInterval in x-init: no way
+                        to stop it, no reduced-motion check, and never cleared.
+                        autoAdvance (resources/js/motion.js) owns all three.
+                        Hover and keyboard focus suspend it; the button below is
+                        the explicit control WCAG 2.2.2 asks for, and a
+                        deliberate stop survives the pointer leaving.
+                    --}}
                     <div
-                        x-data="{ active: 0, count: {{ $testimonials->count() }} }"
-                        x-init="setInterval(() => { active = (active + 1) % count }, 6000)"
+                        x-data="autoAdvance({{ $testimonials->count() }})"
+                        @mouseenter="suspend()"
+                        @mouseleave="resume()"
+                        @focusin="suspend()"
+                        @focusout="resume()"
                         class="relative mx-auto mt-12 max-w-3xl"
                     >
                         @foreach ($testimonials as $index => $testimonial)
@@ -242,7 +264,14 @@
                              (-m-2 cancels the padding's effect on layout/spacing) so
                              the actual tappable target is closer to a usable mobile
                              touch-target size instead of exactly 8x8px. --}}
-                        <div class="mt-6 flex justify-center gap-2">
+                        <div class="mt-6 flex items-center justify-center gap-2">
+                            <x-public.motion-toggle
+                                :playing-label="__('site.motion.pause_slideshow')"
+                                :paused-label="__('site.motion.play_slideshow')"
+                                state="stopped"
+                                class="me-2 border border-border-default text-text-secondary hover:text-text-main"
+                            />
+
                             @foreach ($testimonials as $index => $testimonial)
                                 <button
                                     type="button"

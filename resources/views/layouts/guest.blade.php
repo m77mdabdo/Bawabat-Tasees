@@ -18,11 +18,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-text-main antialiased">
-        <div class="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden py-6">
+        <div x-data="backgroundVideo" class="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden py-6">
             {{-- preload="metadata" for the same reason as the homepage hero:
                  it autoplays, so "none" would be a hint the browser overrides
-                 on the spot. --}}
+                 on the spot. `autoplay` stays for the JavaScript-off case;
+                 motion.js pauses it when prefers-reduced-motion is set. --}}
             <video
+                x-ref="video"
                 class="absolute inset-0 h-full w-full object-cover"
                 poster="{{ asset('images/login-poster.jpg') }}"
                 preload="metadata"
@@ -36,6 +38,12 @@
             </video>
 
             <div class="absolute inset-0 bg-dark-green/70"></div>
+
+            <x-public.motion-toggle
+                :playing-label="__('site.motion.pause_video')"
+                :paused-label="__('site.motion.play_video')"
+                class="absolute bottom-4 end-4 z-20"
+            />
 
             <div class="relative z-10 flex w-full flex-col items-center px-4">
                 {{--

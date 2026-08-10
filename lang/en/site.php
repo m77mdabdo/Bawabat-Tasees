@@ -30,8 +30,19 @@ return [
         'open_menu' => 'Open menu',
         'close_menu' => 'Close menu',
         'back_to_top' => 'Back to top',
+        'skip_to_content' => 'Skip to main content',
+        'menu_dialog_label' => 'Site navigation',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'العربية',
+    ],
+
+    // Controls for the parts of the site that move on their own. Every one
+    // of them must be pausable — see resources/js/motion.js.
+    'motion' => [
+        'pause_video' => 'Pause the background video',
+        'play_video' => 'Play the background video',
+        'pause_slideshow' => 'Pause the testimonial slideshow',
+        'play_slideshow' => 'Play the testimonial slideshow',
     ],
 
     'errors' => [

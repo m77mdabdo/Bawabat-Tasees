@@ -265,6 +265,8 @@ return [
         'open_menu' => 'Open menu',
         'close_menu' => 'Close menu',
         'profile' => 'Profile',
+        'skip_to_content' => 'Skip to main content',
+        'menu_dialog_label' => 'Dashboard navigation',
         'switch_to_english' => 'English',
         'switch_to_arabic' => 'عربي',
     ],

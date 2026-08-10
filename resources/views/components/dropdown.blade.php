@@ -13,8 +13,29 @@ $width = match ($width) {
 };
 @endphp
 
-<div class="relative" x-data="{ open: false }" @click.outside="open = false" @close.stop="open = false">
-    <div @click="open = ! open">
+{{--
+    Keyboard handling, which this had none of: Escape closes the panel and
+    puts focus back on the trigger, so a keyboard user is not stranded at the
+    top of the document after dismissing it. The public navbar dropdown
+    (components/public/nav-item) already worked this way; this one — the
+    dashboard user menu — did not.
+
+    `open` is in scope for the trigger slot too, so callers bind
+    :aria-expanded on their own button rather than this wrapper announcing a
+    state for an element it is not.
+
+    No role="menu"/menuitem: those come with an expectation of arrow-key
+    navigation and typeahead, and claiming the pattern without implementing
+    it reads worse to a screen reader than plain links do.
+--}}
+<div
+    class="relative"
+    x-data="{ open: false }"
+    @click.outside="open = false"
+    @close.stop="open = false"
+    @keydown.escape.stop="if (open) { open = false; $refs.trigger?.querySelector('button, [href]')?.focus() }"
+>
+    <div x-ref="trigger" @click="open = ! open">
         {{ $trigger }}
     </div>
 

@@ -18,6 +18,15 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
+        {{-- Skip link — see the public layout for the reasoning. z-[60] keeps
+             it above the drawer panel (z-40) in every state. --}}
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary-green focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:outline-none focus:ring-2 focus:ring-white"
+        >
+            {{ __('dashboard.topbar.skip_to_content') }}
+        </a>
+
         {{--
             The shell's height is set in app.css (100vh with a 100dvh
             override), not with h-screen/h-dvh here: Tailwind emits
@@ -83,7 +92,15 @@
                         --}}
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
-                                <button type="button" class="flex min-h-[44px] max-w-[12rem] items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green">
+                                {{-- `open` comes from x-dropdown's own x-data, which this
+                                     slot renders inside — so the state is announced on the
+                                     button that owns it rather than on a wrapper div. --}}
+                                <button
+                                    type="button"
+                                    :aria-expanded="open ? 'true' : 'false'"
+                                    aria-haspopup="true"
+                                    class="flex min-h-[44px] max-w-[12rem] items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green"
+                                >
                                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-deep text-sm font-semibold text-white">
                                         {{ mb_substr(Auth::user()->name, 0, 1) }}
                                     </span>
@@ -120,7 +137,9 @@
                 @endisset
 
                 <!-- Page Content -->
-                <main class="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-8">
+                {{-- tabindex="-1" so the skip link can move focus here, not
+                     just scroll to it. --}}
+                <main id="main-content" tabindex="-1" class="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-8">
                     {{ $slot }}
                 </main>
             </div>

@@ -175,7 +175,10 @@ class BackToTopButtonTest extends TestCase
         // touch-target minimum. Counted on the float-button class run
         // itself: shadow-lg alone also appears on the hero CTAs.
         $this->assertSame(2, substr_count($html, 'h-14 w-14 items-center justify-center rounded-full'));
-        $this->assertSame(2, substr_count($html, 'rounded-full bg-'), 'Both floats are filled circles.');
+        // Counted on the fixed-position float class run, not on a bare
+        // 'rounded-full bg-' — the hero's motion toggle is also a filled
+        // circle and would otherwise be counted as a third float.
+        $this->assertSame(2, substr_count($html, 'z-30 flex h-14 w-14 items-center justify-center rounded-full bg-'), 'Both floats are filled circles.');
     }
 
     public function test_it_uses_the_brand_palette_and_has_a_visible_focus_state(): void

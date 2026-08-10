@@ -151,7 +151,15 @@ class DashboardResponsiveShellTest extends TestCase
 
             $this->assertStringContainsString('dir="'.$dir.'"', $html);
             // Logical properties, so one class set is correct both ways.
-            $this->assertStringContainsString('inset-y-0 end-0', $html);
+            //
+            // start-0, not end-0: the closed-state transform on the same
+            // element is ltr:-translate-x-full / rtl:translate-x-full, and
+            // those signs move a drawer pinned at inline-START off-screen.
+            // Pinned at inline-END they moved it inward instead. start-0 also
+            // matches where the desktop sidebar sits — at lg:static the aside
+            // is the shell's first flex child, so it renders at the inline
+            // start in both directions.
+            $this->assertStringContainsString('inset-y-0 start-0', $html);
         }
     }
 
