@@ -3,8 +3,8 @@
 use App\Http\Controllers\Dashboard\ArticleController;
 use App\Http\Controllers\Dashboard\CampaignController;
 use App\Http\Controllers\Dashboard\CommentController;
-use App\Http\Controllers\Dashboard\ConversionEventController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
+use App\Http\Controllers\Dashboard\ConversionEventController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\DashboardHomeController;
 use App\Http\Controllers\Dashboard\FaqController;
@@ -22,7 +22,11 @@ use App\Http\Controllers\Dashboard\TestimonialController;
 use App\Http\Controllers\Dashboard\TrackingSettingController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale'])->group(function () {
+// 'throttle:dashboard-writes' is applied to the whole group but only counts
+// unsafe methods — the limiter returns Limit::none() for GET/HEAD (see
+// AppServiceProvider::configureRateLimiting), so browsing is unrationed and
+// every write is capped at 60/minute per admin.
+Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale', 'throttle:dashboard-writes'])->group(function () {
     Route::get('/', [DashboardHomeController::class, 'index'])->name('dashboard');
 
     Route::name('dashboard.')->group(function () {

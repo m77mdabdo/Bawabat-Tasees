@@ -81,7 +81,9 @@ Route::middleware('setlocale')->group(fn () => $registerPublicRoutes());
 // English — "{name}.en" names, "en" prefix.
 Route::prefix('en')->middleware('setlocale')->group(fn () => $registerPublicRoutes('.en'));
 
-Route::middleware(['auth', 'dashboardlocale'])->group(function () {
+// Same write throttle as the dashboard group — profile update and account
+// deletion are authenticated writes with no other ceiling on them.
+Route::middleware(['auth', 'dashboardlocale', 'throttle:dashboard-writes'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

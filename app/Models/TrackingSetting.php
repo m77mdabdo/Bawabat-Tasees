@@ -10,6 +10,42 @@ class TrackingSetting extends Model
 {
     use HasFactory;
 
+    /**
+     * key => the format that key's value must match.
+     *
+     * WHY THIS IS NOT COSMETIC. These values are interpolated straight into
+     * inline <script> blocks in components/tracking-scripts.blade.php. Blade's
+     * {{ }} escaping does hold there — htmlspecialchars encodes < > and quotes,
+     * so neither `</script>` nor a string break-out survives — but that leaves
+     * the entire boundary resting on HTML escaping behaving correctly inside a
+     * JavaScript context, which is not what it is for. Pinning each ID to its
+     * platform's published shape means nothing that is not an ID can reach the
+     * page in the first place.
+     *
+     * Patterns are deliberately a little looser than the current published
+     * formats (length ranges rather than exact lengths): a platform lengthening
+     * its IDs should not lock an admin out of the field. They are still narrow
+     * enough that no character with meaning in HTML or JavaScript is accepted.
+     *
+     * The seeder and the editor screen both work from this same list of keys.
+     *
+     * @var array<string, string>
+     */
+    public const FORMATS = [
+        // Numeric, currently 15-16 digits.
+        'meta_pixel_id' => '/^[0-9]{8,25}$/',
+        // GTM-XXXXXXX
+        'gtm_container_id' => '/^GTM-[A-Z0-9]{4,15}$/i',
+        // G-XXXXXXXXXX
+        'ga4_measurement_id' => '/^G-[A-Z0-9]{6,20}$/i',
+        // AW-XXXXXXXXX
+        'google_ads_conversion_id' => '/^AW-[0-9]{6,20}$/i',
+        // An opaque base64url-ish token, e.g. AbC-dEfGhIjKlMnOp.
+        'google_ads_conversion_label' => '/^[A-Za-z0-9_-]{4,60}$/',
+        // Alphanumeric, currently 20 characters.
+        'tiktok_pixel_id' => '/^[A-Z0-9]{10,40}$/i',
+    ];
+
     protected $fillable = [
         'key',
         'value',

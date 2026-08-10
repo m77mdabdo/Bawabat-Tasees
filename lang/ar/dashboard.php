@@ -380,6 +380,22 @@ return [
         'example_google_ads_id' => 'مثال: AW-XXXXXXXXX',
         'example_google_ads_label' => 'مثال: AbCdEfGhIjKlMnOp',
         'example_tiktok' => 'مثال: XXXXXXXXXXXXXXXXXX',
+
+        // The shape each ID must take, named in its own validation message —
+        // "الصيغة غير صحيحة" on its own tells an admin nothing.
+        'format_hint' => [
+            'meta_pixel_id' => 'أرقام فقط، مثال: 123456789012345',
+            'gtm_container_id' => 'يبدأ بـ GTM-، مثال: GTM-XXXXXXX',
+            'ga4_measurement_id' => 'يبدأ بـ G-، مثال: G-XXXXXXXXXX',
+            'google_ads_conversion_id' => 'يبدأ بـ AW-، مثال: AW-XXXXXXXXX',
+            'google_ads_conversion_label' => 'حروف وأرقام و _ - فقط، مثال: AbCdEfGhIjKlMnOp',
+            'tiktok_pixel_id' => 'حروف وأرقام فقط، مثال: XXXXXXXXXXXXXXXXXX',
+        ],
+
+        'validation' => [
+            'format' => 'صيغة :attribute غير صحيحة. المتوقع: :example',
+            'required_when_active' => 'يجب إدخال قيمة قبل تفعيل هذا المعرّف.',
+        ],
     ],
 
     'seo' => [
@@ -630,7 +646,6 @@ return [
         'filter_handled' => 'المُعالجة فقط',
         'source' => 'المصدر',
     ],
-
 
     'auth' => [
         'show_password' => 'إظهار كلمة المرور',

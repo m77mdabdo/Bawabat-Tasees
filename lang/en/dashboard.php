@@ -377,6 +377,22 @@ return [
         'example_google_ads_id' => 'e.g.: AW-XXXXXXXXX',
         'example_google_ads_label' => 'e.g.: AbCdEfGhIjKlMnOp',
         'example_tiktok' => 'e.g.: XXXXXXXXXXXXXXXXXX',
+
+        // The shape each ID must take, named in its own validation message —
+        // "the format is invalid" on its own tells an admin nothing.
+        'format_hint' => [
+            'meta_pixel_id' => 'digits only, e.g. 123456789012345',
+            'gtm_container_id' => 'starts with GTM-, e.g. GTM-XXXXXXX',
+            'ga4_measurement_id' => 'starts with G-, e.g. G-XXXXXXXXXX',
+            'google_ads_conversion_id' => 'starts with AW-, e.g. AW-XXXXXXXXX',
+            'google_ads_conversion_label' => 'letters, digits, _ and - only, e.g. AbCdEfGhIjKlMnOp',
+            'tiktok_pixel_id' => 'letters and digits only, e.g. XXXXXXXXXXXXXXXXXX',
+        ],
+
+        'validation' => [
+            'format' => ':attribute is not in the right format. Expected: :example',
+            'required_when_active' => 'Enter a value before enabling this ID.',
+        ],
     ],
 
     'seo' => [
@@ -627,7 +643,6 @@ return [
         'filter_handled' => 'Handled only',
         'source' => 'Source',
     ],
-
 
     'auth' => [
         'show_password' => 'Show password',

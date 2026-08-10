@@ -5,7 +5,11 @@ namespace App\Providers;
 use App\Models\MenuItem;
 use App\Services\Cms\SettingsRepository;
 use App\Services\Crm\ContactMessageService;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Translatable\Facades\Translatable;
@@ -27,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->forceHttpsInProduction();
+        $this->configureRateLimiting();
+
         // spatie/laravel-translatable ships no publishable config file in
         // this version (just an in-memory Translatable singleton) — this
         // is the actual equivalent of "set the package's fallback_locale
@@ -70,6 +77,57 @@ class AppServiceProvider extends ServiceProvider
         // (leads_type_is_handled_index).
         View::composer('components.dashboard.sidebar', function ($view) {
             $view->with('unhandledContactMessages', app(ContactMessageService::class)->unhandledCount());
+        });
+    }
+
+    /**
+     * Generate https:// links in production.
+     *
+     * config/trustedproxy.php is what makes $request->secure() true behind a
+     * TLS-terminating load balancer, and that alone is normally enough — the
+     * UrlGenerator follows the request's scheme. This is the second half, for
+     * the cases where there is no request scheme to follow (artisan-generated
+     * URLs, a queue worker) or where the proxy forwards no X-Forwarded-Proto
+     * at all.
+     *
+     * Gated on APP_URL actually being https, so a production deployment that
+     * genuinely runs over http is not broken by this. Never applied locally,
+     * where forcing https would break the dev server outright.
+     */
+    private function forceHttpsInProduction(): void
+    {
+        if ($this->app->environment('production') && str_starts_with((string) config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
+    }
+
+    /**
+     * Rate limits.
+     *
+     * The public forms carry an inline `throttle:5,1`; the dashboard had
+     * nothing at all, so every admin write — including the transactional menu
+     * reorder — was unlimited, and a stolen session had no ceiling.
+     *
+     * Safe methods return Limit::none() so the limiter can be applied to the
+     * whole dashboard group without rationing ordinary browsing: only writes
+     * are counted. Keyed on the user id (falling back to IP for the
+     * theoretically-unauthenticated case), so two admins never share a
+     * bucket.
+     *
+     * 60/minute is deliberately far above human editing speed — this is a
+     * runaway/abuse ceiling, not a usability constraint. The public forms
+     * stay at 5/minute because they are unauthenticated.
+     */
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('dashboard-writes', function (Request $request) {
+            if ($request->isMethodSafe()) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(60)->by(
+                $request->user()?->getAuthIdentifier() ?? $request->ip()
+            );
         });
     }
 
