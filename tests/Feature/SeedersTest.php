@@ -6,6 +6,7 @@ use App\Models\LeadSource;
 use App\Models\Setting;
 use App\Models\TrackingSetting;
 use App\Models\User;
+use App\Services\Cms\SettingsService;
 use Database\Seeders\AdminUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
@@ -21,7 +22,11 @@ class SeedersTest extends TestCase
 
         $this->assertSame(1, User::where('is_admin', true)->count());
         $this->assertSame(11, LeadSource::count());
-        $this->assertSame(16, Setting::count());
+        // Derived from the definition, not hard-coded: the seeder and the
+        // editor read the same list, so the count following it is the actual
+        // invariant. Hard-coding it just made adding a setting a three-file
+        // change.
+        $this->assertSame(count(SettingsService::keys()), Setting::count());
         $this->assertSame(6, TrackingSetting::count());
         $this->assertSame(0, TrackingSetting::where('is_active', true)->count());
     }
@@ -33,7 +38,7 @@ class SeedersTest extends TestCase
 
         $this->assertSame(1, User::where('is_admin', true)->count());
         $this->assertSame(11, LeadSource::count());
-        $this->assertSame(16, Setting::count());
+        $this->assertSame(count(SettingsService::keys()), Setting::count());
         $this->assertSame(6, TrackingSetting::count());
     }
 

@@ -575,6 +575,7 @@ return [
             'whatsapp' => 'WhatsApp',
             'social' => 'Social links',
             'seo_defaults' => 'SEO defaults',
+            'home_seo' => 'Homepage SEO',
         ],
         'group_hints' => [
             'general' => 'The site name, logo and short tagline.',
@@ -582,6 +583,7 @@ return [
             'whatsapp' => 'The number used by the floating WhatsApp button.',
             'social' => 'Shown in the site footer. Empty fields are not rendered at all.',
             'seo_defaults' => 'Used when a page has no title or description of its own.',
+            'home_seo' => 'The title and description for the homepage itself. It is the only page with no content record of its own, so without these it falls back to the defaults above.',
         ],
         'fields' => [
             'site_name' => 'Site name',
@@ -600,6 +602,8 @@ return [
             'social_snapchat' => 'Snapchat',
             'default_meta_title' => 'Default meta title',
             'default_meta_description' => 'Default meta description',
+            'home_meta_title' => 'Homepage title',
+            'home_meta_description' => 'Homepage description',
         ],
     ],
 

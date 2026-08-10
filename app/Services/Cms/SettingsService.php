@@ -65,6 +65,22 @@ class SettingsService
             'default_meta_title' => self::TYPE_TEXT,
             'default_meta_description' => self::TYPE_TEXT,
         ],
+        /*
+         * The homepage is the one public page with no backing record, so it
+         * had nothing to hang a SeoMeta row off and fell all the way through
+         * to default_meta_title — which is how the site's single most
+         * important <title> ended up reading "… (placeholder — update in
+         * Settings)" in both locales.
+         *
+         * TRANSLATED, unlike the two defaults above: /  and /en are separate
+         * pages to a crawler and deserve their own copy, whereas the
+         * site-wide defaults are a last resort where one string is
+         * acceptable.
+         */
+        'home_seo' => [
+            'home_meta_title' => self::TYPE_TRANSLATED,
+            'home_meta_description' => self::TYPE_TRANSLATED,
+        ],
     ];
 
     public function __construct(

@@ -143,6 +143,12 @@ class SeoTagService
         }
 
         // Brand logo as the last resort so a shared link is never imageless.
+        //
+        // The 1024 variant, not the 256 the navbar uses: Facebook and X want
+        // at least ~600px wide before they will render a large card, and this
+        // is the only place in the project that needs it. It looks orphaned
+        // in the public/images tree for exactly that reason — it is the one
+        // asset referenced from PHP rather than from a Blade view.
         return asset('images/brand/logo-full-color-1024.png');
     }
 

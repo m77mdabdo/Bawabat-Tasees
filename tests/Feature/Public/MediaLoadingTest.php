@@ -174,9 +174,21 @@ class MediaLoadingTest extends TestCase
      * were shipping unused. Deleted — recoverable from git if a future design
      * wants them back.
      */
+    /**
+     * Scans app/ as well as the views, and that is not incidental: the first
+     * cut of this pass deleted logo-full-color-1024.png as an orphan because
+     * only Blade had been searched. Its one reference is in
+     * SeoTagService::imageUrl(), the og:image fallback — so every shared link
+     * on the site would have pointed at a 404.
+     */
     public function test_no_unreferenced_media_ships_in_public(): void
     {
-        $referenced = $this->filenamesMentionedIn(resource_path('views'));
+        $referenced = array_merge(
+            $this->filenamesMentionedIn(resource_path('views')),
+            $this->filenamesMentionedIn(app_path()),
+            $this->filenamesMentionedIn(base_path('config')),
+            $this->filenamesMentionedIn(database_path()),
+        );
 
         $shipped = array_merge(
             $this->filesUnder(public_path('images')),
@@ -196,7 +208,7 @@ class MediaLoadingTest extends TestCase
         $found = [];
 
         foreach ($this->walk($directory) as $file) {
-            if (! str_ends_with($file, '.blade.php')) {
+            if (! str_ends_with($file, '.php')) {
                 continue;
             }
 

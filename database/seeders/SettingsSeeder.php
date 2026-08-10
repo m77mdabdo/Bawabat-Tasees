@@ -85,6 +85,21 @@ class SettingsSeeder extends Seeder
             // SEO defaults
             ['key' => 'default_meta_title', 'group' => 'seo_defaults', 'value' => 'Bawabat Taasees Al Sharikat'.$placeholder],
             ['key' => 'default_meta_description', 'group' => 'seo_defaults', 'value' => 'Company formation and investment services in Saudi Arabia'.$placeholder],
+
+            // Homepage SEO. NOT placeholders: the homepage has no backing
+            // record to carry a SeoMeta row, so without real values here its
+            // <title> falls through to default_meta_title above — which is
+            // exactly how the placeholder ended up on the most-shared page on
+            // the site. These are the real brand strings, so a fresh install
+            // is correct before anyone opens the Settings screen.
+            ['key' => 'home_meta_title', 'group' => 'home_seo', 'value' => [
+                'ar' => 'بوابة تأسيس الشركات — تأسيس شركتك في السعودية',
+                'en' => 'Bawabat Taasees Al Sharikat — Company Formation in Saudi Arabia',
+            ]],
+            ['key' => 'home_meta_description', 'group' => 'home_seo', 'value' => [
+                'ar' => 'خدمات متكاملة لتأسيس الشركات والاستثمار في المملكة العربية السعودية: التراخيص، السجل التجاري، والمتطلبات النظامية للمستثمرين الأجانب.',
+                'en' => 'End-to-end company formation and investment services in Saudi Arabia: licensing, commercial registration and the regulatory requirements for foreign investors.',
+            ]],
         ];
     }
 }

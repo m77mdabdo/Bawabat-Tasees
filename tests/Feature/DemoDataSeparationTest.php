@@ -12,6 +12,7 @@ use App\Models\Page;
 use App\Models\SeoMeta;
 use App\Models\Service;
 use App\Models\Testimonial;
+use App\Services\Cms\SettingsService;
 use App\Services\Dashboard\ReportingService;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,7 +47,7 @@ class DemoDataSeparationTest extends TestCase
         $this->assertGreaterThan(0, Page::count());
         $this->assertGreaterThan(0, Article::count());
         $this->assertGreaterThan(0, SeoMeta::count());
-        $this->assertDatabaseCount('settings', 16);
+        $this->assertDatabaseCount('settings', count(SettingsService::keys()));
         $this->assertDatabaseCount('lead_sources', 11);
         $this->assertDatabaseCount('tracking_settings', 6);
     }

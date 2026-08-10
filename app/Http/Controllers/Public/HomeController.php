@@ -19,6 +19,13 @@ class HomeController extends Controller
         $aboutPage = Page::where('slug', 'about')->where('is_published', true)->first();
 
         return view('public.home', [
+            // The homepage has no backing record, so it cannot carry a
+            // SeoMeta row the way every other page does. These two settings
+            // are its equivalent — without them the title falls through to
+            // the site-wide default, which is a last resort, not a homepage
+            // title. Both are bilingual, so / and /en differ properly.
+            'homeMetaTitle' => $settings->translated('home_meta_title'),
+            'homeMetaDescription' => $settings->translated('home_meta_description'),
             'whatsappNumber' => $settings->string('contact_whatsapp'),
             'contactPhone' => $settings->string('contact_phone'),
             'contactWhatsapp' => $settings->string('contact_whatsapp'),

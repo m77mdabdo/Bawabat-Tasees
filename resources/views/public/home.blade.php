@@ -1,4 +1,7 @@
-<x-public-layout :seo-description="__('site.home.hero_subheading')">
+<x-public-layout
+    :title="$homeMetaTitle"
+    :seo-description="$homeMetaDescription ?? __('site.home.hero_subheading')"
+>
     <section x-data="backgroundVideo" class="relative h-[85vh] min-h-[560px] w-full overflow-hidden">
         {{-- preload="metadata", not "none": this element autoplays, so the
              browser has to fetch it regardless and "none" would only be a
