@@ -35,11 +35,7 @@
     </x-slot>
 
     <div class="max-w-3xl space-y-6">
-        @if (session('status'))
-            <div class="rounded-md bg-primary-green/5 border border-primary-green/30 p-4 text-primary-green">
-                {{ session('status') }}
-            </div>
-        @endif
+        <x-flash />
 
         <x-card class="p-6">
             <p class="text-sm text-text-secondary">

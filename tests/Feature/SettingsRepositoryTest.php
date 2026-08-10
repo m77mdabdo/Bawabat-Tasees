@@ -118,16 +118,11 @@ class SettingsRepositoryTest extends TestCase
         $this->assertSame('fallback', app(SettingsRepository::class)->get('nope', 'fallback'));
     }
 
-    public function test_group_returns_only_that_group(): void
-    {
-        Setting::factory()->create(['key' => 'contact_phone', 'group' => 'contact', 'value' => 'p']);
-        Setting::factory()->create(['key' => 'social_x', 'group' => 'social', 'value' => 's']);
-
-        $contact = app(SettingsRepository::class)->group('contact');
-
-        $this->assertTrue($contact->has('contact_phone'));
-        $this->assertFalse($contact->has('social_x'));
-    }
+    // group() was removed along with its method: it had this test and no
+    // production caller at all, so the test was the only thing keeping it
+    // alive. Every real lookup goes through get()/string()/translated(),
+    // which read the single cached copy of the table rather than issuing a
+    // second query the way group() did.
 
     /**
      * An admin editing a setting must see it immediately, so the in-memory

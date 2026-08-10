@@ -49,8 +49,24 @@ class UpdateSettingsRequest extends FormRequest
             };
         }
 
-        // The logo arrives as a file, outside the settings array.
-        $rules['site_logo'] = ['nullable', 'image', 'mimes:jpeg,png,webp,svg', 'max:2048'];
+        /*
+         * The logo arrives as a file, outside the settings array.
+         *
+         * NO SVG, deliberately. The form used to offer it — `accept` listed
+         * image/svg+xml and this rule listed `svg` — but Laravel's `image`
+         * rule rejects SVG unless given `allow_svg`, and it runs first, so
+         * an admin who picked one got a confusing failure with no
+         * explanation. Rather than add `allow_svg`, this closes the door:
+         * an SVG is an executable document, `storage/settings/*.svg` is
+         * served same-origin, and navigating straight to it would run any
+         * script it carries in this site's origin. There is no SVG
+         * sanitiser in the project, and the media library already restricts
+         * itself to raster formats for the same reason.
+         *
+         * `mimes` is kept alongside `image` so the accepted list is stated
+         * once, visibly, rather than inherited from the framework's default.
+         */
+        $rules['site_logo'] = ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'];
 
         return $rules;
     }

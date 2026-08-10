@@ -28,19 +28,9 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            @if (session('status'))
-                <div class="p-4 bg-green-100 text-green-800 rounded-md">{{ session('status') }}</div>
-            @endif
+            <x-flash />
 
-            @if ($errors->any())
-                <div class="p-4 bg-red-100 text-red-800 rounded-md">
-                    <ul class="list-disc space-y-1 ps-5 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <x-flash type="error" :messages="$errors->all()" />
 
             {{-- enctype: the logo is a file upload. --}}
             <form method="POST" action="{{ route('dashboard.settings.update') }}" enctype="multipart/form-data" class="space-y-6">
@@ -77,7 +67,10 @@
                                             <img src="{{ Illuminate\Support\Facades\Storage::url($values[$key]) }}"
                                                 alt="{{ __('dashboard.settings.current_logo') }}" class="mb-2 mt-1 h-16 w-auto">
                                         @endif
-                                        <input id="{{ $key }}" name="{{ $key }}" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                                        {{-- No image/svg+xml: SVG is an executable document and
+                                             would be served same-origin from /storage — see the
+                                             site_logo rule in UpdateSettingsRequest. --}}
+                                        <input id="{{ $key }}" name="{{ $key }}" type="file" accept="image/jpeg,image/png,image/webp"
                                             class="mt-1 block w-full max-w-full py-2 text-sm text-text-main file:me-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0 file:bg-bg-soft file:px-4 file:text-sm file:font-medium file:text-text-main hover:file:bg-border-default">
                                         <p class="mt-1 text-xs text-text-secondary">{{ __('dashboard.settings.logo_hint') }}</p>
                                         <x-input-error :messages="$errors->get($key)" class="mt-2" />

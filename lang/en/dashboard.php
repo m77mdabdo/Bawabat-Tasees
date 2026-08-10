@@ -565,7 +565,7 @@ return [
         'subtitle' => 'The global details shown across the site.',
         'save' => 'Save settings',
         'current_logo' => 'Current logo',
-        'logo_hint' => 'Leave empty to keep the current logo. Preferred size 512x512 pixels.',
+        'logo_hint' => 'JPEG, PNG or WebP, up to 2MB. Leave empty to keep the current logo. Preferred size 512x512 pixels.',
         'optional_hint' => 'Leave empty to hide it from the site.',
         'groups' => [
             'general' => 'General',

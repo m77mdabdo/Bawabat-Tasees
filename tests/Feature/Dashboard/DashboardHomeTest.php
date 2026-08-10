@@ -13,7 +13,6 @@ use App\Models\Service;
 use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\CreatesAdminUsers;
 use Tests\TestCase;
 

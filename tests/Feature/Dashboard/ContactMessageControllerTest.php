@@ -6,6 +6,7 @@ use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Tests\Concerns\CreatesAdminUsers;
 use Tests\TestCase;
 
@@ -285,7 +286,7 @@ class ContactMessageControllerTest extends TestCase
     public function test_contact_messages_are_leads_not_a_separate_table(): void
     {
         $this->assertFalse(
-            \Illuminate\Support\Facades\Schema::hasTable('contact_messages'),
+            Schema::hasTable('contact_messages'),
             'Contact submissions live in leads with type = contact.'
         );
 

@@ -87,14 +87,6 @@ class SettingsRepository
     }
 
     /**
-     * @return Collection<string, mixed>
-     */
-    public function group(string $group): Collection
-    {
-        return Setting::where('group', $group)->get(['key', 'value'])->pluck('value', 'key');
-    }
-
-    /**
      * Drops the in-memory copy so a write is reflected by later reads in
      * the same request.
      */

@@ -12,6 +12,7 @@ use Database\Seeders\SettingsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\CreatesAdminUsers;
 use Tests\TestCase;
 
@@ -196,6 +197,79 @@ class SettingsControllerTest extends TestCase
         $this->save()->assertRedirect();
 
         $this->assertSame('settings/existing.png', app(SettingsRepository::class)->string('site_logo'));
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function acceptedLogoFormats(): array
+    {
+        return [
+            'png' => ['logo.png', 'png'],
+            'jpeg' => ['logo.jpg', 'jpg'],
+            'webp' => ['logo.webp', 'webp'],
+        ];
+    }
+
+    #[DataProvider('acceptedLogoFormats')]
+    public function test_every_offered_logo_format_is_actually_accepted(string $name, string $extension): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs($this->makeAdmin())
+            ->put(route('dashboard.settings.update'), $this->payload() + [
+                'site_logo' => UploadedFile::fake()->image($name),
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect();
+
+        $path = app(SettingsRepository::class)->string('site_logo');
+
+        $this->assertNotNull($path);
+        $this->assertStringEndsWith('.'.$extension, $path);
+    }
+
+    /**
+     * The form used to offer SVG in both `accept` and `mimes:` while the
+     * `image` rule — which runs first — rejected it, so picking one failed
+     * with no explanation. SVG is now refused deliberately and consistently:
+     * it is an executable document, and storage/settings/*.svg is served
+     * same-origin, so navigating straight to it would run any script it
+     * carries in this site's origin.
+     */
+    public function test_an_svg_logo_is_rejected_and_leaves_the_current_one_alone(): void
+    {
+        Storage::fake('public');
+        Setting::where('key', 'site_logo')->first()->update(['value' => 'settings/existing.png']);
+
+        $svg = UploadedFile::fake()->createWithContent(
+            'logo.svg',
+            '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'
+        );
+
+        $this->actingAs($this->makeAdmin())
+            ->put(route('dashboard.settings.update'), $this->payload() + ['site_logo' => $svg])
+            ->assertSessionHasErrors('site_logo');
+
+        $this->assertSame('settings/existing.png', app(SettingsRepository::class)->string('site_logo'));
+        Storage::disk('public')->assertDirectoryEmpty('settings');
+    }
+
+    /**
+     * The form must not advertise a format the validator refuses — that
+     * mismatch is what this pair of changes existed to remove.
+     */
+    public function test_the_form_does_not_offer_a_format_the_validator_rejects(): void
+    {
+        $html = $this->actingAs($this->makeAdmin())
+            ->get(route('dashboard.settings.edit'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString('accept="image/jpeg,image/png,image/webp"', $html);
+        // Narrow, not a bare 'svg': the dashboard chrome is full of inline
+        // <svg> icons.
+        $this->assertStringNotContainsString('image/svg+xml', $html);
     }
 
     // ---------------------------------------------------------------

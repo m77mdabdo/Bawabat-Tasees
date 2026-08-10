@@ -27,19 +27,9 @@
 
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            @if (session('status'))
-                <div class="p-4 bg-green-100 text-green-800 rounded-md">{{ session('status') }}</div>
-            @endif
+            <x-flash />
 
-            @if ($errors->any())
-                <div class="p-4 bg-red-100 text-red-800 rounded-md">
-                    <ul class="list-disc space-y-1 ps-5 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <x-flash type="error" :messages="$errors->all()" />
 
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 <p class="text-xs text-text-secondary">{{ __('dashboard.menu.order_hint') }}</p>

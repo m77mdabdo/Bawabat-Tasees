@@ -82,22 +82,6 @@ class SettingsService
         return array_merge(...array_values(self::DEFINITION));
     }
 
-    public static function typeOf(string $key): ?string
-    {
-        return self::keys()[$key] ?? null;
-    }
-
-    public static function groupOf(string $key): ?string
-    {
-        foreach (self::DEFINITION as $group => $keys) {
-            if (array_key_exists($key, $keys)) {
-                return $group;
-            }
-        }
-
-        return null;
-    }
-
     /**
      * Persists the submitted values.
      *

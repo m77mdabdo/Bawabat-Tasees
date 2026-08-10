@@ -14,9 +14,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            @if (session('status'))
-                <div class="p-4 bg-green-100 text-green-800 rounded-md">{{ session('status') }}</div>
-            @endif
+            <x-flash />
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
                 @foreach ([

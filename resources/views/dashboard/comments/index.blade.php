@@ -6,11 +6,7 @@
     </x-slot>
 
     <div class="space-y-6">
-        @if (session('status'))
-            <div class="rounded-md bg-primary-green/5 border border-primary-green/30 p-4 text-primary-green">
-                {{ session('status') }}
-            </div>
-        @endif
+        <x-flash />
 
         <x-card class="p-4">
             <form method="GET" action="{{ route('dashboard.comments.index') }}" class="grid grid-cols-1 gap-4 sm:grid-cols-3">
