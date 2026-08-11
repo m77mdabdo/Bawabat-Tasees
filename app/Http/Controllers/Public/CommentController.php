@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreCommentRequest;
 use App\Models\Article;
 use App\Models\Comment;
+use App\Services\Analytics\VisitorSessionService;
 use Illuminate\Http\RedirectResponse;
 
 class CommentController extends Controller
 {
+    public function __construct(
+        private readonly VisitorSessionService $visitorSessions,
+    ) {}
+
     public function store(StoreCommentRequest $request, Article $article): RedirectResponse
     {
         // Same rules as the article's own public show() action — no
@@ -41,6 +46,10 @@ class CommentController extends Controller
             'status' => 'pending',
             'ip_address' => $request->ip(),
         ]);
+
+        // No lead: a comment is engagement, not a conversion. The journey
+        // records that it happened without claiming the session converted.
+        $this->visitorSessions->recordConversion($request, 'comment_submitted');
 
         return redirect()
             ->to(lroute('articles.show', $article))

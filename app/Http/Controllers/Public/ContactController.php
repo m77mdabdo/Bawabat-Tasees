@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreContactRequest;
 use App\Models\Lead;
+use App\Services\Analytics\VisitorSessionService;
 use App\Services\Cms\SettingsRepository;
 use App\Services\Marketing\AttributionService;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,7 @@ class ContactController extends Controller
     public function __construct(
         private readonly AttributionService $attributionService,
         private readonly SettingsRepository $settings,
+        private readonly VisitorSessionService $visitorSessions,
     ) {}
 
     public function create(): View
@@ -45,13 +47,15 @@ class ContactController extends Controller
             'consent_given',
         ]);
 
-        Lead::create([
+        $lead = Lead::create([
             ...$data,
             ...$this->attributionService->resolve($request),
             'type' => 'contact',
             'consent_given' => true,
             'consented_at' => now(),
         ]);
+
+        $this->visitorSessions->recordConversion($request, 'contact_submitted', $lead);
 
         return redirect($redirectTarget)
             ->with('status', __('site.flash.contact_submitted'));

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreConsultationRequest;
 use App\Models\Lead;
 use App\Models\Service;
+use App\Services\Analytics\VisitorSessionService;
 use App\Services\Marketing\AttributionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -13,7 +14,8 @@ use Illuminate\View\View;
 class ConsultationController extends Controller
 {
     public function __construct(
-        private readonly AttributionService $attributionService
+        private readonly AttributionService $attributionService,
+        private readonly VisitorSessionService $visitorSessions,
     ) {}
 
     public function create(): View
@@ -42,13 +44,18 @@ class ConsultationController extends Controller
             'consent_given',
         ]);
 
-        Lead::create([
+        $lead = Lead::create([
             ...$data,
             ...$this->attributionService->resolve($request),
             'type' => 'consultation',
             'consent_given' => true,
             'consented_at' => now(),
         ]);
+
+        // After the Lead exists, and after the honeypot return above — a
+        // caught bot leaves no journey entry either. Silent if the visitor
+        // never consented; the form works regardless.
+        $this->visitorSessions->recordConversion($request, 'consultation_submitted', $lead);
 
         return redirect()
             ->to(lroute('consultation'))

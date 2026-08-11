@@ -46,7 +46,39 @@ class VisitorSessionService
     public function __construct(
         private readonly IpAnonymizer $ipAnonymizer,
         private readonly UserAgentParser $userAgents,
+        private readonly VisitorTrackingGate $gate,
     ) {}
+
+    /**
+     * The one call the form controllers make: log what the visitor did and,
+     * when it produced a lead, link the journey to it.
+     *
+     * All of the gate, cookie and uid handling lives here rather than in
+     * three controllers, so a form added later cannot record a conversion
+     * without the same consent check the middleware applies. A refusal is
+     * silent — the form still works, there is simply no journey to write to.
+     */
+    public function recordConversion(Request $request, string $label, ?Lead $lead = null): void
+    {
+        if (! $this->gate->allows($request)) {
+            return;
+        }
+
+        $uid = $request->cookie(self::COOKIE);
+
+        // No cookie means no journey — a visitor whose first ever request is
+        // the form POST itself, which the middleware never saw because it
+        // only tracks GETs.
+        if (! is_string($uid) || ! preg_match('/^[a-f0-9]{32}$/', $uid)) {
+            return;
+        }
+
+        $this->recordAction($request, $uid, $label);
+
+        if ($lead !== null) {
+            $this->linkLead($uid, $lead);
+        }
+    }
 
     /**
      * Records a page view, starting the session if this is the first one.
