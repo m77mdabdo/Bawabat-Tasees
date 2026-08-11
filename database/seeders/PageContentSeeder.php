@@ -11,6 +11,25 @@ use Illuminate\Database\Seeder;
  * unverifiable statistics, no specific legal claims) — it is a starting
  * point for the admin to review and refine via the dashboard Pages screen,
  * not final legally-reviewed content.
+ *
+ * THIS SEEDER BOOTSTRAPS, IT DOES NOT MIGRATE.
+ *
+ * Every write here is create-only: a page that already exists is left
+ * completely alone, content and sections both. It used to call
+ * Page::updateOrCreate, which quietly made `db:seed` destructive on a live
+ * site — an admin who had spent an afternoon rewriting the privacy policy
+ * in the dashboard would lose it to anyone reseeding to pick up an
+ * unrelated change. That is a bad enough failure to be worth giving up the
+ * ability to refresh copy this way.
+ *
+ * Content changes to an EXISTING install ship as data migrations instead —
+ * see 2026_08_11_140000_add_visitor_session_privacy_disclosure, which
+ * appends a section only when it is not already there. More work per
+ * change, and the right trade: a migration runs once, states its own
+ * idempotency, and cannot silently destroy prose.
+ *
+ * A fresh install is unchanged; this is still the single source of the
+ * original copy.
  */
 class PageContentSeeder extends Seeder
 {
@@ -27,7 +46,7 @@ class PageContentSeeder extends Seeder
     private function seedAbout(): void
     {
         // About is intro-only per this task's scope — no sections.
-        Page::updateOrCreate(
+        $this->seedPage(
             ['slug' => 'about'],
             [
                 'is_published' => true,
@@ -43,7 +62,7 @@ class PageContentSeeder extends Seeder
 
     private function seedWhyInvest(): void
     {
-        $page = Page::updateOrCreate(
+        $page = $this->seedPage(
             ['slug' => 'why-invest-saudi-arabia'],
             [
                 'is_published' => true,
@@ -68,7 +87,7 @@ class PageContentSeeder extends Seeder
 
     private function seedFormationProcess(): void
     {
-        $page = Page::updateOrCreate(
+        $page = $this->seedPage(
             ['slug' => 'formation-process'],
             [
                 'is_published' => true,
@@ -94,7 +113,7 @@ class PageContentSeeder extends Seeder
 
     private function seedRequiredDocuments(): void
     {
-        $page = Page::updateOrCreate(
+        $page = $this->seedPage(
             ['slug' => 'required-documents'],
             [
                 'is_published' => true,
@@ -136,7 +155,7 @@ class PageContentSeeder extends Seeder
      */
     private function seedPrivacyPolicy(): void
     {
-        Page::updateOrCreate(
+        $this->seedPage(
             ['slug' => 'privacy-policy'],
             [
                 'is_published' => true,
@@ -197,7 +216,7 @@ class PageContentSeeder extends Seeder
 
     private function seedTermsAndConditions(): void
     {
-        Page::updateOrCreate(
+        $this->seedPage(
             ['slug' => 'terms-and-conditions'],
             [
                 'is_published' => true,
@@ -256,9 +275,27 @@ class PageContentSeeder extends Seeder
      * clears and re-creates them rather than risking duplicates or stale
      * leftovers if the starter content list changes.
      */
+    /**
+     * Creates the page when it is missing, and returns the existing row
+     * untouched when it is not. See the class docblock for why this is not
+     * an upsert.
+     *
+     * @param  array<string, mixed>  $keys
+     * @param  array<string, mixed>  $attributes
+     */
+    private function seedPage(array $keys, array $attributes): Page
+    {
+        return Page::where($keys)->first() ?? Page::create([...$keys, ...$attributes]);
+    }
+
     private function replaceSections(Page $page, array $sections): void
     {
-        $page->sections()->delete();
+        // Create-only, like the pages themselves. This used to delete every
+        // section and recreate it, so reseeding threw away admin edits AND
+        // reassigned every section's primary key.
+        if ($page->sections()->exists()) {
+            return;
+        }
 
         foreach ($sections as $index => $section) {
             $page->sections()->create([
