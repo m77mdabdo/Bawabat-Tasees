@@ -6,10 +6,32 @@
      * never hardcoded here; they only ever come from the tracking_settings
      * table, edited via the dashboard's Tracking Settings screen.
      *
-     * Every script tag loads asynchronously (async / dynamically-inserted
-     * <script> elements), matching each platform's own recommended
-     * snippet — none of this blocks page rendering.
+     * CONSENT. Nothing here tracks anybody until the visitor accepts the
+     * cookie banner. Two different mechanisms, because the platforms differ:
+     *
+     *   GOOGLE (GTM + GA4 + Ads) uses Consent Mode v2. gtag.js still loads,
+     *   but the FIRST thing on the page sets every consent signal to
+     *   'denied', so it sets no cookies and sends no identifiers — it sends
+     *   only cookieless pings, which is what feeds Google's conversion
+     *   modelling. On consent it is updated to 'granted'. This is the
+     *   mechanism Google designed for exactly this, and the reason to prefer
+     *   it over not loading at all: a site that withholds the tag entirely
+     *   loses the modelled data too.
+     *
+     *   META and TIKTOK have no equivalent. Their consent APIs still require
+     *   loading the vendor script first, which is itself a request carrying
+     *   the visitor's IP to a third party. So those two are not loaded at
+     *   all until consent — the snippets sit inside btsPixels.load() and
+     *   nothing calls it until the visitor agrees.
+     *
+     * Consent arrives by two routes and both are handled: this component
+     * calls the loader server-side when the request already carries the
+     * consent cookie (a returning visitor, tracked from the first paint),
+     * and resources/js/visitor-session.js calls it the moment the banner is
+     * accepted (a new visitor, tracked without needing a reload).
      */
+    use App\Services\Analytics\VisitorTrackingGate;
+
     $tracking = \App\Models\TrackingSetting::query()
         ->where('is_active', true)
         ->whereNotNull('value')
@@ -21,29 +43,62 @@
     $gtm = $tracking->get('gtm_container_id');
     $gtagTargets = collect([$tracking->get('ga4_measurement_id'), $tracking->get('google_ads_conversion_id')])->filter();
     $tiktok = $tracking->get('tiktok_pixel_id');
+
+    $hasGoogle = $gtm || $gtagTargets->isNotEmpty();
+    $hasDeferred = $metaPixel || $tiktok;
+
+    // Read once, server-side. app(...) rather than a view composer because
+    // this component is the only thing that needs it.
+    $marketingConsent = app(VisitorTrackingGate::class)->marketingAllowed(request());
 @endphp
-@if ($metaPixel)
-    {{-- Meta (Facebook) Pixel — official base snippet, fires PageView automatically. --}}
+
+@if ($hasGoogle)
+    {{--
+        Consent Mode v2 defaults. This block MUST come before gtag.js and
+        before the GTM container, or the tag will have already run once in
+        its unrestricted default state — the ordering is the entire
+        mechanism, not a style preference.
+    --}}
     <script>
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '{{ $metaPixel->value }}');
-        fbq('track', 'PageView');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'personalization_storage': 'denied',
+            /* Not tracking signals: these cover things like remembering a
+               language choice and anti-abuse, which the site needs to work. */
+            'functionality_storage': 'granted',
+            'security_storage': 'granted',
+            /* Holds tags for 500ms so a consent update that lands moments
+               later is applied to the first event rather than after it. */
+            'wait_for_update': 500
+        });
+
+        window.btsConsent = window.btsConsent || {};
+        window.btsConsent.grantGoogle = function () {
+            gtag('consent', 'update', {
+                'ad_storage': 'granted',
+                'ad_user_data': 'granted',
+                'ad_personalization': 'granted',
+                'analytics_storage': 'granted',
+                'personalization_storage': 'granted'
+            });
+        };
+
+        @if ($marketingConsent)
+            /* Returning visitor who already agreed: granted before the tag
+               below loads, so nothing is lost to the denied window. */
+            window.btsConsent.grantGoogle();
+        @endif
     </script>
-    <noscript>
-        <img height="1" width="1" style="display:none" alt=""
-            src="https://www.facebook.com/tr?id={{ $metaPixel->value }}&ev=PageView&noscript=1">
-    </noscript>
 @endif
 
 @if ($gtm)
-    {{-- Google Tag Manager --}}
+    {{-- Google Tag Manager. Reads the consent state from dataLayer above. --}}
     <script>
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -56,11 +111,10 @@
 @if ($gtagTargets->isNotEmpty())
     {{-- Google Analytics 4 / Google Ads — one shared gtag.js loader, one
          gtag('config', ...) call per active ID, so both can be active at
-         once without loading the loader script twice. --}}
+         once without loading the loader script twice. dataLayer and gtag()
+         are already defined by the consent block above. --}}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gtagTargets->first()->value }}"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         @foreach ($gtagTargets as $target)
             gtag('config', '{{ $target->value }}');
@@ -68,13 +122,72 @@
     </script>
 @endif
 
-@if ($tiktok)
-    {{-- TikTok Pixel — official base snippet, fires page view automatically. --}}
+@if ($hasDeferred)
+    {{--
+        Meta and TikTok, defined but NOT executed.
+
+        Nothing in here runs — and no request reaches facebook.net or
+        tiktok.com — until btsPixels.load() is called. The IDs being present
+        in the page source is harmless: they are public identifiers that
+        appear in any page that uses them, which the Tracking Settings
+        screen says in as many words.
+    --}}
     <script>
-        !function (w, d, t) {
-            w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<e.length;n++)ttq.setAndDefer(e,e[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
-            ttq.load('{{ $tiktok->value }}');
-            ttq.page();
-        }(window, document, 'ttq');
+        window.btsPixels = window.btsPixels || {};
+        window.btsPixels.loaded = false;
+
+        window.btsPixels.load = function () {
+            /* Guarded because both the server block below and the consent
+               banner can call this, and a double-loaded pixel double-counts
+               every PageView. */
+            if (window.btsPixels.loaded) {
+                return;
+            }
+            window.btsPixels.loaded = true;
+
+            @if ($metaPixel)
+                /* Meta (Facebook) Pixel — official base snippet, fires PageView. */
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '{{ $metaPixel->value }}');
+                fbq('track', 'PageView');
+            @endif
+
+            @if ($tiktok)
+                /* TikTok Pixel — official base snippet, fires page view. */
+                !function (w, d, t) {
+                    w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<e.length;n++)ttq.setAndDefer(e,e[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+                    ttq.load('{{ $tiktok->value }}');
+                    ttq.page();
+                }(window, document, 'ttq');
+            @endif
+        };
+
+        @if ($marketingConsent)
+            /* Returning visitor who already agreed. */
+            window.btsPixels.load();
+        @endif
     </script>
+@endif
+
+@if ($metaPixel && $marketingConsent)
+    {{--
+        The Meta no-JS fallback. Gated on the SERVER because it is an <img>:
+        it fires on parse with no JavaScript involved, so the client-side
+        loader above cannot hold it back.
+
+        A visitor with JavaScript disabled can never have accepted the
+        banner (it is an Alpine component), so in practice this only renders
+        for someone who consented earlier and has since turned JS off.
+    --}}
+    <noscript>
+        <img height="1" width="1" style="display:none" alt=""
+            src="https://www.facebook.com/tr?id={{ $metaPixel->value }}&ev=PageView&noscript=1">
+    </noscript>
 @endif

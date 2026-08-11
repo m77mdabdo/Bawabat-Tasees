@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Testimonial;
 use App\Models\TrackingSetting;
+use App\Services\Analytics\VisitorTrackingGate;
 use Database\Seeders\MenuItemSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -317,6 +318,12 @@ class HomeTest extends TestCase
         $response->assertDontSee('fbq(', false);
     }
 
+    /**
+     * The base code is on the page when the pixel is active — but inside
+     * btsPixels.load(), which nothing calls until the visitor consents.
+     * Being present in the source and being executed are different things;
+     * see MarketingConsentTest for the gating itself.
+     */
     public function test_tracking_scripts_render_meta_pixel_base_code_when_active_with_a_test_id(): void
     {
         TrackingSetting::create(['key' => 'meta_pixel_id', 'value' => '999999999999999', 'is_active' => true]);
@@ -326,6 +333,19 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertSee('connect.facebook.net/en_US/fbevents.js', false);
         $response->assertSee("fbq('init', '999999999999999');", false);
-        $response->assertSee('facebook.com/tr?id=999999999999999', false);
+
+        // The <noscript> fallback used to render unconditionally. It cannot
+        // be held back by JavaScript — an <img> fires on parse — so it is
+        // now gated on the server and is absent without consent.
+        $response->assertDontSee('facebook.com/tr?id=999999999999999', false);
+    }
+
+    public function test_the_meta_noscript_pixel_appears_once_the_visitor_consents(): void
+    {
+        TrackingSetting::create(['key' => 'meta_pixel_id', 'value' => '999999999999999', 'is_active' => true]);
+
+        $this->withUnencryptedCookies([
+            VisitorTrackingGate::CONSENT_COOKIE => VisitorTrackingGate::CONSENT_GRANTED,
+        ])->get('/')->assertOk()->assertSee('facebook.com/tr?id=999999999999999', false);
     }
 }

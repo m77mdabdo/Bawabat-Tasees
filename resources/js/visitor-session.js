@@ -63,6 +63,25 @@ export function doNotTrackEnabled() {
 }
 
 /**
+ * Releases the marketing tags the moment the visitor agrees, so a new
+ * visitor is tracked from the page they consented on rather than from the
+ * next one they happen to load.
+ *
+ * Both hooks are defined by components/tracking-scripts.blade.php and are
+ * absent when the corresponding platform has no ID configured — hence the
+ * optional calls rather than assuming either exists.
+ *
+ *   grantGoogle() flips Consent Mode v2 from denied to granted. The tag is
+ *   already on the page in its restricted state.
+ *   btsPixels.load() actually injects Meta and TikTok, which until this
+ *   point have not been fetched at all.
+ */
+function grantMarketingConsent() {
+    window.btsConsent?.grantGoogle?.();
+    window.btsPixels?.load?.();
+}
+
+/**
  * The banner.
  *
  * `decided` starts true when DNT is on, so the banner never appears — the
@@ -80,6 +99,7 @@ Alpine.data('cookieConsent', () => ({
         setCookie(CONSENT_COOKIE, CONSENT_GRANTED, CONSENT_DAYS);
         this.decided = true;
         startBeacon();
+        grantMarketingConsent();
     },
 
     decline() {

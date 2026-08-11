@@ -77,6 +77,29 @@ class VisitorTrackingGate
     }
 
     /**
+     * Whether the visitor has agreed to MARKETING tracking — the Meta,
+     * TikTok and Google tags.
+     *
+     * Deliberately NOT allows(). That method also consults
+     * visitor_sessions_enabled, which is the switch for journey recording;
+     * routing the pixels through it would mean turning off session recording
+     * silently killed the marketing tags too, which is not what that switch
+     * says it does.
+     *
+     * What the two share is the part that matters: the same consent cookie
+     * and the same DNT/GPC override, so a visitor cannot be refused by one
+     * subsystem and tracked by the other.
+     */
+    public function marketingAllowed(Request $request): bool
+    {
+        if ($this->doNotTrackRequested($request)) {
+            return false;
+        }
+
+        return $request->cookie(self::CONSENT_COOKIE) === self::CONSENT_GRANTED;
+    }
+
+    /**
      * DNT: 1 is the header. Sec-GPC is the Global Privacy Control signal,
      * which has actual legal force in some jurisdictions where DNT never
      * did; honouring both costs nothing and there is no argument for
