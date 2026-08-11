@@ -44,6 +44,11 @@ class UpdateSettingsRequest extends FormRequest
                 // down further.
                 SettingsService::TYPE_PHONE => [$field => ['nullable', 'string', 'regex:/^[0-9+\-\s()]{6,30}$/']],
                 SettingsService::TYPE_URL => [$field => ['nullable', 'string', 'url', 'max:255', 'starts_with:https://,http://']],
+                SettingsService::TYPE_BOOLEAN => [$field => ['nullable', 'boolean']],
+                // Bounded here as well as clamped at the point of use: a
+                // retention window reaches a DELETE, and "0 days" would mean
+                // "delete everything including today".
+                SettingsService::TYPE_INTEGER => [$field => ['nullable', 'integer', 'min:1', 'max:3650']],
                 SettingsService::TYPE_IMAGE => [],
                 default => [$field => ['nullable', 'string', 'max:500']],
             };

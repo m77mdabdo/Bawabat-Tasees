@@ -78,6 +78,32 @@
                                         <x-input-error :messages="$errors->get($key)" class="mt-2" />
                                     </div>
 
+                                @elseif ($type === SettingsService::TYPE_BOOLEAN)
+                                    {{-- The hidden 0 is what makes "unchecked" reach the
+                                         server at all: a bare unchecked checkbox is simply
+                                         absent from the payload. SettingsService treats an
+                                         absent boolean as false for the same reason, so
+                                         this is belt and braces, but it also keeps old()
+                                         working on a failed round-trip. --}}
+                                    <div>
+                                        <label class="flex min-h-[44px] cursor-pointer items-center gap-3">
+                                            <input type="hidden" name="settings[{{ $key }}]" value="0">
+                                            <input type="checkbox" name="settings[{{ $key }}]" value="1"
+                                                @checked(old('settings.'.$key, $values[$key] ?? false))
+                                                class="rounded border-border-default text-primary-green shadow-sm focus:ring-primary-green">
+                                            <span class="text-sm font-medium text-text-main">{{ __('dashboard.settings.fields.'.$key) }}</span>
+                                        </label>
+                                        <x-input-error :messages="$errors->get('settings.'.$key)" class="mt-2" />
+                                    </div>
+
+                                @elseif ($type === SettingsService::TYPE_INTEGER)
+                                    <div>
+                                        <x-input-label :for="$key" :value="__('dashboard.settings.fields.'.$key)" />
+                                        <x-text-input :id="$key" :name="'settings['.$key.']'" type="number" min="1" max="3650" dir="ltr"
+                                            class="mt-1 block w-full sm:max-w-[12rem]" :value="$current($key)" />
+                                        <x-input-error :messages="$errors->get('settings.'.$key)" class="mt-2" />
+                                    </div>
+
                                 @else
                                     <div>
                                         <x-input-label :for="$key" :value="__('dashboard.settings.fields.'.$key)" />

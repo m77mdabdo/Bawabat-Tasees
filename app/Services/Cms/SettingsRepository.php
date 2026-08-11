@@ -42,6 +42,40 @@ class SettingsRepository
     }
 
     /**
+     * A stored flag.
+     *
+     * Tolerant of shape on purpose: this column has held JSON-encoded
+     * scalars since it was created, so a flag can legitimately arrive as
+     * true, "1", 1 or "true" depending on whether it came from the seeder,
+     * the editor form or a hand-edited row. FILTER_VALIDATE_BOOLEAN treats
+     * all of those alike, and null (never set) falls back to $default rather
+     * than to false — the difference matters for a feature whose default is
+     * "on".
+     */
+    public function boolean(string $key, bool $default = false): bool
+    {
+        $value = $this->get($key);
+
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default;
+    }
+
+    /**
+     * A stored whole number, or $default when unset or not numeric. Callers
+     * that use the result in a query are expected to clamp it themselves —
+     * see VisitorTrackingGate::retentionDays().
+     */
+    public function integer(string $key, int $default = 0): int
+    {
+        $value = $this->get($key);
+
+        return is_numeric($value) ? (int) $value : $default;
+    }
+
+    /**
      * A bilingual setting in the current locale, falling back to Arabic —
      * the same fallback rule HasTranslations applies to model fields, so
      * a setting with no English value shows its Arabic one rather than

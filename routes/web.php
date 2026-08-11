@@ -76,10 +76,15 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
 };
 
 // Arabic — canonical names, no prefix.
-Route::middleware('setlocale')->group(fn () => $registerPublicRoutes());
+//
+// 'trackvisitor' records the visitor journey. It is on the PUBLIC groups
+// only: an admin browsing the site from the dashboard is not a visitor, and
+// the middleware itself writes nothing until the gate agrees (consent, DNT,
+// bot filter, the admin switch — see VisitorTrackingGate).
+Route::middleware(['setlocale', 'trackvisitor'])->group(fn () => $registerPublicRoutes());
 
 // English — "{name}.en" names, "en" prefix.
-Route::prefix('en')->middleware('setlocale')->group(fn () => $registerPublicRoutes('.en'));
+Route::prefix('en')->middleware(['setlocale', 'trackvisitor'])->group(fn () => $registerPublicRoutes('.en'));
 
 // Same write throttle as the dashboard group — profile update and account
 // deletion are authenticated writes with no other ceiling on them.

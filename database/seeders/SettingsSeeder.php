@@ -96,6 +96,13 @@ class SettingsSeeder extends Seeder
                 'ar' => 'بوابة تأسيس الشركات — تأسيس شركتك في السعودية',
                 'en' => 'Bawabat Taasees Al Sharikat — Company Formation in Saudi Arabia',
             ]],
+            // Visitor sessions. Capture defaults ON but records nothing until
+            // a visitor accepts the cookie banner, so a fresh install is not
+            // quietly collecting anything. 90 days matches the retention
+            // window named in the privacy policy.
+            ['key' => 'visitor_sessions_enabled', 'group' => 'visitor_sessions', 'value' => true],
+            ['key' => 'visitor_sessions_retention_days', 'group' => 'visitor_sessions', 'value' => 90],
+
             ['key' => 'home_meta_description', 'group' => 'home_seo', 'value' => [
                 'ar' => 'خدمات متكاملة لتأسيس الشركات والاستثمار في المملكة العربية السعودية: التراخيص، السجل التجاري، والمتطلبات النظامية للمستثمرين الأجانب.',
                 'en' => 'End-to-end company formation and investment services in Saudi Arabia: licensing, commercial registration and the regulatory requirements for foreign investors.',

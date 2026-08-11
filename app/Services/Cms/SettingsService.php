@@ -35,6 +35,10 @@ class SettingsService
 
     public const TYPE_IMAGE = 'image';
 
+    public const TYPE_BOOLEAN = 'boolean';
+
+    public const TYPE_INTEGER = 'integer';
+
     /**
      * group => [key => type]. Order here is the order rendered in the UI.
      */
@@ -81,6 +85,19 @@ class SettingsService
             'home_meta_title' => self::TYPE_TRANSLATED,
             'home_meta_description' => self::TYPE_TRANSLATED,
         ],
+        /*
+         * Visitor session journeys. Both of these are privacy controls, not
+         * preferences, which is why they live in the admin UI rather than in
+         * a config file: turning capture off and shortening retention are
+         * things a site owner may need to do immediately, without a deploy.
+         *
+         * Retention is enforced by the visitor-sessions:prune command, which
+         * clamps whatever is stored here before it reaches a DELETE.
+         */
+        'visitor_sessions' => [
+            'visitor_sessions_enabled' => self::TYPE_BOOLEAN,
+            'visitor_sessions_retention_days' => self::TYPE_INTEGER,
+        ],
     ];
 
     public function __construct(
@@ -115,6 +132,16 @@ class SettingsService
                         if ($logo && $key === 'site_logo') {
                             $this->writeImage($key, $group, $logo);
                         }
+
+                        continue;
+                    }
+
+                    // An unchecked checkbox is absent from the payload
+                    // entirely, so a boolean cannot use the guard below —
+                    // "not submitted" IS the value false, whereas for every
+                    // other type it means "leave alone".
+                    if ($type === self::TYPE_BOOLEAN) {
+                        $this->write($key, $group, (bool) ($values[$key] ?? false));
 
                         continue;
                     }
@@ -160,6 +187,10 @@ class SettingsService
      */
     private function normalise(string $type, mixed $value): mixed
     {
+        if ($type === self::TYPE_INTEGER) {
+            return is_numeric($value) ? (int) $value : null;
+        }
+
         if ($type === self::TYPE_TRANSLATED) {
             $value = array_filter(
                 array_map(fn ($v) => is_string($v) ? trim($v) : $v, (array) $value),
