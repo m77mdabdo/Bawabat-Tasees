@@ -20,6 +20,7 @@ use App\Http\Controllers\Dashboard\ServiceController;
 use App\Http\Controllers\Dashboard\SettingsController;
 use App\Http\Controllers\Dashboard\TestimonialController;
 use App\Http\Controllers\Dashboard\TrackingSettingController;
+use App\Http\Controllers\Dashboard\VisitorSessionController;
 use Illuminate\Support\Facades\Route;
 
 // 'throttle:dashboard-writes' is applied to the whole group but only counts
@@ -60,6 +61,27 @@ Route::prefix('dashboard')->middleware(['auth', 'admin', 'dashboardlocale', 'thr
         Route::resource('lead-sources', LeadSourceController::class)
             ->except('show')
             ->parameters(['lead-sources' => 'leadSource']);
+
+        /*
+         * Visitor Sessions.
+         *
+         * ROUTE ORDER MATTERS: the two export routes are registered BEFORE
+         * the resource, or "visitor-sessions/export" would be swallowed by
+         * "visitor-sessions/{visitorSession}" and Laravel would try to
+         * resolve a session with the slug "export".
+         *
+         * The sidebar links to dashboard.visitor-sessions.index by name, so
+         * renaming any of these orphans that link and 500s every dashboard
+         * page — the same trap the lead-sources and contact-messages routes
+         * carry a note about.
+         */
+        Route::get('visitor-sessions/export', [VisitorSessionController::class, 'export'])
+            ->name('visitor-sessions.export');
+        Route::get('visitor-sessions/{visitorSession}/export', [VisitorSessionController::class, 'exportOne'])
+            ->name('visitor-sessions.export-one');
+        Route::resource('visitor-sessions', VisitorSessionController::class)
+            ->only(['index', 'show'])
+            ->parameters(['visitor-sessions' => 'visitorSession']);
 
         Route::resource('leads', LeadController::class)->only(['index', 'show', 'destroy']);
 

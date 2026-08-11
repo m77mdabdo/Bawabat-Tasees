@@ -123,6 +123,30 @@ class VisitorSession extends Model
     }
 
     /**
+     * The session length, for a person reading a table.
+     *
+     * Seconds below a minute, m:ss above it — "3:07" is read faster than
+     * "187 seconds", and an analytics duration past an hour is either a
+     * left-open tab or a bug, so hours are shown rather than folded away.
+     */
+    public function durationForHumans(): string
+    {
+        $seconds = max(0, $this->total_duration_seconds);
+
+        if ($seconds < 60) {
+            return $seconds.'s';
+        }
+
+        $hours = intdiv($seconds, 3600);
+        $minutes = intdiv($seconds % 3600, 60);
+        $remainder = $seconds % 60;
+
+        return $hours > 0
+            ? sprintf('%d:%02d:%02d', $hours, $minutes, $remainder)
+            : sprintf('%d:%02d', $minutes, $remainder);
+    }
+
+    /**
      * The attribution source this session arrived on, for the index column.
      * Reads the latest touch, matching the rule AttributionService uses for
      * the flat lead columns: latest-touch is what immediately preceded the

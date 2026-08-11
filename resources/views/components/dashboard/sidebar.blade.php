@@ -175,6 +175,18 @@
             @endif
         </x-dashboard.nav-link>
 
+        {{-- Links by route NAME: dashboard.visitor-sessions.index must keep
+             existing or every dashboard page 500s on the route() call. --}}
+        <x-dashboard.nav-link :href="route('dashboard.visitor-sessions.index')" :active="request()->routeIs('dashboard.visitor-sessions.*')">
+            <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <circle cx="5" cy="6" r="2" />
+                <circle cx="12" cy="12" r="2" />
+                <circle cx="19" cy="18" r="2" />
+                <path d="M7 6h3a2 2 0 012 2v2M14 12h1a2 2 0 012 2v2" stroke-dasharray="2 2" />
+            </svg>
+            {{ __('dashboard.sidebar.visitor_sessions') }}
+        </x-dashboard.nav-link>
+
         <x-dashboard.nav-link :href="route('dashboard.reports.index')" :active="request()->routeIs('dashboard.reports.*')">
             <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                 <path d="M4 20V10M10 20V4M16 20v-7M3 20h18" />
