@@ -36,6 +36,17 @@ return [
         'switch_to_arabic' => 'العربية',
     ],
 
+    // The cookie consent banner. Deliberately specific about what accepting
+    // permits: a banner that says "we use cookies" and nothing else is not
+    // informed consent.
+    'consent' => [
+        'aria_label' => 'Cookie consent',
+        'message' => 'We record how visitors move through this site so we can improve it. Nothing is recorded unless you agree, and we never store your full IP address.',
+        'policy_link' => 'Read our privacy policy',
+        'accept' => 'Accept',
+        'decline' => 'Decline',
+    ],
+
     // Controls for the parts of the site that move on their own. Every one
     // of them must be pausable — see resources/js/motion.js.
     'motion' => [

@@ -41,6 +41,12 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=ibm-plex-sans-arabic:400,500,600,700&display=swap" rel="stylesheet" />
 
+        {{-- The beacon needs both of these: an endpoint it can post to, and
+             a CSRF token it can put in a form field (sendBeacon cannot set
+             headers, so the token cannot travel as one). --}}
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="visitor-beacon-url" content="{{ route('visitor.beacon') }}">
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -258,5 +264,7 @@
         {{-- Stacked above the WhatsApp button when that one is rendering,
              so the two floats never overlap. --}}
         <x-back-to-top-button :stacked="(bool) $navWhatsapp" />
+
+        <x-public.cookie-consent :enabled="$visitorTrackingEnabled" />
     </body>
 </html>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
+use App\Http\Controllers\Public\VisitorBeaconController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -97,6 +98,24 @@ Route::middleware(['auth', 'dashboardlocale', 'throttle:dashboard-writes'])->gro
 require __DIR__.'/auth.php';
 require __DIR__.'/dashboard.php';
 
+/*
+ * The time-on-page beacon.
+ *
+ * Registered ONCE, outside the dual-locale closure: it is an endpoint, not
+ * a page, so it has no Arabic and English variants to keep in step.
+ *
+ * Deliberately NOT in the 'trackvisitor' group — it is a POST, so the
+ * middleware would skip it anyway, but keeping it out makes that
+ * independent of the middleware's internals.
+ *
+ * Throttled hard. A beacon fires a few times per page at most, so 60/minute
+ * is far above real use and well below what would let someone inflate a
+ * session's duration by hammering it.
+ */
+Route::post('_visitor/beacon', VisitorBeaconController::class)
+    ->middleware('throttle:60,1')
+    ->name('visitor.beacon');
+
 // Single document listing BOTH locales, so it is registered once rather
 // than through the dual-locale closure above.
 Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
@@ -114,6 +133,7 @@ Route::get('robots.txt', function () {
         'Disallow: /confirm-password',
         'Disallow: /verify-email',
         'Disallow: /profile',
+        'Disallow: /_visitor',
         '',
         'Sitemap: '.route('sitemap'),
     ];

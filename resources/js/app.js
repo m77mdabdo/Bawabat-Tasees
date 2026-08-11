@@ -13,6 +13,10 @@ Alpine.plugin(focus);
 // Must be imported before Alpine.start(), which the ES module order gives us.
 import './motion';
 
+// The cookie consent banner and the time-on-page beacon. Same constraint —
+// it registers an Alpine component, so it has to be in before start().
+import './visitor-session';
+
 window.Alpine = Alpine;
 
 Alpine.start();

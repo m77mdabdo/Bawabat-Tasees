@@ -65,6 +65,10 @@ class AppServiceProvider extends ServiceProvider
                 'siteName' => $settings->translated('site_name') ?? __('site.brand.name'),
                 'siteLogo' => $settings->string('site_logo'),
                 'socialLinks' => $this->socialLinks($settings),
+                // Drives whether the cookie banner renders at all. Read off
+                // the same already-loaded settings collection as everything
+                // above it, so it costs no extra query.
+                'visitorTrackingEnabled' => $settings->boolean('visitor_sessions_enabled', true),
             ]);
         });
 
