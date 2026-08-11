@@ -112,6 +112,18 @@ class Lead extends Model
     }
 
     /**
+     * The visitor journeys that produced this lead.
+     *
+     * hasMany rather than hasOne even though one session produces at most
+     * one lead: a visitor can convert twice from two separate sessions, and
+     * a hasOne would quietly hide the second journey.
+     */
+    public function visitorSessions(): HasMany
+    {
+        return $this->hasMany(VisitorSession::class);
+    }
+
+    /**
      * Newest first — the lead show page reads this as a timeline, and
      * ordering here keeps every caller consistent.
      */
