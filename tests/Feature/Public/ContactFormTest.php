@@ -116,7 +116,7 @@ class ContactFormTest extends TestCase
 
     /**
      * Regression guard: the honeypot must be invisible to sighted users
-     * AND screen readers. `sr-only` was tried in an earlier task to fix
+     * AND screen readers. `sr-only` was tried first to fix
      * a horizontal-overflow bug, but `sr-only`'s entire purpose is to
      * stay VISIBLE to screen readers while hidden visually — the
      * opposite of what a honeypot needs. Asserts the field carries
@@ -206,7 +206,7 @@ class ContactFormTest extends TestCase
     }
 
     /**
-     * Pre-existing gap fixed as part of this task: the redirect used to
+     * A gap found and fixed here: the redirect used to
      * hardcode the Arabic `route('contact')` regardless of locale, so an
      * English-locale visitor submitting from /en/contact would land back
      * on the Arabic /contact page. Now goes through lroute() for both

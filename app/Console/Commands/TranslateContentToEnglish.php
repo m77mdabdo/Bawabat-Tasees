@@ -22,7 +22,7 @@ class TranslateContentToEnglish extends Command
     protected $description = 'Writes professional English translations into every translatable field that currently has Arabic content and no English content.';
 
     /**
-     * Every English value here was written by hand for this task — there
+     * Every English value here was written by hand — there
      * is no machine-translation API wired into this project, and none was
      * requested. Keyed by the EXACT Arabic source text (a stable, simple
      * lookup that works well given this project's content is authored
@@ -113,10 +113,10 @@ class TranslateContentToEnglish extends Command
 
     /**
      * Pages whose Arabic starter copy was already flagged (in an earlier
-     * task's TASKS.md entry) as draft content pending legal/professional
+     * project documentation) as draft content pending legal/professional
      * review, not final. Their English translations carry the exact same
      * caveat — translating draft copy doesn't make it final. Restated
-     * here, and in this task's TASKS.md entry, per this task's explicit
+     * here, and in the project documentation, by explicit
      * instruction not to present the English versions as more final than
      * the Arabic originals.
      */
@@ -305,6 +305,6 @@ class TranslateContentToEnglish extends Command
 
         $unreviewed = implode(', ', $this->unreviewedPageSlugs);
         $this->newLine();
-        $this->warn("Reminder: the Arabic starter copy for [{$unreviewed}] was flagged in an earlier task as draft content pending legal/professional review — their new English translations carry the exact same caveat and are not more final than the Arabic originals.");
+        $this->warn("Reminder: the Arabic starter copy for [{$unreviewed}] is draft content pending legal/professional review — the new English translations carry the exact same caveat and are not more final than the Arabic originals.");
     }
 }

@@ -45,7 +45,7 @@ class PageContentSeeder extends Seeder
 
     private function seedAbout(): void
     {
-        // About is intro-only per this task's scope — no sections.
+        // About is intro-only by design — no sections.
         $this->seedPage(
             ['slug' => 'about'],
             [
@@ -139,9 +139,8 @@ class PageContentSeeder extends Seeder
     /**
      * Privacy Policy and Terms and Conditions — intro-only, no sections,
      * same as About. Written directly bilingual (unlike the four pages
-     * above, which were seeded Arabic-only and translated to English by
-     * a separate `content:translate-to-english` command run in an
-     * earlier task) — this project is fully bilingual now, so new
+     * above, which are seeded Arabic-only and translated to English by
+     * the separate `content:translate-to-english` command) — new
      * content is authored in both languages from the start.
      *
      * IMPORTANT: this is professional-sounding STARTER copy, written to

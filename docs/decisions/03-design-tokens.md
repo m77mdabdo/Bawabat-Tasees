@@ -63,7 +63,7 @@ weight range.
   `resources/views/layouts/public.blade.php` — the Bunny Fonts `<link>`
   tags (previously loading Figtree, now loading IBM Plex Sans Arabic).
 
-## Not done in this task
+## Deliberately out of scope
 
 - No dark mode variant of the token set.
 - No public-facing Services/Countries/Articles pages restyled — this

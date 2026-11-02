@@ -22,3 +22,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local working notes and internal audit reports — not documentation.
+/TASKS.md
+/docs/AUDIT.md
+/docs/testing/

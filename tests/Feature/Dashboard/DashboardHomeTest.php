@@ -109,7 +109,7 @@ class DashboardHomeTest extends TestCase
 
     /**
      * Spot-check existing CRUD screens still render correctly inside the
-     * new sidebar shell — this task must not break already-working pages.
+     * new sidebar shell — the shell must not break already-working pages.
      */
     public function test_existing_crud_index_pages_still_work_inside_new_shell(): void
     {

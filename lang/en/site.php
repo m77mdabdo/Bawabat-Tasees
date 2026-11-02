@@ -4,7 +4,7 @@
  * English counterpart of lang/ar/site.php. Written as natural,
  * professional business English for an audience of foreign investors
  * evaluating Saudi Arabia — not a literal/mechanical translation of the
- * Arabic. See TASKS.md for the brand-name-form decision and any strings
+ * Arabic. See the note below on the brand-name form, and any strings
  * flagged for review.
  */
 return [
@@ -15,7 +15,7 @@ return [
         // "Company Formation Gateway" is used contextually — in meta
         // descriptions and the About page intro — where a first-time
         // visitor needs to understand what the name means, not appended
-        // to every single mention (see TASKS.md for the full rationale).
+        // to every single mention.
         'name' => 'Bawabat Taasees Al Sharikat',
         'tagline' => 'Company Formation Gateway',
     ],

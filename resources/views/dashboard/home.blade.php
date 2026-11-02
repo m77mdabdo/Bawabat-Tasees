@@ -2,7 +2,7 @@
     // "Needs attention" cards all link to the plain CRUD index rather than
     // a pre-filtered list — none of the existing controllers support a
     // status query filter, and adding one would mean touching CRUD
-    // controller logic, which is out of scope for this task (layout/nav/
+    // controller logic, which is out of scope here (layout/nav/
     // home only). The "page sections" card links to the Pages index
     // (not a single sections list) because page_sections has no
     // cross-page index route — sections are only ever listed nested

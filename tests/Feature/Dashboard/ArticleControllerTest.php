@@ -116,7 +116,7 @@ class ArticleControllerTest extends TestCase
     }
 
     /**
-     * The critical security test for this task: a script tag and an
+     * The critical security test for article bodies: a script tag and an
      * onerror event-handler attribute must both be stripped from the body
      * before it is ever persisted, while safe markup survives untouched.
      */

@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * URL-based, not session-based (an earlier task built a session/cookie
- * toggle before this task's routing requirement was specified — replaced
- * here, see TASKS.md). Every public route is registered twice (see
+ * URL-based rather than session-based: the locale belongs in the URL so
+ * every page has one canonical address per language, which is what makes
+ * the hreflang alternates and the sitemap possible at all. Every public
+ * route is registered twice (see
  * routes/web.php): canonical names with no prefix for Arabic, "{name}.en"
  * names under an "en" prefix for English. The route NAME itself is the
  * one unambiguous signal for which locale matched — a route named

@@ -21,16 +21,11 @@ use Illuminate\Support\Facades\Route;
 | Arabic is the default with no URL prefix (/, /services, ...); English
 | lives under /en/... (/en, /en/services, ...).
 |
-| docs/decisions/00-technical-decisions.md, which this task's own
-| instructions pointed to for "the exact original decision", does not
-| exist anywhere in this project (confirmed — no such file was ever
-| created in any earlier task). This structure follows this task's own
-| explicit, repeated specification instead — see TASKS.md for the full
-| note, including why a plain optional {locale?} prefix segment doesn't
-| work here: Laravel/Symfony route compilation does not support an
-| optional parameter followed by required literal segments (confirmed by
-| direct testing — a route like `{locale?}/services` 404s on `/services`
-| once locale is omitted, only ever matching `/en/services`).
+| Why not a single optional {locale?} prefix segment: Laravel/Symfony
+| route compilation does not support an optional parameter followed by
+| required literal segments. Confirmed by direct testing — a route like
+| `{locale?}/services` 404s on `/services` once the locale is omitted,
+| and only ever matches `/en/services`.
 |
 | The real fix: every route below is registered TWICE via the same
 | closure — once with canonical names and no prefix (Arabic), once with

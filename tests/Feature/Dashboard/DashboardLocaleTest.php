@@ -182,7 +182,7 @@ class DashboardLocaleTest extends TestCase
         // which pushes it to the logical end unconditionally,
         // independent of the hamburger's visibility. This test does
         // not (and cannot, without a real browser) verify the visual
-        // result — see TASKS.md for the manual verification steps.
+        // result — the remaining assertion is covered by manual QA.
         $admin = $this->makeAdmin();
 
         $html = $this->actingAs($admin)->get(route('dashboard'))->getContent();
