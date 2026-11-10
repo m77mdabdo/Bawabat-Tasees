@@ -1,0 +1,88 @@
+<?php
+
+// Email wording. Every email the platform sends reads its text from here (English) or lang/ar/mail.php.
+return [
+    'brand' => 'Bawabat Taasees',
+    'footer' => 'Bawabat Taasees · Company formation and investment in Saudi Arabia',
+    'automatic' => 'This is an automatic message from the Bawabat Taasees website.',
+
+    'lead' => [
+        'kind_consultation' => 'Consultation request',
+        'kind_contact' => 'Contact message',
+        'team_subject' => 'New :kind :ref — :name',
+        'team_kicker' => 'New enquiry from the website',
+        'team_intro' => 'A new :kind arrived from the website. Replying to this email goes straight to the client.',
+        'client_section' => 'Client',
+        'request_section' => 'Request details',
+        'source_section' => 'Where they came from',
+        'message' => 'Message',
+        'open_dashboard' => 'Open in the dashboard',
+        'client_subject' => 'We received your request :ref',
+        'client_kicker' => 'Request received',
+        'client_greeting' => 'Hello :name,',
+        'client_intro' => 'Thank you for contacting Bawabat Taasees. We have received your request and one of our consultants will be in touch soon during working days.',
+        'client_reference' => 'Your reference',
+        'client_summary' => 'What you sent us',
+        'client_whatsapp' => 'For a quick reply on WhatsApp',
+        'client_ignore' => 'If you did not send this request, please ignore this email.',
+        'fields' => [
+            'full_name' => 'Name',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'whatsapp_number' => 'WhatsApp',
+            'nationality' => 'Nationality',
+            'country_of_residence' => 'Country of residence',
+            'service' => 'Requested service',
+            'requested_activity' => 'Business activity',
+            'owns_external_company' => 'Owns a company outside Saudi Arabia',
+            'language' => 'Language',
+            'submitted_at' => 'Submitted at',
+            'source' => 'Source',
+            'campaign' => 'Campaign',
+            'landing_page' => 'Landing page',
+        ],
+        'yes' => 'Yes',
+        'no' => 'No',
+        'languages' => ['ar' => 'Arabic', 'en' => 'English'],
+    ],
+
+    'recipient' => [
+        'subject' => 'You will now receive Bawabat Taasees website enquiries',
+        'kicker' => 'Enquiry alerts',
+        'greeting' => 'Hello :name,',
+        'intro' => ':by added :email to the list of people told about new website enquiries. You will get an instant email for every :kinds.',
+        'kinds_both' => 'consultation request and contact message',
+        'kinds_consultation' => 'consultation request',
+        'kinds_contact' => 'contact message',
+        'outro' => 'If you were not expecting this, ask the site administrator to remove your address.',
+    ],
+
+    'staff' => [
+        'invite_subject' => 'Your invitation to the Bawabat Taasees dashboard',
+        'link_subject' => 'Set your dashboard password',
+        'kicker' => 'Dashboard',
+        'greeting' => 'Hello :name,',
+        'invite_intro' => 'An account was created for you on the Bawabat Taasees dashboard with the “:role” role. Use the button to choose your password.',
+        'link_intro' => 'A new link was requested to set the password of your dashboard account.',
+        'button' => 'Set my password',
+        'expires' => 'This link expires in :minutes minutes. We never send passwords by email.',
+        'account' => 'Your account',
+        'otp_note' => 'Every time you sign in, a verification code will be sent to this address to finish signing in.',
+    ],
+
+    'signin' => [
+        'subject' => 'Your dashboard sign-in code',
+        'kicker' => 'Sign-in verification',
+        'greeting' => 'Hello :name,',
+        'intro' => 'Use this code to finish signing in to the dashboard:',
+        'expires' => 'The code works once and expires in :minutes minutes.',
+        'ignore' => 'If you did not try to sign in, change your password now: someone may know it.',
+    ],
+
+    'test' => [
+        'subject' => 'Test email from Bawabat Taasees',
+        'kicker' => 'Mail check',
+        'body' => 'If this reached you, the website mail settings work.',
+        'sent_at' => 'Sent at :time',
+    ],
+];

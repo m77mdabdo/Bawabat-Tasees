@@ -4,19 +4,17 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreContactRequest;
+use App\Leads\LeadIntake;
 use App\Models\Lead;
-use App\Services\Analytics\VisitorSessionService;
 use App\Services\Cms\SettingsRepository;
-use App\Services\Marketing\AttributionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class ContactController extends Controller
 {
     public function __construct(
-        private readonly AttributionService $attributionService,
+        private readonly LeadIntake $intake,
         private readonly SettingsRepository $settings,
-        private readonly VisitorSessionService $visitorSessions,
     ) {}
 
     public function create(): View
@@ -31,33 +29,11 @@ class ContactController extends Controller
 
     public function store(StoreContactRequest $request): RedirectResponse
     {
-        $redirectTarget = $this->redirectTarget($request);
-
-        // Honeypot check happens before any DB write — see the same note
-        // in ConsultationController@store.
-        if ($request->filled('website_url')) {
-            return redirect($redirectTarget)
-                ->with('status', __('site.flash.contact_submitted'));
+        if (! $this->intake->isSpam($request)) {
+            $this->intake->submit($request, Lead::TYPE_CONTACT);
         }
 
-        $data = $request->safe()->except([
-            'first_touch_snapshot',
-            'latest_touch_snapshot',
-            'website_url',
-            'consent_given',
-        ]);
-
-        $lead = Lead::create([
-            ...$data,
-            ...$this->attributionService->resolve($request),
-            'type' => 'contact',
-            'consent_given' => true,
-            'consented_at' => now(),
-        ]);
-
-        $this->visitorSessions->recordConversion($request, 'contact_submitted', $lead);
-
-        return redirect($redirectTarget)
+        return redirect($this->redirectTarget($request))
             ->with('status', __('site.flash.contact_submitted'));
     }
 

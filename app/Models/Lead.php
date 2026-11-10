@@ -25,6 +25,7 @@ class Lead extends Model
         'owns_external_company',
         'message',
         'type',
+        'locale',
         'source_platform',
         'campaign_name',
         'campaign_id',
@@ -56,6 +57,8 @@ class Lead extends Model
      */
     public const TYPE_CONTACT = 'contact';
 
+    public const TYPE_CONSULTATION = 'consultation';
+
     /**
      * Mirrors the column default so a just-created Lead reports false
      * rather than null in the same request — without this, the inbox
@@ -67,6 +70,23 @@ class Lead extends Model
     protected $attributes = [
         'is_handled' => false,
     ];
+
+    public function isContactMessage(): bool
+    {
+        return $this->type === self::TYPE_CONTACT;
+    }
+
+    /** Short human reference used in email subjects and dashboard alerts, e.g. "BT-000042". */
+    public function reference(): string
+    {
+        return 'BT-'.str_pad((string) $this->getKey(), 6, '0', STR_PAD_LEFT);
+    }
+
+    /** Adds a delivery problem to the lead without hiding an earlier one. Saved quietly (no events). */
+    public function recordMailError(string $error): void
+    {
+        $this->forceFill(['mail_error' => mb_strimwidth(trim($this->mail_error.' | '.$error, ' |'), 0, 500)])->saveQuietly();
+    }
 
     public function scopeContactMessages(Builder $query): Builder
     {
@@ -87,6 +107,8 @@ class Lead extends Model
             'latest_touch' => 'array',
             'consent_given' => 'boolean',
             'consented_at' => 'datetime',
+            'team_notified_at' => 'datetime',
+            'client_confirmed_at' => 'datetime',
         ];
     }
 

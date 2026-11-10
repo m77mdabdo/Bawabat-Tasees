@@ -628,6 +628,14 @@ Schedule the task runner so analytics retention is enforced:
 | Tests | 1,211 passing · 4,098 assertions |
 | JS / CSS bundle | 26.4 kB / 11.6 kB gzipped |
 
+## Changelog
+
+- **2026-11-11** — Enquiry notifications: every consultation request and contact message raises a
+  `LeadSubmitted` event; listeners email each dashboard-managed recipient separately (reply goes to the
+  client) and send the client a confirmation in the language they used. Delivery is recorded on the lead
+  (`team_notified_at`, `client_confirmed_at`, `mail_error`) and a mail failure never loses the lead.
+  Both public forms now share one `LeadIntake` service. New `php artisan mail:test {email}` command.
+
 ---
 
 <div align="center">
