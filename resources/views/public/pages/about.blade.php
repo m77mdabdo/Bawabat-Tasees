@@ -33,7 +33,7 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <img
-                    src="{{ asset('images/about/about-team-meeting.jpg') }}"
+                    src="{{ site_media('about_team_image') }}"
                     alt="{{ __('site.about.meeting_photo_alt') }}"
                     width="1600"
                     height="1066"
@@ -41,7 +41,7 @@
                     class="h-72 w-full rounded-2xl object-cover shadow-sm sm:h-96"
                 >
                 <img
-                    src="{{ asset('images/about/about-office-building.jpg') }}"
+                    src="{{ site_media('about_building_image') }}"
                     alt="{{ __('site.about.office_photo_alt') }}"
                     width="1600"
                     height="1066"
@@ -120,7 +120,7 @@
                     aria-label="{{ __('site.about.play_video') }}"
                 >
                     <img
-                        src="{{ asset('images/about/about-office-tour-poster.jpg') }}"
+                        src="{{ site_media('about_tour_poster') }}"
                         alt="{{ __('site.about.video_poster_alt') }}"
                         width="1920"
                         height="1080"
@@ -148,7 +148,7 @@
                     playsinline
                     class="h-72 w-full bg-black object-cover sm:h-[28rem]"
                 >
-                    <source src="{{ asset('videos/about/about-office-tour.mp4') }}" type="video/mp4">
+                    <source src="{{ site_media('about_tour_video') }}" type="{{ str_ends_with((string) site_media('about_tour_video'), '.webm') ? 'video/webm' : 'video/mp4' }}">
                 </video>
             </div>
         </div>

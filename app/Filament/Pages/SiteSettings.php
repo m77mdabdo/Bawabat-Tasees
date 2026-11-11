@@ -8,6 +8,7 @@ use App\Services\Cms\SettingsRepository;
 use App\Services\Cms\SettingsService;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -80,7 +81,11 @@ class SiteSettings extends Page
                     SettingsService::TYPE_TRANSLATED => Bilingual::tabs(fn (string $l) => [
                         TextInput::make("$key.$l")->label($label)->maxLength(255)->extraInputAttributes(Bilingual::dir($l)),
                     ], $key),
-                    SettingsService::TYPE_IMAGE => Fields::image($key, 'settings', $label)->helperText(__('dashboard.settings.logo_hint')),
+                    SettingsService::TYPE_IMAGE => Fields::image($key, 'settings', $label)
+                        ->helperText($key === 'site_logo' ? __('dashboard.settings.logo_hint') : __('JPEG, PNG or WebP, up to 2 MB. Remove the file to go back to the built-in image.')),
+                    SettingsService::TYPE_VIDEO => FileUpload::make($key)->label($label)->disk('public')->directory('settings')
+                        ->acceptedFileTypes(['video/mp4', 'video/webm'])->maxSize(20 * 1024)
+                        ->helperText(__('MP4 or WebM, up to 20 MB. Remove the file to go back to the built-in video.')),
                     SettingsService::TYPE_EMAIL => TextInput::make($key)->label($label)->email()->maxLength(255)->extraInputAttributes(['dir' => 'ltr']),
                     SettingsService::TYPE_PHONE => TextInput::make($key)->label($label)->tel()->regex('/^[0-9+\-\s()]{6,30}$/')->extraInputAttributes(['dir' => 'ltr']),
                     SettingsService::TYPE_URL => TextInput::make($key)->label($label)->url()->maxLength(255)->extraInputAttributes(['dir' => 'ltr']),
@@ -107,11 +112,17 @@ class SiteSettings extends Page
         $data = $this->form->getState();
         $service = app(SettingsService::class);
 
-        $logo = $data['site_logo'] ?? null;
-        unset($data['site_logo']);
+        // Uploaded files are stored by the form first; the service then points the setting at them.
+        $files = [];
+        foreach (SettingsService::keys() as $key => $type) {
+            if (in_array($type, [SettingsService::TYPE_IMAGE, SettingsService::TYPE_VIDEO], true)) {
+                $files[$key] = filled($data[$key] ?? null) ? $data[$key] : null;
+                unset($data[$key]);
+            }
+        }
         $service->update($data);
-        if (is_string($logo) && $logo !== '') {
-            $service->replaceLogo($logo);
+        foreach ($files as $key => $path) {
+            $service->replaceFile($key, $path);
         }
 
         Notification::make()->success()->title(__('dashboard.flash.settings_updated'))->send();

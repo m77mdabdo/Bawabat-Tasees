@@ -16,15 +16,20 @@
         <video
             x-ref="video"
             class="absolute inset-0 h-full w-full object-cover"
-            poster="{{ asset('images/hero-poster.jpg') }}"
+            poster="{{ site_media('hero_poster') }}"
             preload="metadata"
             autoplay
             muted
             loop
             playsinline
         >
-            <source src="{{ asset('videos/hero-bg.webm') }}" type="video/webm">
-            <source src="{{ asset('videos/hero-bg.mp4') }}" type="video/mp4">
+            {{-- A video uploaded in Settings replaces the built-in pair (videos/hero-bg.webm|mp4). --}}
+            @if ($heroVideo = site_media('hero_video'))
+                <source src="{{ $heroVideo }}" type="{{ str_ends_with($heroVideo, '.webm') ? 'video/webm' : 'video/mp4' }}">
+            @else
+                <source src="{{ asset('videos/hero-bg.webm') }}" type="video/webm">
+                <source src="{{ asset('videos/hero-bg.mp4') }}" type="video/mp4">
+            @endif
         </video>
 
         <div class="absolute inset-0 bg-dark-green/70"></div>
@@ -88,7 +93,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
                     <img
-                        src="{{ asset('images/about/about-team-meeting.jpg') }}"
+                        src="{{ site_media('about_team_image') }}"
                         alt="{{ __('site.about.meeting_photo_alt') }}"
                         width="1600"
                         height="1066"

@@ -35,6 +35,18 @@ class SettingsService
 
     public const TYPE_IMAGE = 'image';
 
+    public const TYPE_VIDEO = 'video';
+
+    /** Built-in files shown until an image or video is uploaded in Settings (see site_media()). */
+    public const MEDIA_DEFAULTS = [
+        'hero_poster' => 'images/hero-poster.jpg',
+        'hero_video' => null, // the built-in hero ships as webm + mp4, chosen in the view
+        'about_team_image' => 'images/about/about-team-meeting.jpg',
+        'about_building_image' => 'images/about/about-office-building.jpg',
+        'about_tour_poster' => 'images/about/about-office-tour-poster.jpg',
+        'about_tour_video' => 'videos/about/about-office-tour.mp4',
+    ];
+
     public const TYPE_BOOLEAN = 'boolean';
 
     public const TYPE_INTEGER = 'integer';
@@ -47,6 +59,14 @@ class SettingsService
             'site_name' => self::TYPE_TRANSLATED,
             'site_tagline' => self::TYPE_TRANSLATED,
             'site_logo' => self::TYPE_IMAGE,
+        ],
+        'media' => [
+            'hero_poster' => self::TYPE_IMAGE,
+            'hero_video' => self::TYPE_VIDEO,
+            'about_team_image' => self::TYPE_IMAGE,
+            'about_building_image' => self::TYPE_IMAGE,
+            'about_tour_poster' => self::TYPE_IMAGE,
+            'about_tour_video' => self::TYPE_VIDEO,
         ],
         'contact' => [
             'contact_phone' => self::TYPE_PHONE,
@@ -128,7 +148,7 @@ class SettingsService
                     // Image settings are handled separately: their value
                     // comes from an upload, not the text payload, and an
                     // absent file must leave the current logo alone.
-                    if ($type === self::TYPE_IMAGE) {
+                    if ($type === self::TYPE_IMAGE || $type === self::TYPE_VIDEO) {
                         if ($logo && $key === 'site_logo') {
                             $this->writeImage($key, $group, $logo);
                         }
@@ -168,12 +188,26 @@ class SettingsService
      */
     public function replaceLogo(string $storedPath): void
     {
-        $previous = $this->settings->get('site_logo');
+        $this->replaceFile('site_logo', $storedPath);
+    }
+
+    /**
+     * Points an image or video setting at a file already stored on the public disk (the dashboard
+     * upload stores it first) and removes the file it replaces. Null goes back to the built-in file.
+     */
+    public function replaceFile(string $key, ?string $storedPath): void
+    {
+        $group = collect(self::DEFINITION)->search(fn (array $keys) => array_key_exists($key, $keys));
+        if ($group === false) {
+            return;
+        }
+
+        $previous = $this->settings->get($key);
         if (is_string($previous) && $previous !== $storedPath) {
             $this->contentPublishingService->deleteImage($previous);
         }
 
-        $this->write('site_logo', 'general', $storedPath);
+        $this->write($key, $group, $storedPath);
         $this->settings->flush();
     }
 

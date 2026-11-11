@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Content\SiteTexts;
 use App\Models\MenuItem;
 use App\Services\Cms\SettingsRepository;
+use App\Translation\OverridingLoader;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\RateLimiter;
@@ -23,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
         // Singleton so the settings table is read at most once per
         // request, however many callers ask for a value.
         $this->app->singleton(SettingsRepository::class);
+
+        // Website texts edited in the dashboard sit on top of lang/*/site.php (App\Content\SiteTexts).
+        $this->app->singleton(SiteTexts::class);
+        $this->app->extend('translation.loader', fn (Loader $files) => new OverridingLoader($files));
     }
 
     /**

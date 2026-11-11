@@ -61,6 +61,14 @@ class SettingsSeeder extends Seeder
             ]],
             ['key' => 'site_logo', 'group' => 'general', 'value' => null],
 
+            // Site images and videos: empty means the built-in file (SettingsService::MEDIA_DEFAULTS).
+            ['key' => 'hero_poster', 'group' => 'media', 'value' => null],
+            ['key' => 'hero_video', 'group' => 'media', 'value' => null],
+            ['key' => 'about_team_image', 'group' => 'media', 'value' => null],
+            ['key' => 'about_building_image', 'group' => 'media', 'value' => null],
+            ['key' => 'about_tour_poster', 'group' => 'media', 'value' => null],
+            ['key' => 'about_tour_video', 'group' => 'media', 'value' => null],
+
             // Contact — displayed publicly, so the placeholders stay
             // visible (and self-labelled) until an admin replaces them.
             ['key' => 'contact_phone', 'group' => 'contact', 'value' => '+966 5xx xxx xxx'.$placeholder],

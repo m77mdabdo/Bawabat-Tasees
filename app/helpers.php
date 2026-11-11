@@ -1,6 +1,9 @@
 <?php
 
+use App\Services\Cms\SettingsRepository;
+use App\Services\Cms\SettingsService;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 if (! function_exists('lroute')) {
     /**
@@ -64,5 +67,23 @@ if (! function_exists('route_in_locale')) {
         }
 
         return route($name, $currentRoute->parameters());
+    }
+}
+
+if (! function_exists('site_media')) {
+    /**
+     * URL of a site image or video that can be replaced in Settings → Site images and videos.
+     * Falls back to the built-in file (SettingsService::MEDIA_DEFAULTS); null when neither exists.
+     */
+    function site_media(string $key): ?string
+    {
+        $uploaded = app(SettingsRepository::class)->string($key);
+        if ($uploaded !== null) {
+            return Storage::disk('public')->url($uploaded);
+        }
+
+        $default = SettingsService::MEDIA_DEFAULTS[$key] ?? null;
+
+        return $default ? asset($default) : null;
     }
 }

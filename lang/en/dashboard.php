@@ -571,6 +571,7 @@ return [
         'logo_hint' => 'JPEG, PNG or WebP, up to 2MB. Leave empty to keep the current logo. Preferred size 512x512 pixels.',
         'optional_hint' => 'Leave empty to hide it from the site.',
         'groups' => [
+            'media' => 'Site images and videos',
             'general' => 'General',
             'contact' => 'Contact details',
             'whatsapp' => 'WhatsApp',
@@ -580,6 +581,7 @@ return [
             'visitor_sessions' => 'Visitor sessions',
         ],
         'group_hints' => [
+            'media' => 'The homepage hero image and video, and the About page images and video. Leave empty to keep the built-in files.',
             'general' => 'The site name, logo and short tagline.',
             'contact' => 'Shown on the homepage and the contact page.',
             'whatsapp' => 'The number used by the floating WhatsApp button.',
@@ -589,6 +591,12 @@ return [
             'visitor_sessions' => 'Journey tracking on the public site. Nothing is recorded from a visitor who has not accepted the cookie banner, or who sends a Do Not Track signal, whatever these are set to.',
         ],
         'fields' => [
+            'hero_poster' => 'Homepage hero image',
+            'hero_video' => 'Homepage hero video',
+            'about_team_image' => 'Team photo',
+            'about_building_image' => 'Office photo',
+            'about_tour_poster' => 'Office tour cover',
+            'about_tour_video' => 'Office tour video',
             'site_name' => 'Site name',
             'site_tagline' => 'Tagline',
             'site_logo' => 'Site logo',
