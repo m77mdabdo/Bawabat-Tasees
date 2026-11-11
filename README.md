@@ -14,7 +14,7 @@ Built with Laravel 12 · PHP 8.2+ · Filament 5 · Tailwind CSS · Alpine.js
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Alpine.js](https://img.shields.io/badge/Alpine.js-3-8BC0D0?style=flat-square&logo=alpinedotjs&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-771_passing-22c55e?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-774_passing-22c55e?style=flat-square)
 ![RTL](https://img.shields.io/badge/RTL-first-0B5D3B?style=flat-square)
 ![WCAG](https://img.shields.io/badge/WCAG_2.1-AA-0B5D3B?style=flat-square)
 
@@ -77,7 +77,7 @@ editable from the dashboard. No deployment is required to change a comma.
 | 🔐 **Privacy by design** | Opt-in consent, DNT/GPC honoured, IP truncation, configurable retention with automatic pruning |
 | ♿ **WCAG 2.1 AA** | Verified contrast, skip links, focus traps, reduced-motion support, 44px touch targets |
 | 📱 **Mobile-first** | Including the dashboard: tables collapse to cards, off-canvas drawer, no horizontal scroll at 375px |
-| ✅ **771 tests** | 2,694 assertions across feature and unit suites |
+| ✅ **774 tests** | 2,782 assertions across feature and unit suites |
 
 ---
 
@@ -551,7 +551,7 @@ resources/
 ## Testing
 
 ```
-Tests:    771 passed (2,694 assertions)
+Tests:    774 passed (2,782 assertions)
 Duration: ~25s
 ```
 
@@ -672,11 +672,14 @@ Schedule the task runner so analytics retention is enforced:
 | Service classes | 18 |
 | Database migrations | 35 |
 | Registered routes | 102 |
-| Tests | 771 passing · 2,694 assertions |
+| Tests | 774 passing · 2,782 assertions |
 | JS / CSS bundle (public site) | 26.4 kB / 11.6 kB gzipped |
 
 ## Changelog
 
+- **2026-11-11** — Real photographs (Unsplash License, credited in `docs/photo-credits.md`) for every service and
+  article, a sharper night-skyline hero image, and flags for every country. They ship in
+  `database/seeders/photos` and are installed by `PhotoSeeder`, which never replaces a dashboard upload.
 - **2026-11-11** — Every fixed website text is editable: new **Website texts** screen (151 texts, Arabic and
   English, grouped by page) stores only the changed wording in `site_texts` and lays it over
   `lang/*/site.php` through a translation loader; clearing a field restores the original. The homepage hero

@@ -179,7 +179,7 @@ class AdministrationCrudTest extends DashboardTestCase
         Livewire::test(SiteSettings::class)->fillForm([...$valid, 'hero_poster' => null])->call('save')->assertHasNoFormErrors();
         $this->assertNull(Setting::where('key', 'hero_poster')->value('value'));
         Storage::disk('public')->assertMissing($path);
-        $this->get('/')->assertSee('images/hero-poster.jpg', false);
+        $this->get('/')->assertSee('images/hero-poster.webp', false);
     }
 
     public function test_website_texts_change_the_site_and_clearing_restores_them(): void

@@ -42,6 +42,10 @@ class DatabaseSeeder extends Seeder
             // public menu becomes admin-manageable without changing what
             // a visitor sees.
             MenuItemSeeder::class,
+
+            // Real photos for the seeded services and articles, and country flags
+            // (never replaces an image uploaded in the dashboard).
+            PhotoSeeder::class,
         ]);
 
         // The content seeders above author Arabic only — English comes

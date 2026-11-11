@@ -39,7 +39,7 @@ class SettingsService
 
     /** Built-in files shown until an image or video is uploaded in Settings (see site_media()). */
     public const MEDIA_DEFAULTS = [
-        'hero_poster' => 'images/hero-poster.jpg',
+        'hero_poster' => 'images/hero-poster.webp',
         'hero_video' => null, // the built-in hero ships as webm + mp4, chosen in the view
         'about_team_image' => 'images/about/about-team-meeting.jpg',
         'about_building_image' => 'images/about/about-office-building.jpg',
