@@ -93,6 +93,10 @@ Alpine.data('cookieConsent', () => ({
 
     init() {
         this.decided = doNotTrackEnabled() || consentState() !== null;
+        // While the banner is open it covers the bottom corner, so the floating
+        // WhatsApp and back-to-top buttons step aside (see .consent-open in app.css).
+        this.$watch('decided', (decided) => document.documentElement.classList.toggle('consent-open', ! decided));
+        document.documentElement.classList.toggle('consent-open', ! this.decided);
     },
 
     accept() {

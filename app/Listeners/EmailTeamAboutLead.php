@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Events\LeadSubmitted;
 use App\Leads\RecipientDirectory;
 use App\Mail\NewLeadAlert;
-use App\Models\NotificationRecipient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;

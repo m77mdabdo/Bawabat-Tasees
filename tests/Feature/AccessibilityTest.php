@@ -79,14 +79,6 @@ class AccessibilityTest extends TestCase
         );
     }
 
-    public function test_the_dashboard_has_a_skip_link_too(): void
-    {
-        $html = $this->actingAs($this->makeAdmin())->get('/dashboard')->assertOk()->getContent();
-
-        $this->assertStringContainsString('href="#main-content"', $html);
-        $this->assertStringContainsString('id="main-content" tabindex="-1"', $html);
-    }
-
     public function test_the_skip_link_is_translated(): void
     {
         $this->assertStringContainsString(__('site.nav.skip_to_content', [], 'ar'), $this->get('/')->getContent());
@@ -117,29 +109,9 @@ class AccessibilityTest extends TestCase
         }
     }
 
-    public function test_the_dashboard_drawer_traps_focus_and_closes_on_escape(): void
-    {
-        $html = $this->actingAs($this->makeAdmin())->get('/dashboard')->assertOk()->getContent();
-
-        $this->assertStringContainsString('x-trap.noscroll="sidebarOpen"', $html);
-        $this->assertStringContainsString('@keydown.escape.window="sidebarOpen = false"', $html);
-    }
-
     // -----------------------------------------------------------------
     // Dropdown
     // -----------------------------------------------------------------
-
-    public function test_the_dashboard_user_menu_announces_and_restores_state(): void
-    {
-        $html = $this->actingAs($this->makeAdmin())->get('/dashboard')->assertOk()->getContent();
-
-        $this->assertStringContainsString(':aria-expanded="open ? \'true\' : \'false\'"', $html);
-        $this->assertStringContainsString('aria-haspopup="true"', $html);
-        // Escape closes it AND hands focus back, rather than stranding the
-        // keyboard user at the top of the document.
-        $this->assertStringContainsString('@keydown.escape.stop', $html);
-        $this->assertStringContainsString('$refs.trigger', $html);
-    }
 
     // -----------------------------------------------------------------
     // Pause controls (WCAG 2.2.2)
@@ -153,15 +125,6 @@ class AccessibilityTest extends TestCase
         $this->assertStringContainsString('x-ref="video"', $html);
         $this->assertStringContainsString(__('site.motion.pause_video', [], 'ar'), $html);
         $this->assertStringContainsString('aria-pressed', $html);
-    }
-
-    public function test_the_login_background_can_be_paused(): void
-    {
-        $html = $this->get('/login')->assertOk()->getContent();
-
-        $this->assertStringContainsString('x-data="backgroundVideo"', $html);
-        $this->assertStringContainsString('x-ref="video"', $html);
-        $this->assertStringContainsString(__('site.motion.pause_video', [], 'ar'), $html);
     }
 
     public function test_the_pause_control_is_translated(): void

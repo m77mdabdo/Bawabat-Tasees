@@ -55,9 +55,10 @@ class RouteSweepTest extends TestCase
         $this->assertGreaterThan(10, $uris->filter(fn ($uri) => str_starts_with($uri, 'en'))->count(), 'English routes missing.');
         $this->assertGreaterThan(10, $uris->filter(fn ($uri) => str_starts_with($uri, 'dashboard'))->count());
 
-        // The two sections built here specifically.
+        // The enquiry screens and the staff screen, which carry most of the business logic.
+        $this->assertTrue($uris->contains('dashboard/leads'));
         $this->assertTrue($uris->contains('dashboard/lead-sources'));
-        $this->assertTrue($uris->contains('dashboard/contact-messages'));
+        $this->assertTrue($uris->contains('dashboard/users'));
     }
 
     public function test_every_public_get_route_responds_in_both_locales(): void
@@ -98,7 +99,11 @@ class RouteSweepTest extends TestCase
 
                 $status = $this->actingAs($admin)->get('/'.$route->uri())->getStatusCode();
 
-                if ($status !== 200) {
+                // Sign-in, password-reset and code set-up screens are for guests:
+                // a signed-in admin is sent on (302); the reset form also needs a signed link (403).
+                $guestScreen = preg_match('#^dashboard/(login|password-reset|multi-factor-authentication)#', $route->uri());
+
+                if ($status !== 200 && ! ($guestScreen && in_array($status, [302, 403], true))) {
                     $failures[] = "[{$locale}] {$route->getName()} ({$route->uri()}) → {$status}";
                 }
             }
@@ -138,7 +143,8 @@ class RouteSweepTest extends TestCase
         $user = User::factory()->create();
 
         foreach ($this->gettableRoutes() as $route) {
-            if (! str_starts_with($route->uri(), 'dashboard')) {
+            if (! str_starts_with($route->uri(), 'dashboard')
+                || preg_match('#^dashboard/(login|password-reset|multi-factor-authentication)#', $route->uri())) {
                 continue;
             }
 

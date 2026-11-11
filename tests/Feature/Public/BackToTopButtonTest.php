@@ -3,7 +3,6 @@
 namespace Tests\Feature\Public;
 
 use App\Models\Setting;
-use App\Models\User;
 use Database\Seeders\MenuItemSeeder;
 use Database\Seeders\PageContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -197,7 +196,7 @@ class BackToTopButtonTest extends TestCase
     {
         $admin = $this->makeAdmin();
 
-        foreach (['/dashboard', '/dashboard/leads', '/dashboard/settings'] as $uri) {
+        foreach (['/dashboard', '/dashboard/leads', '/dashboard/site-settings'] as $uri) {
             $this->actingAs($admin)->get($uri)
                 ->assertOk()
                 ->assertDontSee(__('site.nav.back_to_top'), escape: false);
@@ -206,14 +205,14 @@ class BackToTopButtonTest extends TestCase
 
     public function test_it_does_not_appear_on_auth_pages(): void
     {
-        $this->get('/login')->assertOk()->assertDontSee(__('site.nav.back_to_top'), escape: false);
-        $this->get('/forgot-password')->assertOk()->assertDontSee(__('site.nav.back_to_top'), escape: false);
+        $this->get('/dashboard/login')->assertOk()->assertDontSee(__('site.nav.back_to_top'), escape: false);
+        $this->get('/dashboard/password-reset/request')->assertOk()->assertDontSee(__('site.nav.back_to_top'), escape: false);
     }
 
     public function test_it_does_not_appear_on_the_profile_page(): void
     {
-        $this->actingAs(User::factory()->create())
-            ->get('/profile')
+        $this->actingAs($this->makeAdmin())
+            ->get('/dashboard/profile')
             ->assertOk()
             ->assertDontSee(__('site.nav.back_to_top'), escape: false);
     }

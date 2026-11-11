@@ -106,7 +106,7 @@ Then check both locales render real content:
 The only Arabic that should appear on an `/en/` page is the navbar's
 locale-toggle link, which is labelled "العربية" on purpose.
 
-Log in at `/login` with the admin credentials from your `.env` (or the
+Sign in at `/dashboard` (a 6-digit code is emailed after the password, so configure `MAIL_*` first; locally with `MAIL_MAILER=log` the code is in `storage/logs/laravel.log`) with the admin credentials from your `.env` (or the
 fallback ones the seeder printed).
 
 ## Day-to-day commands

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetDashboardLocale;
 use App\Http\Middleware\SetLocale;
@@ -45,7 +44,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'admin' => EnsureUserIsAdmin::class,
             'setlocale' => SetLocale::class,
             'dashboardlocale' => SetDashboardLocale::class,
             'trackvisitor' => TrackVisitorSession::class,

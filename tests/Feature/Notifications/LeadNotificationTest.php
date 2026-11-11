@@ -4,6 +4,7 @@ namespace Tests\Feature\Notifications;
 
 use App\Mail\LeadConfirmation;
 use App\Mail\NewLeadAlert;
+use App\Mail\TestMail;
 use App\Models\Lead;
 use App\Models\NotificationRecipient;
 use App\Models\Service;
@@ -190,6 +191,6 @@ class LeadNotificationTest extends TestCase
         $this->artisan('mail:test', ['email' => 'owner@example.com'])->assertSuccessful();
         $this->artisan('mail:test', ['email' => 'not-an-email'])->assertFailed();
 
-        Mail::assertSent(\App\Mail\TestMail::class, fn ($m) => $m->hasTo('owner@example.com'));
+        Mail::assertSent(TestMail::class, fn ($m) => $m->hasTo('owner@example.com'));
     }
 }

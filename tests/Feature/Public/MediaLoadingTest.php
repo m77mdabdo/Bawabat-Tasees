@@ -151,7 +151,7 @@ class MediaLoadingTest extends TestCase
 
     public function test_the_autoplaying_backgrounds_do_not_buffer_the_whole_file(): void
     {
-        foreach (['/' => 'hero-bg', '/login' => 'login-bg'] as $uri => $asset) {
+        foreach (['/' => 'hero-bg'] as $uri => $asset) {
             $html = $this->get($uri)->assertOk()->getContent();
 
             $this->assertStringContainsString($asset, $html);

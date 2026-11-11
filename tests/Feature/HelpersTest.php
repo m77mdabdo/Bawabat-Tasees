@@ -197,7 +197,7 @@ class HelpersTest extends TestCase
         app()->setLocale('en');
 
         $this->assertSame(route('login'), lroute('login'));
-        $this->assertSame(route('dashboard'), lroute('dashboard'));
+        $this->assertSame(route('filament.dashboard.pages.dashboard'), lroute('filament.dashboard.pages.dashboard'));
     }
 
     public function test_lroute_does_not_double_suffix_an_already_english_name(): void

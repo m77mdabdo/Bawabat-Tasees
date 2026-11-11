@@ -53,7 +53,7 @@ class Lead extends Model
     /**
      * Inbox read-state for type = 'contact' rows. Deliberately absent
      * from $fillable: it is never part of a public submission, and the
-     * only writer is ContactMessageService.
+     * only writer is the dashboard (LeadResource "mark as handled").
      */
     public const TYPE_CONTACT = 'contact';
 

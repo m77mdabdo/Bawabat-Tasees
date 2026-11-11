@@ -6,7 +6,7 @@
 
 **A bilingual (Arabic-first, RTL) company-formation platform for the Saudi market — public marketing site, full content-management dashboard, lead attribution, and privacy-first visitor analytics.**
 
-Built with Laravel 12 · PHP 8.2+ · Tailwind CSS · Alpine.js
+Built with Laravel 12 · PHP 8.2+ · Filament 5 · Tailwind CSS · Alpine.js
 
 <br>
 
@@ -14,7 +14,7 @@ Built with Laravel 12 · PHP 8.2+ · Tailwind CSS · Alpine.js
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Alpine.js](https://img.shields.io/badge/Alpine.js-3-8BC0D0?style=flat-square&logo=alpinedotjs&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-1%2C211_passing-22c55e?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-717_passing-22c55e?style=flat-square)
 ![RTL](https://img.shields.io/badge/RTL-first-0B5D3B?style=flat-square)
 ![WCAG](https://img.shields.io/badge/WCAG_2.1-AA-0B5D3B?style=flat-square)
 
@@ -77,7 +77,7 @@ editable from the dashboard. No deployment is required to change a comma.
 | 🔐 **Privacy by design** | Opt-in consent, DNT/GPC honoured, IP truncation, configurable retention with automatic pruning |
 | ♿ **WCAG 2.1 AA** | Verified contrast, skip links, focus traps, reduced-motion support, 44px touch targets |
 | 📱 **Mobile-first** | Including the dashboard: tables collapse to cards, off-canvas drawer, no horizontal scroll at 375px |
-| ✅ **1,211 tests** | 4,098 assertions across feature and unit suites |
+| ✅ **717 tests** | 2,378 assertions across feature and unit suites |
 
 ---
 
@@ -184,14 +184,67 @@ queries**, so they still work when the database is the thing that is down.
 
 ## The admin dashboard
 
-A complete back office in Arabic and English, with a locale toggle independent of
-the public site — an administrator can work in Arabic while the site is being
-viewed in English.
+A Filament 5 dashboard at `/dashboard`, in Arabic (right-to-left) or English per staff
+member, in the brand's green and gold. Every sign-in is finished with a one-time code
+emailed to the person signing in, and what each person sees depends on their role.
 
 <div align="center">
-<img src="docs/screenshots/20-dash-home.jpg" alt="Dashboard home" width="100%">
-<em>Dashboard home — "needs attention" counters, content overview and lead metrics</em>
+<img src="docs/screenshots/20-dash-home.jpg" alt="Dashboard overview" width="100%">
+<em>Overview — what is waiting today, quick actions, enquiry figures and trends</em>
 </div>
+
+### Enquiries and instant alerts
+
+Consultation requests and contact messages live in one **Enquiries** screen with tabs
+(all, not handled, consultations, contact messages), filters, a WhatsApp shortcut,
+"mark as handled", and the conversions each enquiry produced.
+
+Every new enquiry raises one `LeadSubmitted` event. Three independent listeners react to it:
+
+| Listener | What it does |
+|---|---|
+| `EmailTeamAboutLead` | One separate email per address in **Enquiry email alerts** (reply goes straight to the client) |
+| `EmailClientConfirmation` | "We received your request" to the client, in the language they wrote in |
+| `NotifyStaffInDashboard` | A bell notification for staff who handle enquiries; the dashboard polls every 5 seconds |
+
+A mail failure is recorded on the enquiry (`mail_error`) and never loses it. A new
+alert address is told by email what it will receive and who added it.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/25-dash-leads.jpg" alt="Enquiries"></td>
+<td width="50%"><img src="docs/screenshots/26-dash-lead-detail.jpg" alt="Enquiry detail"></td>
+</tr>
+<tr>
+<td align="center"><em>Enquiries — tabs, filters, unhandled badge</em></td>
+<td align="center"><em>One enquiry — client, request, delivery status, origin, conversions</em></td>
+</tr>
+</table>
+
+### Staff, roles and sign-in
+
+| Role | Can |
+|---|---|
+| Super Admin | Everything, including staff accounts |
+| Manager | Content, enquiries, marketing, reports, settings |
+| Content Editor | Services, articles, pages, menu, media, comments |
+| Sales | Enquiries: follow up, mark handled, record conversions |
+| Viewer | Read-only: reports, visitor journeys, enquiries |
+
+Permissions are one table in `app/Auth/PermissionMatrix.php`. New staff are **invited by
+email** to choose their own password (nobody types a password for someone else), and
+nobody can demote, switch off or delete themselves or the last Super Admin.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/39-dash-staff.jpg" alt="Staff and roles"></td>
+<td width="50%"><img src="docs/screenshots/41-dash-signin-code.jpg" alt="Sign-in code"></td>
+</tr>
+<tr>
+<td align="center"><em>Staff and roles, with the role × permission window</em></td>
+<td align="center"><em>Every sign-in ends with a 6-digit code sent by email</em></td>
+</tr>
+</table>
 
 ### Content management
 
@@ -201,62 +254,41 @@ viewed in English.
 <td width="50%"><img src="docs/screenshots/38-dash-articles.jpg" alt="Articles admin"></td>
 </tr>
 <tr>
-<td align="center"><em>Services — sortable, with flagship flags</em></td>
-<td align="center"><em>Articles — publish scheduling</em></td>
+<td align="center"><em>Services — drag to reorder, flagship flag</em></td>
+<td align="center"><em>Articles — rich text, purified on save</em></td>
 </tr>
 </table>
 
 <div align="center">
 <img src="docs/screenshots/22-dash-service-form.jpg" alt="Service editor" width="100%">
-<em>Every content form is bilingual side-by-side, with per-record SEO overrides</em>
+<em>Every content form has Arabic / English tabs and optional per-record SEO</em>
 </div>
+
+Rich text (article and page bodies, service descriptions) is purified **in the model**
+(`SanitizesContent`), so it is safe whatever writes it. Blank English is not stored, so
+the public site falls back to Arabic instead of showing an empty field.
+
+### Settings, navigation and media
 
 <table>
 <tr>
-<td width="50%"><img src="docs/screenshots/23-dash-pages.jpg" alt="Pages admin"></td>
-<td width="50%"><img src="docs/screenshots/35-dash-media.jpg" alt="Media library"></td>
+<td width="50%"><img src="docs/screenshots/24-dash-menu.jpg" alt="Navigation"></td>
+<td width="50%"><img src="docs/screenshots/32-dash-settings.jpg" alt="Site settings"></td>
 </tr>
 <tr>
-<td align="center"><em>Fixed pages — content editable, structure protected</em></td>
-<td align="center"><em>Media library with alt-text enforcement</em></td>
+<td align="center"><em>Navigation — through MenuService (ordering, safe deletes)</em></td>
+<td align="center"><em>Site settings — built from one definition in SettingsService</em></td>
 </tr>
 </table>
-
-### Navigation manager
-
-The public navbar is **data-driven, not hardcoded**. Items can be created,
-reordered, nested one level deep, and hidden — all without a deployment.
-
-<div align="center">
-<img src="docs/screenshots/24-dash-menu.jpg" alt="Navigation manager" width="100%">
-<em>Drag-free reordering with explicit controls, plus nesting and visibility toggles</em>
-</div>
-
-### Site settings
-
-Contact details, social links, the site logo, SEO defaults and the analytics
-retention policy — all editable, all validated per field type.
-
-<div align="center">
-<img src="docs/screenshots/32-dash-settings.jpg" alt="Site settings" width="100%">
-<em>Settings are defined once in a single source of truth that drives the form, the validation rules and the seeder</em>
-</div>
 
 ### Dashboard on mobile
 
 <table>
 <tr>
 <td width="50%"><img src="docs/screenshots/36-dash-mobile.jpg" alt="Dashboard on mobile"></td>
-<td width="50%"><img src="docs/screenshots/37-dash-leads-mobile.jpg" alt="Leads table on mobile"></td>
-</tr>
-<tr>
-<td align="center"><em>Off-canvas drawer, stacked stat tiles</em></td>
-<td align="center"><em>Data tables collapse into labelled cards — no sideways scrolling</em></td>
+<td width="50%"><img src="docs/screenshots/37-dash-leads-mobile.jpg" alt="Enquiries on mobile"></td>
 </tr>
 </table>
-
-The table-to-card transformation is pure CSS keyed on `data-label` attributes, so
-there is no duplicated markup and no second query for the mobile view.
 
 ---
 
@@ -470,14 +502,18 @@ app/
 ├── Http/
 │   ├── Controllers/
 │   │   ├── Public/        Marketing site, forms, sitemap, analytics beacon
-│   │   └── Dashboard/     Admin CRUD, reports, settings, sessions
-│   ├── Middleware/        Locale, admin gate, security headers, session capture
+│   ├── Middleware/        Locale, dashboard locale, security headers, session capture
 │   └── Requests/          Form Requests — validation lives here, never in controllers
-├── Models/                19 Eloquent models with translatable JSON fields
+├── Auth/                  PermissionMatrix (who may do what), RoleSync, emailed sign-in code
+├── Enums/Role.php         The five dashboard roles
+├── Events/ Listeners/     LeadSubmitted → team email, client confirmation, dashboard bell
+├── Filament/              The dashboard: Resources, Pages, Widgets, Support (bilingual tabs, SEO fields)
+├── Leads/                 LeadIntake (both public forms), RecipientDirectory, LeadPresenter
+├── Mail/                  Branded bilingual emails (one shared layout)
+├── Models/                20 Eloquent models with translatable JSON fields
 ├── Services/
 │   ├── Analytics/         Session capture, consent gate, IP anonymisation, UA parsing
 │   ├── Cms/               Content publishing, sanitisation, menus, settings
-│   ├── Crm/               Contact message inbox
 │   ├── Marketing/         Attribution, campaigns, conversions, lead sources
 │   └── Seo/               Meta resolution and tag rendering
 └── View/Components/       Layout components
@@ -487,7 +523,8 @@ resources/
 ├── js/                    Alpine, attribution capture, session beacon, motion controls
 └── views/
     ├── components/        Reusable Blade components
-    ├── dashboard/         Admin screens
+    ├── filament/          Dashboard widgets, reports page, journey timeline
+    ├── mail/              Email layout and messages
     ├── public/            Marketing pages
     └── errors/            Branded bilingual error pages
 ```
@@ -495,8 +532,10 @@ resources/
 **Conventions applied throughout:**
 
 - Controllers stay thin — validation in Form Requests, writes owned by services.
-- Authorisation at the route-middleware layer; Form Request `authorize()` is a
-  documented pass-through rather than a second, divergent gate.
+- Dashboard authorisation comes from one table (`PermissionMatrix`); each resource
+  names the permission to see it and the one to change it (`GuardedByPermissions`).
+- Side effects hang off events, not controllers: a new reaction to an enquiry is a new
+  listener, and one failing listener never stops the others or loses the enquiry.
 - Anything with a fixed set of keys (settings, tracking IDs) is defined **once** in a
   single constant that drives the editor UI, the validation rules and the seeder, so
   they cannot drift apart.
@@ -508,8 +547,8 @@ resources/
 ## Testing
 
 ```
-Tests:    1,211 passed (4,098 assertions)
-Duration: ~22s
+Tests:    717 passed (2,378 assertions)
+Duration: ~25s
 ```
 
 81 test files covering:
@@ -518,7 +557,8 @@ Duration: ~22s
   the sweep ever narrows to nothing and starts passing vacuously.
 - **Public pages** — rendering, SEO tags, sitemap, canonical and `hreflang`.
 - **Forms** — validation, honeypot, throttling, consent capture, attribution.
-- **Dashboard CRUD** — authorisation, validation, XSS sanitisation on write.
+- **Dashboard** — role access per screen, sign-in code, staff invitations, enquiry alerts
+  (email and bell), bilingual saving, XSS sanitisation on write.
 - **Analytics** — capture, bot filtering, IP anonymisation, consent and DNT, lead
   linking, retention pruning, export shape.
 - **Accessibility and responsive structure** — contrast tokens, touch targets, table
@@ -573,8 +613,11 @@ php artisan db:seed --class=DemoDataSeeder
 
 ### Admin access
 
-Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env` before seeding. Outside local and
-testing environments the seeder refuses to fall back to placeholder credentials.
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env` before seeding; that account becomes the
+first Super Admin. Outside local and testing environments the seeder refuses to fall back
+to placeholder credentials. Sign in at `/dashboard`: the sign-in code is emailed, so set
+the `MAIL_*` values first and check them with `php artisan mail:test you@example.com`.
+Everyone else is invited from **Settings → Staff and roles**.
 
 See [`docs/setup-instructions.md`](docs/setup-instructions.md) for the full setup
 walkthrough.
@@ -609,6 +652,8 @@ Schedule the task runner so analytics retention is enforced:
 - [ ] HTTPS enforced at the web server
 - [ ] `SESSION_SECURE_COOKIE=true`, `LOG_LEVEL=warning`, `LOG_STACK=daily`
 - [ ] Demo data **not** loaded
+- [ ] Real SMTP in `MAIL_*` and a real `MAIL_FROM_ADDRESS`; `php artisan mail:test` arrives
+- [ ] At least one address in **Enquiry email alerts**
 
 ---
 
@@ -616,20 +661,25 @@ Schedule the task runner so analytics retention is enforced:
 
 | | |
 |---|---|
-| PHP source | ~28,800 lines |
-| Models | 19 |
-| Controllers | 42 |
-| Service classes | 20 |
-| Form Requests | 30 |
-| Blade views | 125 |
-| Database migrations | 31 |
-| Registered routes | 144 |
-| Translation keys | 760 |
-| Tests | 1,211 passing · 4,098 assertions |
-| JS / CSS bundle | 26.4 kB / 11.6 kB gzipped |
+| PHP in `app/` | ~10,400 lines |
+| Models | 20 |
+| Dashboard resources / pages / widgets | 15 / 4 / 5 |
+| Public controllers | 12 |
+| Service classes | 18 |
+| Database migrations | 35 |
+| Registered routes | 102 |
+| Tests | 717 passing · 2,378 assertions |
+| JS / CSS bundle (public site) | 26.4 kB / 11.6 kB gzipped |
 
 ## Changelog
 
+- **2026-11-11** — New dashboard: Filament 5 at `/dashboard` replaces the hand-built Blade dashboard
+  and the Breeze sign-in. Five roles (spatie/laravel-permission, one matrix in `PermissionMatrix`),
+  staff invitations by email, a one-time sign-in code emailed on every sign-in, a dashboard bell for
+  new enquiries (polled every 5 s), an Enquiries screen for consultations and contact messages,
+  enquiry-alert recipients with a welcome email, Arabic/English per staff member. Rich text is
+  purified in the model. Service descriptions now render as HTML instead of showing tags.
+  Floating buttons step aside while the cookie banner is open. `npm test` runs on Node 24.
 - **2026-11-11** — Enquiry notifications: every consultation request and contact message raises a
   `LeadSubmitted` event; listeners email each dashboard-managed recipient separately (reply goes to the
   client) and send the client a confirmation in the language they used. Delivery is recorded on the lead

@@ -49,7 +49,7 @@
         x-transition:leave-end="opacity-0 translate-y-2"
         @click="toTop()"
         aria-label="{{ __('site.nav.back_to_top') }}"
-        class="fixed {{ $stacked ? 'bottom-24' : 'bottom-6' }} left-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary-green text-white shadow-lg transition hover:scale-105 hover:bg-dark-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2"
+        class="bt-float fixed {{ $stacked ? 'bottom-24' : 'bottom-6' }} left-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary-green text-white shadow-lg transition hover:scale-105 hover:bg-dark-green focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-green focus-visible:ring-offset-2"
     >
         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 19V5" />

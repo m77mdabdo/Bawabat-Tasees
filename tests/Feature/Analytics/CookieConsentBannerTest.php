@@ -100,7 +100,7 @@ class CookieConsentBannerTest extends TestCase
 
     public function test_the_banner_is_not_on_the_dashboard(): void
     {
-        $html = $this->get('/login')->assertOk()->getContent();
+        $html = $this->get('/dashboard/login')->assertOk()->getContent();
 
         $this->assertStringNotContainsString('x-data="cookieConsent"', $html);
     }

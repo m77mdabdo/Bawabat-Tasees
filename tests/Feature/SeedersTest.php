@@ -20,7 +20,7 @@ class SeedersTest extends TestCase
     {
         $this->seed();
 
-        $this->assertSame(1, User::where('is_admin', true)->count());
+        $this->assertSame(1, User::role('super_admin')->count());
         $this->assertSame(11, LeadSource::count());
         // Derived from the definition, not hard-coded: the seeder and the
         // editor read the same list, so the count following it is the actual
@@ -36,20 +36,21 @@ class SeedersTest extends TestCase
         $this->seed();
         $this->seed();
 
-        $this->assertSame(1, User::where('is_admin', true)->count());
+        $this->assertSame(1, User::role('super_admin')->count());
         $this->assertSame(11, LeadSource::count());
         $this->assertSame(count(SettingsService::keys()), Setting::count());
         $this->assertSame(6, TrackingSetting::count());
     }
 
-    public function test_admin_user_has_hashed_password_and_is_admin_flag(): void
+    public function test_admin_user_has_hashed_password_and_is_a_super_admin(): void
     {
         $this->seed();
 
-        $admin = User::where('is_admin', true)->first();
+        $admin = User::role('super_admin')->first();
 
         $this->assertNotNull($admin);
-        $this->assertTrue($admin->is_admin);
+        $this->assertTrue($admin->isSuperAdmin());
+        $this->assertTrue($admin->can('users.manage'));
         $this->assertNotSame('', $admin->password);
         $this->assertStringStartsWith('$2y$', $admin->password);
     }
@@ -84,6 +85,6 @@ class SeedersTest extends TestCase
             app()->detectEnvironment(fn () => 'testing');
         }
 
-        $this->assertSame(1, User::where('is_admin', true)->count());
+        $this->assertSame(1, User::role('super_admin')->count());
     }
 }

@@ -162,6 +162,21 @@ class SettingsService
         $this->settings->flush();
     }
 
+    /**
+     * Points the logo at a file already stored on the public disk (the dashboard upload
+     * stores it first) and removes the previous logo file.
+     */
+    public function replaceLogo(string $storedPath): void
+    {
+        $previous = $this->settings->get('site_logo');
+        if (is_string($previous) && $previous !== $storedPath) {
+            $this->contentPublishingService->deleteImage($previous);
+        }
+
+        $this->write('site_logo', 'general', $storedPath);
+        $this->settings->flush();
+    }
+
     private function writeImage(string $key, string $group, UploadedFile $file): void
     {
         $previous = $this->settings->get($key);

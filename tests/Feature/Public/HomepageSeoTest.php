@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Public;
 
+use App\Filament\Pages\SiteSettings;
 use App\Models\Setting;
 use App\Services\Cms\SettingsRepository;
-use App\Services\Cms\SettingsService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\CreatesAdminUsers;
 use Tests\TestCase;
@@ -132,37 +133,30 @@ class HomepageSeoTest extends TestCase
 
     public function test_the_settings_screen_exposes_both_fields(): void
     {
-        $html = $this->actingAs($this->makeAdmin())
-            ->get(route('dashboard.settings.edit'))
-            ->assertOk()
-            ->getContent();
+        $this->actingAs($this->makeAdmin());
+
+        $component = Livewire::test(SiteSettings::class)->assertOk();
 
         foreach (['home_meta_title', 'home_meta_description'] as $key) {
-            $this->assertStringContainsString('settings['.$key.'][ar]', $html);
-            $this->assertStringContainsString('settings['.$key.'][en]', $html);
+            $component->assertSeeHtml('data.'.$key.'.ar')->assertSeeHtml('data.'.$key.'.en');
         }
     }
 
     public function test_an_admin_edit_reaches_the_homepage(): void
     {
-        $payload = ['settings' => []];
+        $this->actingAs($this->makeAdmin());
 
-        foreach (SettingsService::keys() as $key => $type) {
-            if ($type === SettingsService::TYPE_IMAGE) {
-                continue;
-            }
-
-            $payload['settings'][$key] = $type === SettingsService::TYPE_TRANSLATED
-                ? ['ar' => 'قيمة', 'en' => 'Value']
-                : null;
-        }
-
-        $payload['settings']['home_meta_title'] = ['ar' => 'عنوان جديد', 'en' => 'A New Title'];
-
-        $this->actingAs($this->makeAdmin())
-            ->put(route('dashboard.settings.update'), $payload)
-            ->assertSessionHasNoErrors()
-            ->assertRedirect();
+        Livewire::test(SiteSettings::class)
+            ->fillForm([
+                // The seeded contact details are deliberate placeholders that fail validation,
+                // so the form makes the admin replace them before anything else can be saved.
+                'contact_phone' => '+966 11 000 0000',
+                'contact_whatsapp' => '+966 55 000 0000',
+                'contact_email' => 'info@example.sa',
+                'home_meta_title' => ['ar' => 'عنوان جديد', 'en' => 'A New Title'],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
         $this->assertStringContainsString('<title>عنوان جديد</title>', $this->get('/')->getContent());
         $this->assertStringContainsString('<title>A New Title</title>', $this->get('/en')->getContent());

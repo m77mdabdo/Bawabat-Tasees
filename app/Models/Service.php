@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasSlug;
+use App\Models\Concerns\SanitizesContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,13 @@ use Spatie\Translatable\HasTranslations;
 
 class Service extends Model
 {
-    use HasFactory, HasSlug, HasTranslations, SoftDeletes;
+    use HasFactory, HasSlug, HasTranslations, SanitizesContent, SoftDeletes;
+
+    /** @var list<string> Rendered as HTML on the service page, so purified on every save. */
+    protected array $richTextAttributes = ['body'];
+
+    /** @var list<string> Shown as plain text; tags stripped on every save. */
+    protected array $plainTextAttributes = ['name', 'summary', 'requirements', 'process'];
 
     protected $fillable = [
         'slug',

@@ -1,0 +1,94 @@
+/*
+ * Bawabat Taasees dashboard theme. Filament's own design system, with the brand's
+ * deep green and gold: soft green-tinted canvas, gold accents, rounded stat cards and
+ * a welcome banner (resources/views/filament/widgets). Plain CSS on purpose: the public
+ * site builds with Tailwind 3, Filament ships its own compiled styles.
+ */
+:root {
+  --bt-green: #0B5D3B;
+  --bt-green-dark: #073E2A;
+  --bt-gold: #B8903A;
+  --bt-gold-light: #D4B76A;
+  --bt-canvas: #F7F8F6;
+}
+
+/* Light: soft canvas with a gentle gold and green glow */
+html:not(.dark) .fi-body {
+  background:
+    radial-gradient(1100px 480px at 100% -10%, rgba(184, 144, 58, .14), transparent 60%),
+    radial-gradient(900px 420px at -10% 110%, rgba(11, 93, 59, .10), transparent 60%),
+    var(--bt-canvas);
+  background-attachment: fixed;
+}
+html:not(.dark) .fi-sidebar { background: linear-gradient(180deg, #ffffff 0%, #f3f6f2 100%); border-inline-end: 1px solid rgba(11, 93, 59, .10); }
+html:not(.dark) .fi-topbar { background: rgba(255, 255, 255, .86); backdrop-filter: blur(12px); }
+html:not(.dark) .fi-section, html:not(.dark) .fi-ta-ctn, html:not(.dark) .fi-wi-stats-overview-stat {
+  box-shadow: 0 1px 2px rgba(23, 33, 28, .04), 0 10px 26px -14px rgba(11, 93, 59, .28);
+}
+
+/* Dark: deep green-black with gold */
+html.dark .fi-body { background: radial-gradient(1000px 500px at 100% -10%, rgba(184, 144, 58, .12), transparent 60%), #08130e; background-attachment: fixed; }
+html.dark .fi-sidebar { background: #0b1a13; }
+
+/* Active navigation item: a green pill with a gold edge */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+  background: linear-gradient(90deg, rgba(11, 93, 59, .14), rgba(184, 144, 58, .10));
+  box-shadow: inset 3px 0 0 var(--bt-gold);
+}
+html[dir="rtl"] .fi-sidebar-item.fi-active > .fi-sidebar-item-btn { box-shadow: inset -3px 0 0 var(--bt-gold); }
+
+.fi-header-heading { font-weight: 700; letter-spacing: -.01em; }
+
+/* Stat cards: rounded with a brand stripe */
+.fi-wi-stats-overview-stat { border-radius: 1rem; overflow: hidden; position: relative; }
+.fi-wi-stats-overview-stat::before {
+  content: ""; position: absolute; inset-inline: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, var(--bt-green), var(--bt-gold), var(--bt-gold-light));
+}
+.fi-wi-stats-overview-stat-value { font-size: 1.9rem; }
+
+/* Welcome banner and quick actions */
+.bt-hero {
+  position: relative; overflow: hidden; border-radius: 1.25rem; padding: 1.75rem;
+  color: #fff; background: linear-gradient(120deg, var(--bt-green-dark) 0%, var(--bt-green) 55%, #6f5a22 100%);
+}
+.bt-hero::after {
+  content: ""; position: absolute; inset-block: -40%; inset-inline-end: -10%; width: 55%;
+  background: radial-gradient(circle, rgba(212, 183, 106, .45), transparent 65%); pointer-events: none;
+}
+.bt-hero h2 { font-size: clamp(1.35rem, 3vw, 1.9rem); font-weight: 700; margin: 0; }
+.bt-hero p { margin: .35rem 0 0; color: rgba(255, 255, 255, .82); }
+.bt-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; position: relative; z-index: 1; }
+.bt-chip { display: inline-flex; align-items: center; gap: .4rem; border-radius: 999px; padding: .35rem .85rem; font-size: .8rem; background: rgba(255, 255, 255, .14); color: #fff; text-decoration: none; }
+.bt-chip--alert { background: rgba(212, 183, 106, .9); color: #17211C; font-weight: 600; }
+.bt-actions { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: 1rem; }
+.bt-action {
+  display: flex; align-items: center; gap: .75rem; border-radius: 1rem; padding: 1rem; min-height: 4.25rem;
+  background: #fff; border: 1px solid rgba(23, 33, 28, .07); color: #17211C; text-decoration: none;
+  transition: transform .2s, box-shadow .2s;
+}
+.bt-action:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -14px rgba(11, 93, 59, .45); }
+.bt-action__icon { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: .75rem; background: rgba(11, 93, 59, .10); color: var(--bt-green); flex-shrink: 0; }
+.bt-action__title { font-weight: 600; font-size: .92rem; }
+.bt-action__hint { font-size: .78rem; color: #66706A; }
+html.dark .bt-action { background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .08); color: #f1f5f1; }
+html.dark .bt-action__icon { background: rgba(212, 183, 106, .14); color: var(--bt-gold-light); }
+html.dark .bt-action__hint { color: #a3ada7; }
+@media (prefers-reduced-motion: reduce) { .bt-action { transition: none; } .bt-action:hover { transform: none; } }
+
+/* Top bar: language switch and "view website" */
+.bt-locale-switch, .bt-view-site {
+  display: inline-flex; align-items: center; gap: .35rem; height: 2.25rem; padding: 0 .8rem; border-radius: 999px;
+  border: 1px solid rgba(23, 33, 28, .12); background: #fff; color: #374151; font-size: .85rem; font-weight: 600; text-decoration: none;
+}
+.bt-locale-switch:hover, .bt-view-site:hover { border-color: var(--bt-green); color: var(--bt-green); }
+html.dark .bt-locale-switch, html.dark .bt-view-site { background: rgba(255, 255, 255, .05); border-color: rgba(255, 255, 255, .12); color: #e5e7eb; }
+@media (max-width: 640px) { .bt-view-site__label { display: none; } }
+
+/* Visitor journey timeline (Visitor sessions → view) */
+.bt-timeline { list-style: none; margin: 0; padding: 0; border-inline-start: 2px solid rgba(11, 93, 59, .2); }
+.bt-timeline li { position: relative; padding: .35rem 1rem .85rem; }
+.bt-timeline li::before { content: ""; position: absolute; inset-inline-start: -7px; top: .65rem; width: 12px; height: 12px; border-radius: 999px; background: var(--bt-green); }
+.bt-timeline li.is-action::before { background: var(--bt-gold); }
+.bt-timeline time { font-size: .75rem; color: #66706A; }
+.bt-timeline .bt-url { font-family: ui-monospace, monospace; font-size: .8rem; word-break: break-all; }

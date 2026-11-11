@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Auth\RoleSync;
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -52,7 +54,7 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        $admin->is_admin = true;
-        $admin->save();
+        RoleSync::run();
+        $admin->syncRoles([Role::SuperAdmin->value]);
     }
 }

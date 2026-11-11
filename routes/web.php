@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\ArticleController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\ConsultationController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Public\VisitorBeaconController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -82,16 +82,21 @@ Route::middleware(['setlocale', 'trackvisitor'])->group(fn () => $registerPublic
 // English — "{name}.en" names, "en" prefix.
 Route::prefix('en')->middleware(['setlocale', 'trackvisitor'])->group(fn () => $registerPublicRoutes('.en'));
 
-// Same write throttle as the dashboard group — profile update and account
-// deletion are authenticated writes with no other ceiling on them.
-Route::middleware(['auth', 'dashboardlocale', 'throttle:dashboard-writes'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+/*
+ * The staff dashboard is the Filament panel at /dashboard (App\Providers\Filament\DashboardPanelProvider):
+ * sign-in, password reset, profile and the emailed sign-in code all live there.
+ * The old addresses below keep working so bookmarks and the robots.txt rules stay valid.
+ */
+Route::redirect('login', 'dashboard/login')->name('login');
+Route::redirect('profile', 'dashboard/profile');
 
-require __DIR__.'/auth.php';
-require __DIR__.'/dashboard.php';
+// Switches the signed-in staff member's dashboard language (Arabic / English).
+Route::post('dashboard/locale', function (Request $request) {
+    $user = $request->user();
+    $user->forceFill(['locale' => $user->dashboardLocale() === 'ar' ? 'en' : 'ar'])->save();
+
+    return back();
+})->middleware(['auth', 'throttle:dashboard-writes'])->name('dashboard.locale');
 
 /*
  * The time-on-page beacon.

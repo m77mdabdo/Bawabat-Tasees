@@ -2,20 +2,24 @@
 
 namespace Tests\Concerns;
 
+use App\Auth\RoleSync;
+use App\Enums\Role;
 use App\Models\User;
 
 trait CreatesAdminUsers
 {
-    /**
-     * is_admin is intentionally excluded from User::$fillable, so it can't
-     * be set via the factory's mass-assigned attributes — set it directly.
-     */
+    /** A Super Admin: roles are never mass-assigned, so they are given through spatie. */
     protected function makeAdmin(): User
     {
-        $admin = User::factory()->create();
-        $admin->is_admin = true;
-        $admin->save();
+        return $this->makeStaff(Role::SuperAdmin);
+    }
 
-        return $admin->fresh();
+    protected function makeStaff(Role $role, array $attributes = []): User
+    {
+        RoleSync::run();
+        $user = User::factory()->create($attributes);
+        $user->assignRole($role->value);
+
+        return $user->fresh();
     }
 }

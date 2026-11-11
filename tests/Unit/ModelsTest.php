@@ -184,22 +184,22 @@ class ModelsTest extends TestCase
         $this->assertTrue(TrackingSetting::active()->whereKey($tracking->id)->exists());
     }
 
-    public function test_user_is_admin_is_cast_but_not_mass_assignable(): void
+    public function test_account_status_is_cast_but_not_mass_assignable(): void
     {
         $user = User::create([
-            'name' => 'Admin',
-            'email' => 'admin2@example.com',
+            'name' => 'Staff',
+            'email' => 'staff2@example.com',
             'password' => bcrypt('secret'),
-            'is_admin' => true,
+            'is_active' => false,
         ]);
 
-        $this->assertFalse($user->fresh()->is_admin);
-        $this->assertNotContains('is_admin', $user->getFillable());
+        $this->assertTrue($user->fresh()->is_active);
+        $this->assertNotContains('is_active', $user->getFillable());
 
-        $user->is_admin = true;
+        $user->is_active = false;
         $user->save();
 
-        $this->assertTrue($user->fresh()->is_admin);
-        $this->assertIsBool($user->fresh()->is_admin);
+        $this->assertFalse($user->fresh()->is_active);
+        $this->assertIsBool($user->fresh()->is_active);
     }
 }

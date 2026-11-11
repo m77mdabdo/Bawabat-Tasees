@@ -5,7 +5,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "test": "node --test tests/js"
+        "test": "node --test tests/js/*.test.mjs"
     },
     "devDependencies": {
         "@alpinejs/focus": "^3.15.12",

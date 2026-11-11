@@ -20,7 +20,7 @@ class SecurityHeadersTest extends TestCase
             'english home' => ['/en'],
             'services' => ['/services'],
             'contact' => ['/contact'],
-            'login' => ['/login'],
+            'login' => ['/dashboard/login'],
         ];
     }
 
@@ -39,7 +39,7 @@ class SecurityHeadersTest extends TestCase
     {
         // Even the redirect a guest gets must carry them.
         $this->get('/dashboard')
-            ->assertRedirect(route('login'))
+            ->assertRedirect(route('filament.dashboard.auth.login'))
             ->assertHeader('X-Content-Type-Options', 'nosniff');
     }
 

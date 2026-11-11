@@ -402,3 +402,8 @@
         @apply my-6 border-s-4 border-luxury-gold bg-bg-soft py-3 ps-4 text-text-secondary;
     }
 }
+
+/* Floating corner buttons hide while the cookie banner is open, so neither covers the other. */
+html.consent-open .bt-float {
+    visibility: hidden;
+}

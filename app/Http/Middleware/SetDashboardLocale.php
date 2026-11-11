@@ -8,19 +8,14 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Resolves the dashboard's locale from the authenticated STAFF member's
- * own `locale` column — completely independent of the public site's
- * URL-based locale (see SetLocale), which is resolved per-visitor from
- * the route name instead. Applied only to auth-gated routes (dashboard,
- * profile, post-login auth screens) — there is no user record to read
- * from on pre-login pages (login, forgot-password), so those stay on
- * the app's default locale ('ar').
+ * The dashboard speaks each staff member's own language (users.locale), independent of the
+ * public site's URL locale. Guests on the sign-in screens get Arabic, the site's default.
  */
 class SetDashboardLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->user()?->locale ?? 'ar';
+        $locale = $request->user()?->dashboardLocale() ?? $request->session()->get('dashboard_locale', 'ar');
 
         app()->setLocale($locale);
         Carbon::setLocale($locale);

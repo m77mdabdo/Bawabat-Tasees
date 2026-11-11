@@ -45,8 +45,9 @@
             </p>
 
             @if ($service->body)
-                <div class="mt-8 text-text-main leading-relaxed">
-                    {{ $service->body }}
+                {{-- Rich text purified on save (Service uses SanitizesContent), like article bodies. --}}
+                <div class="article-body mt-8 text-text-main leading-relaxed">
+                    {!! $service->body !!}
                 </div>
             @endif
 
@@ -56,7 +57,7 @@
                         {{ __('site.services.requirements_heading') }}
                     </h2>
                     <p class="mt-2 text-text-secondary">
-                        {{ $service->requirements }}
+                        {!! nl2br(e($service->requirements)) !!}
                     </p>
                 </div>
             @endif
@@ -67,7 +68,7 @@
                         {{ __('site.services.process_heading') }}
                     </h2>
                     <p class="mt-2 text-text-secondary">
-                        {{ $service->process }}
+                        {!! nl2br(e($service->process)) !!}
                     </p>
                 </div>
             @endif
