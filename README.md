@@ -678,6 +678,7 @@ Schedule the task runner so analytics retention is enforced:
 
 ## Changelog
 
+- **2026-11-12** — A `.htaccess` in the project folder refuses every web request that reaches it, so a local Apache (XAMPP) serving `htdocs` can no longer hand out `.env`, storage or logs; the site itself is still served from `public/`.
 - **2026-11-12** — Security fixes. Visitor names in the dashboard bell are escaped. Tracking settings
   (including the Google Tag Manager container) are Super Admin only (new `tracking.manage` permission),
   and no tracking script loads for a signed-in staff member. The client confirmation email no longer
