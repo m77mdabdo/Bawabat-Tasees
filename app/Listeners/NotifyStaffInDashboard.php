@@ -29,8 +29,9 @@ final class NotifyStaffInDashboard
             foreach ($staff as $user) {
                 $locale = $user->dashboardLocale();
                 Notification::make()
-                    ->title(LeadPresenter::kind($lead, $locale).' '.$lead->reference())
-                    ->body($lead->full_name.($lead->requestedService ? ' · '.$lead->requestedService->getTranslation('name', $locale) : ''))
+                    // Filament renders title and body as (sanitised) HTML: anything a visitor typed is escaped.
+                    ->title(e(LeadPresenter::kind($lead, $locale).' '.$lead->reference()))
+                    ->body(e($lead->full_name.($lead->requestedService ? ' · '.$lead->requestedService->getTranslation('name', $locale) : '')))
                     ->icon($lead->isContactMessage() ? 'heroicon-o-envelope' : 'heroicon-o-inbox-arrow-down')
                     ->iconColor('warning')
                     ->actions([

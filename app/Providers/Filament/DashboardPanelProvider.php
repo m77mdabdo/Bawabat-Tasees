@@ -57,6 +57,9 @@ class DashboardPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->profile(isSimple: false)
+            // A new sign-in address only takes effect once its owner clicks the link sent to it;
+            // the old address is told and can block the change.
+            ->emailChangeVerification()
             ->multiFactorAuthentication([EmailSignInCode::make()], isRequired: true)
             ->brandName(fn () => __('mail.brand'))
             ->brandLogo(asset('images/brand/logo-full-color-256.png'))

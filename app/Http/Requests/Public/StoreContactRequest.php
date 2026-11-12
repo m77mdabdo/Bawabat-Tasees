@@ -23,8 +23,8 @@ class StoreContactRequest extends FormRequest
             'message' => ['required', 'string', 'max:5000'],
             'consent_given' => ['accepted'],
 
-            'first_touch_snapshot' => ['nullable', 'string'],
-            'latest_touch_snapshot' => ['nullable', 'string'],
+            'first_touch_snapshot' => ['nullable', 'string', 'max:4000'],
+            'latest_touch_snapshot' => ['nullable', 'string', 'max:4000'],
 
             // website_url honeypot — deliberately unvalidated, see the
             // same note in StoreConsultationRequest.

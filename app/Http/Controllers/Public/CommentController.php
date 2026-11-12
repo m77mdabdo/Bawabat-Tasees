@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreCommentRequest;
 use App\Models\Article;
 use App\Models\Comment;
+use App\Services\Analytics\IpAnonymizer;
 use App\Services\Analytics\VisitorSessionService;
 use Illuminate\Http\RedirectResponse;
 
@@ -13,6 +14,7 @@ class CommentController extends Controller
 {
     public function __construct(
         private readonly VisitorSessionService $visitorSessions,
+        private readonly IpAnonymizer $ipAnonymizer,
     ) {}
 
     public function store(StoreCommentRequest $request, Article $article): RedirectResponse
@@ -44,7 +46,9 @@ class CommentController extends Controller
             ...$request->safe()->only(['name', 'email', 'body']),
             'article_id' => $article->id,
             'status' => 'pending',
-            'ip_address' => $request->ip(),
+            // Truncated (/24 or /48) like visitor sessions: enough to spot a flood from one
+            // network, never the visitor's own address.
+            'ip_address' => $this->ipAnonymizer->anonymize($request->ip()),
         ]);
 
         // No lead: a comment is engagement, not a conversion. The journey

@@ -124,7 +124,7 @@ class ContentEditingTest extends DashboardTestCase
     public function test_tracking_ids_must_match_their_format_and_need_a_value_to_switch_on(): void
     {
         $this->seed(TrackingSettingSeeder::class);
-        $this->actingAs($this->makeStaff(Role::Manager));
+        $this->actingAs($this->makeAdmin());
 
         Livewire::test(TrackingSettings::class)
             ->fillForm(['ga4_measurement_id' => ['value' => 'not-an-id', 'is_active' => true], 'meta_pixel_id' => ['value' => '', 'is_active' => true]])

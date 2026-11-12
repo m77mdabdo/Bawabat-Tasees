@@ -33,9 +33,10 @@ class TrackingSettings extends Page
     /** @var array<string, mixed> */
     public ?array $data = [];
 
+    /** Super Admins only: a GTM container can run any script on the public site (PermissionMatrix). */
     public static function canAccess(): bool
     {
-        return (bool) auth()->user()?->can('settings.manage');
+        return (bool) auth()->user()?->can('tracking.manage');
     }
 
     public static function getNavigationGroup(): ?string

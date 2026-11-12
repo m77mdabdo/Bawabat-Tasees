@@ -85,6 +85,16 @@ class ContactFormTest extends TestCase
         $this->assertDatabaseCount('leads', 0);
     }
 
+    public function test_oversized_attribution_snapshots_are_rejected(): void
+    {
+        $huge = json_encode(['utm_source' => str_repeat('a', 4100)]);
+
+        $this->post(route('contact.store'), $this->validPayload(['first_touch_snapshot' => $huge, 'latest_touch_snapshot' => $huge]))
+            ->assertSessionHasErrors(['first_touch_snapshot', 'latest_touch_snapshot']);
+
+        $this->assertDatabaseCount('leads', 0);
+    }
+
     public function test_consent_is_required(): void
     {
         $response = $this->post(route('contact.store'), $this->validPayload(['consent_given' => null]));

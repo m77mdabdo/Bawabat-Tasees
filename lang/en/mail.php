@@ -20,6 +20,7 @@ return [
         'client_subject' => 'We received your request :ref',
         'client_kicker' => 'Request received',
         'client_greeting' => 'Hello :name,',
+        'client_greeting_plain' => 'Hello,',
         'client_intro' => 'Thank you for contacting Bawabat Taasees. We have received your request and one of our consultants will be in touch soon during working days.',
         'client_reference' => 'Your reference',
         'client_summary' => 'What you sent us',

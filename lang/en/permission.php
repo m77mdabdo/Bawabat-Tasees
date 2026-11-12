@@ -10,7 +10,8 @@ return [
     'leads.delete' => 'Delete enquiries',
     'marketing.manage' => 'Campaigns and lead sources',
     'analytics.view' => 'Reports and visitor journeys',
-    'settings.manage' => 'Site and tracking settings',
+    'settings.manage' => 'Site settings',
+    'tracking.manage' => 'Tracking pixels and Google Tag Manager',
     'recipients.manage' => 'Who receives enquiry emails',
     'users.manage' => 'Staff accounts and roles',
 ];

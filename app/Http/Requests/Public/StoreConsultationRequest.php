@@ -36,8 +36,8 @@ class StoreConsultationRequest extends FormRequest
             // Populated client-side from the bts_first_touch/bts_latest_touch
             // cookies (see resources/js/attribution.js) — raw JSON strings,
             // parsed in AttributionService, not mass-assigned directly.
-            'first_touch_snapshot' => ['nullable', 'string'],
-            'latest_touch_snapshot' => ['nullable', 'string'],
+            'first_touch_snapshot' => ['nullable', 'string', 'max:4000'],
+            'latest_touch_snapshot' => ['nullable', 'string', 'max:4000'],
 
             // website_url is the honeypot field — deliberately NOT
             // validated here. A validation rule (e.g. "prohibited") would

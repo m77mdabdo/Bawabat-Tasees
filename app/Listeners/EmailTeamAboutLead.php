@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\LeadSubmitted;
+use App\Leads\MailFailure;
 use App\Leads\RecipientDirectory;
 use App\Mail\NewLeadAlert;
 use Illuminate\Support\Facades\Log;
@@ -10,8 +11,9 @@ use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /**
- * One separate email per recipient (nobody sees the others' addresses). A failing address is
- * recorded on the lead and logged; it never stops the other recipients or loses the lead.
+ * One separate email per recipient (nobody sees the others' addresses). A failing recipient is
+ * recorded on the lead and logged by id and error class, without its address; it never stops
+ * the other recipients or loses the lead.
  */
 final class EmailTeamAboutLead
 {
@@ -32,7 +34,8 @@ final class EmailTeamAboutLead
                     $recipient->forceFill(['last_notified_at' => now()])->saveQuietly();
                 }
             } catch (Throwable $e) {
-                $errors[] = $recipient->email.': '.$e->getMessage();
+                // Recipient id (or "fallback" for the site address), never the address itself.
+                $errors[] = 'recipient '.($recipient->exists ? '#'.$recipient->getKey() : 'fallback').': '.MailFailure::describe($e);
             }
         }
 

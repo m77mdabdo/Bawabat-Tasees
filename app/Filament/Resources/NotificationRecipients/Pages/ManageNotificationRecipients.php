@@ -28,7 +28,7 @@ class ManageNotificationRecipients extends ManageRecords
                 Mail::to($record->email, $record->name)->send(new RecipientAdded($record, (string) auth()->user()?->name));
             } catch (Throwable $e) {
                 report($e);
-                Notification::make()->warning()->title(__('Added, but the welcome email could not be sent'))->body($e->getMessage())->send();
+                Notification::make()->warning()->title(__('Added, but the welcome email could not be sent'))->body(e($e->getMessage()))->send();
             }
         })];
     }

@@ -158,7 +158,7 @@ class UserResource extends Resource
     public static function notifyResult(bool $sent, User $user): void
     {
         $sent
-            ? Notification::make()->success()->title(__('Email sent to :email', ['email' => $user->email]))->send()
+            ? Notification::make()->success()->title(__('Email sent to :email', ['email' => e($user->email)]))->send()
             : Notification::make()->danger()->title(__('Sending failed'))->body(__('Check the mail settings, then use “Send password link”.'))->send();
     }
 

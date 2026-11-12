@@ -10,7 +10,8 @@ return [
     'leads.delete' => 'حذف الطلبات',
     'marketing.manage' => 'الحملات ومصادر العملاء',
     'analytics.view' => 'التقارير ورحلات الزوار',
-    'settings.manage' => 'إعدادات الموقع والتتبع',
+    'settings.manage' => 'إعدادات الموقع',
+    'tracking.manage' => 'بكسلات التتبع ومدير علامات Google',
     'recipients.manage' => 'مستلمو بريد الطلبات',
     'users.manage' => 'حسابات الموظفين وأدوارهم',
 ];

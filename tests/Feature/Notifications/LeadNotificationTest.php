@@ -193,4 +193,69 @@ class LeadNotificationTest extends TestCase
 
         Mail::assertSent(TestMail::class, fn ($m) => $m->hasTo('owner@example.com'));
     }
+
+    public function test_the_client_confirmation_never_echoes_free_text_the_sender_wrote(): void
+    {
+        Mail::fake();
+
+        $this->post(route('consultation.store.en'), $this->consultation([
+            'full_name' => 'Ahmed visit https://evil.test/login or www.evil.test, mail me at x@evil.test evil.example.com',
+            'requested_activity' => 'Click https://phish.test to claim your refund',
+            'message' => 'Your account is locked, call +1 555 0100',
+        ]))->assertRedirect();
+
+        Mail::assertSent(LeadConfirmation::class, function (LeadConfirmation $mail) {
+            $html = $mail->render();
+            foreach (['phish.test', 'claim your refund', 'account is locked', 'evil.test', 'evil.example', '@', 'https://evil'] as $text) {
+                $this->assertStringNotContainsString($text, strip_tags($html), "Confirmation echoes: {$text}");
+            }
+            $mail->assertSeeInHtml('Hello');
+            $mail->assertSeeInHtml('Ahmed');
+            $mail->assertSeeInHtml('Company formation');
+
+            return $mail->hasTo('ahmed@example.com');
+        });
+    }
+
+    public function test_the_greeting_name_is_stripped_of_links_and_addresses_and_kept_short(): void
+    {
+        $this->assertSame('Ahmed Al-Otaibi', \App\Leads\LeadPresenter::greetingName('Ahmed Al-Otaibi'));
+        $this->assertSame('أحمد العتيبي', \App\Leads\LeadPresenter::greetingName('أحمد العتيبي'));
+        $this->assertSame('Sara', \App\Leads\LeadPresenter::greetingName('Sara https://x.test www.y.test a@b.test bit.ly/abc evil.com'));
+        $this->assertSame('', \App\Leads\LeadPresenter::greetingName('<b>x</b>.test'));
+        $this->assertSame('Dr Ahmed', \App\Leads\LeadPresenter::greetingName('Dr. Ahmed'));
+        $this->assertLessThanOrEqual(40, mb_strlen(\App\Leads\LeadPresenter::greetingName(str_repeat('Ahmed ', 30))));
+    }
+
+    public function test_one_address_gets_at_most_three_confirmations_a_day(): void
+    {
+        Mail::fake();
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class); // the form's own per-IP limit is not under test
+        $form = $this->consultation(['email' => 'Victim@Example.com']);
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('consultation.store'), $form)->assertRedirect();
+        }
+        $this->post(route('consultation.store'), array_merge($form, ['email' => 'other@example.com']))->assertRedirect();
+
+        Mail::assertSent(LeadConfirmation::class, fn ($m) => $m->hasTo('Victim@Example.com'));
+        $this->assertSame(3, Mail::sent(LeadConfirmation::class, fn ($m) => $m->hasTo('Victim@Example.com'))->count());
+        Mail::assertSent(LeadConfirmation::class, fn ($m) => $m->hasTo('other@example.com'));
+        $this->assertSame(6, Lead::count(), 'The enquiries themselves are all kept.');
+    }
+
+    public function test_a_mail_failure_is_recorded_without_email_addresses(): void
+    {
+        $recipient = NotificationRecipient::factory()->create(['email' => 'a@team.test']);
+        Mail::shouldReceive('to')->andThrow(new RuntimeException('550 mailbox a@team.test unavailable'));
+
+        $this->post(route('consultation.store'), $this->consultation())->assertRedirect();
+
+        $error = Lead::first()->mail_error;
+        $this->assertStringContainsString('recipient #'.$recipient->id, $error);
+        $this->assertStringContainsString('RuntimeException', $error);
+        $this->assertStringNotContainsString('a@team.test', $error);
+        $this->assertStringNotContainsString('ahmed@example.com', $error);
+        $this->assertStringNotContainsString('@', $error);
+    }
 }

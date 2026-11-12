@@ -220,14 +220,14 @@ class CommentSubmissionTest extends TestCase
         $this->assertDatabaseCount('comments', 0);
     }
 
-    public function test_ip_address_is_recorded(): void
+    public function test_only_an_anonymised_ip_address_is_recorded(): void
     {
         $article = $this->makeArticle();
 
-        $this->post(route('articles.comments.store', $article), $this->validPayload());
+        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.77'])
+            ->post(route('articles.comments.store', $article), $this->validPayload());
 
-        $comment = Comment::firstOrFail();
-        $this->assertNotNull($comment->ip_address);
+        $this->assertSame('203.0.113.0', Comment::firstOrFail()->ip_address);
     }
 
     /**

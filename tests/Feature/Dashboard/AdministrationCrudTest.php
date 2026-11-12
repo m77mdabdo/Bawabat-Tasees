@@ -208,4 +208,19 @@ class AdministrationCrudTest extends DashboardTestCase
         $this->post('/dashboard/locale')->assertRedirect();
         $this->assertSame('en', $this->admin->fresh()->locale);
     }
+
+    public function test_changing_the_profile_email_needs_the_new_address_to_confirm_it(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+        $old = $this->admin->email;
+
+        Livewire::test(\Filament\Auth\Pages\EditProfile::class)
+            ->fillForm(['email' => 'new-address@company.test', 'currentPassword' => 'password'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame($old, $this->admin->fresh()->email, 'The address must not change before it is verified.');
+        \Illuminate\Support\Facades\Notification::assertSentOnDemand(\Filament\Auth\Notifications\VerifyEmailChange::class);
+        \Illuminate\Support\Facades\Notification::assertSentTo($this->admin, \Filament\Auth\Notifications\NoticeOfEmailChangeRequest::class);
+    }
 }

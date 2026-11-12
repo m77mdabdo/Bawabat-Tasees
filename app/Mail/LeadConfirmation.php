@@ -35,7 +35,8 @@ class LeadConfirmation extends Mailable
         return $this->branded('mail.lead-client', $locale, __('mail.lead.client_kicker', [], $locale), __('mail.lead.client_kicker', [], $locale), [
             'preheader' => __('mail.lead.client_intro', [], $locale),
             'lead' => $this->lead,
-            'summaryRows' => LeadPresenter::request($this->lead, $locale),
+            'greetingName' => LeadPresenter::greetingName($this->lead->full_name),
+            'summaryRows' => LeadPresenter::clientSummary($this->lead, $locale),
             'whatsappUrl' => $whatsapp ? 'https://wa.me/'.preg_replace('/\D+/', '', $whatsapp) : null,
         ]);
     }

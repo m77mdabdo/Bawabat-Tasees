@@ -32,7 +32,14 @@
      */
     use App\Services\Analytics\VisitorTrackingGate;
 
-    $tracking = \App\Models\TrackingSetting::query()
+    /*
+     * STAFF BROWSERS. Nothing loads for a signed-in staff member. A GTM
+     * container (or any vendor script) runs whatever its account owner
+     * publishes, in this origin, next to the dashboard session cookie — so
+     * a Super Admin reading the public site must never execute it. Staff
+     * visits are not marketing traffic anyway.
+     */
+    $tracking = auth()->check() ? collect() : \App\Models\TrackingSetting::query()
         ->where('is_active', true)
         ->whereNotNull('value')
         ->where('value', '!=', '')

@@ -88,4 +88,17 @@ class EnquiriesTest extends DashboardTestCase
         $this->assertStringContainsString('طلب استشارة '.$lead->reference(), $sales->notifications->first()->data['title']);
         $this->assertStringContainsString('Consultation request '.$lead->reference(), $english->notifications->first()->data['title']);
     }
+
+    public function test_a_visitor_name_is_escaped_in_the_dashboard_bell(): void
+    {
+        Mail::fake();
+        $sales = $this->makeStaff(Role::Sales);
+
+        LeadSubmitted::dispatch($this->lead(['full_name' => '<b>x</b><img src=x>']));
+
+        $body = $sales->notifications->first()->data['body'];
+        $this->assertStringContainsString('&lt;b&gt;x&lt;/b&gt;', $body);
+        $this->assertStringNotContainsString('<b>', $body);
+        $this->assertStringNotContainsString('<img', $body);
+    }
 }

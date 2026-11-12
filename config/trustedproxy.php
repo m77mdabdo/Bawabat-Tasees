@@ -21,20 +21,19 @@ return [
     |   - route()/url() generate http:// links on an https:// site, including
     |     the canonical tags, the hreflang alternates and sitemap.xml.
     |
-    | DEFAULT. Null (trust nothing) everywhere except production, where it is
-    | '*' — trust whatever proxy is directly in front of us. '*' is safe in
-    | the normal deployment shape, where the application is only reachable
-    | through the load balancer: TrustProxies resolves '*' to the calling
-    | REMOTE_ADDR, not to "anybody", so a client cannot forge headers unless
-    | it can talk to the origin directly. If the app IS directly reachable,
-    | set TRUSTED_PROXIES to the load balancer's actual IPs or CIDRs
-    | (comma-separated) instead of leaving it on '*'.
+    | DEFAULT. Trust nothing, in every environment: an empty or missing
+    | TRUSTED_PROXIES means X-Forwarded-* headers are ignored, so no client
+    | can forge its IP (rate limits, visitor analytics) or the scheme. A
+    | deployment behind a load balancer or reverse proxy sets TRUSTED_PROXIES
+    | to that proxy's IPs or CIDRs, comma-separated. '*' (trust whichever
+    | machine connects directly) is accepted, but only safe when the
+    | application cannot be reached except through the proxy.
     |
-    | Local and testing deliberately trust nothing, so no test can pass by
-    | forging X-Forwarded-Proto.
+    | Local and testing therefore trust nothing either, so no test can pass
+    | by forging X-Forwarded-Proto.
     |
     */
 
-    'proxies' => env('TRUSTED_PROXIES', env('APP_ENV') === 'production' ? '*' : null),
+    'proxies' => env('TRUSTED_PROXIES') ?: null,
 
 ];

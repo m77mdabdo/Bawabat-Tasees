@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Testimonial;
 use App\Models\TrackingSetting;
+use App\Models\User;
 use App\Services\Analytics\VisitorTrackingGate;
 use Database\Seeders\MenuItemSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -305,6 +306,24 @@ class HomeTest extends TestCase
         $headerEnd = strpos($html, '</header>');
         $headerMarkup = substr($html, 0, $headerEnd);
         $this->assertStringNotContainsString('wa.me/', $headerMarkup);
+    }
+
+    /**
+     * A GTM container runs whatever its account owner publishes. A signed-in staff member
+     * (possibly a Super Admin) must never execute it next to their dashboard session.
+     */
+    public function test_tracking_scripts_never_load_in_a_signed_in_staff_browser(): void
+    {
+        TrackingSetting::create(['key' => 'gtm_container_id', 'value' => 'GTM-ABC1234', 'is_active' => true]);
+        TrackingSetting::create(['key' => 'meta_pixel_id', 'value' => '999999999999999', 'is_active' => true]);
+
+        $this->get('/')->assertOk()->assertSee('GTM-ABC1234', false);
+
+        $this->actingAs(User::factory()->create())->get('/')
+            ->assertOk()
+            ->assertDontSee('GTM-ABC1234', false)
+            ->assertDontSee('googletagmanager.com/gtm.js', false)
+            ->assertDontSee('fbevents.js', false);
     }
 
     public function test_tracking_scripts_render_nothing_when_all_settings_inactive(): void

@@ -48,6 +48,8 @@ class AccessAndRolesTest extends DashboardTestCase
             'viewer → enquiries' => [Role::Viewer, '/dashboard/leads', 200],
             'viewer → campaigns' => [Role::Viewer, '/dashboard/campaigns', 403],
             'viewer → tracking' => [Role::Viewer, '/dashboard/tracking-settings', 403],
+            'manager → tracking' => [Role::Manager, '/dashboard/tracking-settings', 403],
+            'super admin → tracking' => [Role::SuperAdmin, '/dashboard/tracking-settings', 200],
         ];
     }
 
@@ -70,6 +72,7 @@ class AccessAndRolesTest extends DashboardTestCase
             $this->assertContains(Role::SuperAdmin, $roles, "Super Admin lacks {$permission}");
         }
         $this->assertSame([Role::SuperAdmin], PermissionMatrix::all()['users.manage']);
+        $this->assertSame([Role::SuperAdmin], PermissionMatrix::all()['tracking.manage']);
         $this->assertFalse($this->makeStaff(Role::Viewer)->can('leads.manage'));
     }
 

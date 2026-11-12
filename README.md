@@ -14,7 +14,7 @@ Built with Laravel 12 · PHP 8.2+ · Filament 5 · Tailwind CSS · Alpine.js
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Alpine.js](https://img.shields.io/badge/Alpine.js-3-8BC0D0?style=flat-square&logo=alpinedotjs&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-774_passing-22c55e?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-788_passing-22c55e?style=flat-square)
 ![RTL](https://img.shields.io/badge/RTL-first-0B5D3B?style=flat-square)
 ![WCAG](https://img.shields.io/badge/WCAG_2.1-AA-0B5D3B?style=flat-square)
 
@@ -77,7 +77,7 @@ editable from the dashboard. No deployment is required to change a comma.
 | 🔐 **Privacy by design** | Opt-in consent, DNT/GPC honoured, IP truncation, configurable retention with automatic pruning |
 | ♿ **WCAG 2.1 AA** | Verified contrast, skip links, focus traps, reduced-motion support, 44px touch targets |
 | 📱 **Mobile-first** | Including the dashboard: tables collapse to cards, off-canvas drawer, no horizontal scroll at 375px |
-| ✅ **774 tests** | 2,782 assertions across feature and unit suites |
+| ✅ **788 tests** | 2,853 assertions across feature and unit suites |
 
 ---
 
@@ -225,8 +225,8 @@ alert address is told by email what it will receive and who added it.
 
 | Role | Can |
 |---|---|
-| Super Admin | Everything, including staff accounts |
-| Manager | Content, enquiries, marketing, reports, settings |
+| Super Admin | Everything, including staff accounts and tracking pixels / Google Tag Manager |
+| Manager | Content, enquiries, marketing, reports, site settings |
 | Content Editor | Services, articles, pages, menu, media, comments |
 | Sales | Enquiries: follow up, mark handled, record conversions |
 | Viewer | Read-only: reports, visitor journeys, enquiries |
@@ -551,7 +551,7 @@ resources/
 ## Testing
 
 ```
-Tests:    774 passed (2,782 assertions)
+Tests:    788 passed (2,853 assertions)
 Duration: ~25s
 ```
 
@@ -650,7 +650,8 @@ Schedule the task runner so analytics retention is enforced:
 
 - [ ] `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` on `https://`
 - [ ] Real `ADMIN_EMAIL` / `ADMIN_PASSWORD`
-- [ ] `TRUSTED_PROXIES` set if behind a load balancer
+- [ ] `TRUSTED_PROXIES` set to the proxy's IPs if behind a load balancer (empty trusts none)
+- [ ] `APP_URL` is the real public address: other Host headers are refused
 - [ ] Real contact details, social links and SEO defaults entered in Settings
 - [ ] Legal pages reviewed by a qualified professional
 - [ ] HTTPS enforced at the web server
@@ -672,10 +673,21 @@ Schedule the task runner so analytics retention is enforced:
 | Service classes | 18 |
 | Database migrations | 35 |
 | Registered routes | 102 |
-| Tests | 774 passing · 2,782 assertions |
+| Tests | 788 passing · 2,853 assertions |
 | JS / CSS bundle (public site) | 26.4 kB / 11.6 kB gzipped |
 
 ## Changelog
+
+- **2026-11-12** — Security fixes. Visitor names in the dashboard bell are escaped. Tracking settings
+  (including the Google Tag Manager container) are Super Admin only (new `tracking.manage` permission),
+  and no tracking script loads for a signed-in staff member. The client confirmation email no longer
+  repeats the requested activity, greets by a cleaned name (no links, addresses or domains, 40 characters
+  at most) and goes to one address at most 3 times a day. Mail failures are recorded by recipient id and
+  error class, without addresses. Production refuses to start with `MAIL_MAILER=log` or `array`
+  (`.env.example` now says `smtp`). No proxy is trusted unless `TRUSTED_PROXIES` lists it, and only
+  `APP_URL`'s host is accepted. Comment IPs are stored truncated, attribution snapshots are limited to
+  4,000 characters, and a profile email change must be confirmed from the new address.
+  The Content-Security-Policy stays in report-only mode.
 
 - **2026-11-11** — Real photographs (Unsplash License, credited in `docs/photo-credits.md`) for every service and
   article, a sharper night-skyline hero image, and flags for every country. They ship in

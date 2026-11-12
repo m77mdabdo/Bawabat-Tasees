@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use RuntimeException;
 use Spatie\Translatable\Facades\Translatable;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->refuseUndeliverableMailInProduction();
         $this->forceHttpsInProduction();
         $this->configureRateLimiting();
 
@@ -77,6 +79,21 @@ class AppServiceProvider extends ServiceProvider
                 'visitorTrackingEnabled' => $settings->boolean('visitor_sessions_enabled', true),
             ]);
         });
+    }
+
+    /**
+     * Production must really send email: sign-in codes, staff invitations and enquiry alerts all
+     * go by mail. With the `log` mailer they would be written to storage/logs instead (sign-in
+     * codes included), and `array` drops them, so the application refuses to start rather than
+     * fail silently.
+     */
+    private function refuseUndeliverableMailInProduction(): void
+    {
+        $mailer = (string) config('mail.default');
+
+        if ($this->app->environment('production') && in_array($mailer, ['log', 'array'], true)) {
+            throw new RuntimeException("MAIL_MAILER is \"{$mailer}\" in production: emails (including sign-in codes) would not be delivered. Configure SMTP in .env.");
+        }
     }
 
     /**

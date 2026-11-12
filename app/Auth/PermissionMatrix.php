@@ -31,6 +31,8 @@ final class PermissionMatrix
             'analytics.view' => [$sa, $mg, $vw],
             'settings.manage' => [$sa, $mg],
             'recipients.manage' => [$sa, $mg],
+            // A GTM container runs any script its owner publishes on every public page, so only Super Admins.
+            'tracking.manage' => [$sa],
             'users.manage' => [$sa],
         ];
     }

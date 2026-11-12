@@ -25,6 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         /*
+         * Only APP_URL's host (and its subdomains) is accepted as the Host
+         * header, so a forged Host cannot steer absolute links such as the
+         * password-reset and invitation URLs. Laravel skips this check in the
+         * local environment and while running tests.
+         */
+        $middleware->trustHosts();
+
+        /*
          * The three first-party analytics cookies are read and written by
          * JavaScript as well as by PHP, so they cannot be encrypted — an
          * encrypted cookie is opaque to the client that has to set it.

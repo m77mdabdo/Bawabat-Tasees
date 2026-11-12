@@ -43,6 +43,38 @@ final class LeadPresenter
         ]);
     }
 
+    /**
+     * What the client's own confirmation repeats back. Only values the site chose (service,
+     * language, time): the confirmation goes to whatever address was typed into a public form,
+     * so it must never echo free text the sender wrote (requested activity, message).
+     *
+     * @return list<array{0: string, 1: string}>
+     */
+    public static function clientSummary(Lead $lead, string $locale): array
+    {
+        return self::rows($locale, [
+            'service' => $lead->requestedService?->getTranslation('name', $locale),
+            'language' => __('mail.lead.languages.'.$lead->locale, [], $locale),
+            'submitted_at' => $lead->created_at?->timezone('Asia/Riyadh')->locale($locale)->translatedFormat($locale === 'ar' ? 'j F Y، g:i a' : 'j F Y, g:i a'),
+        ]);
+    }
+
+    /**
+     * The name used to greet the client: letters, spaces, apostrophes and hyphens only, no links,
+     * addresses or domain-like words, at most 40 characters. Empty when nothing is left.
+     */
+    public static function greetingName(?string $name): string
+    {
+        $name = (string) $name;
+        $name = preg_replace('~(?:[a-z][a-z0-9+.-]*://|www\.)\S*~iu', ' ', $name) ?? '';
+        $name = preg_replace('~\S*@\S*~u', ' ', $name) ?? '';
+        $name = preg_replace('~\S*[.。．]\p{L}{2,}\S*~u', ' ', $name) ?? '';
+        $name = preg_replace("~[^\p{L}\p{M}\s'’-]~u", ' ', $name) ?? '';
+        $name = trim(preg_replace('~\s+~u', ' ', $name) ?? '');
+
+        return trim(mb_substr($name, 0, 40));
+    }
+
     /** Marketing origin, only what is known. @return list<array{0: string, 1: string}> */
     public static function source(Lead $lead, string $locale): array
     {

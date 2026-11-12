@@ -262,6 +262,20 @@ class ConsultationFormTest extends TestCase
         $this->assertDatabaseCount('leads', 0);
     }
 
+    public function test_oversized_attribution_snapshots_are_rejected(): void
+    {
+        $service = $this->makeService();
+        $huge = json_encode(['utm_source' => str_repeat('a', 4100)]);
+
+        $this->post(route('consultation.store'), $this->validPayload([
+            'requested_service_id' => $service->id,
+            'first_touch_snapshot' => $huge,
+            'latest_touch_snapshot' => $huge,
+        ]))->assertSessionHasErrors(['first_touch_snapshot', 'latest_touch_snapshot']);
+
+        $this->assertDatabaseCount('leads', 0);
+    }
+
     public function test_invalid_email_is_rejected(): void
     {
         $service = $this->makeService();

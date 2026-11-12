@@ -13,7 +13,7 @@ use Spatie\Translatable\HasTranslations;
 
 class Article extends Model
 {
-    use HasFactory, HasSlug, HasTranslations, SanitizesContent, SanitizesContent, SoftDeletes;
+    use HasFactory, HasSlug, HasTranslations, SanitizesContent, SoftDeletes;
 
     /** @var list<string> Rendered as HTML on the public site, so purified on every save. */
     protected array $richTextAttributes = ['body'];

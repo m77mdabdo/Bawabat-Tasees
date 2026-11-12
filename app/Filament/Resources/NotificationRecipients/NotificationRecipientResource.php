@@ -86,10 +86,10 @@ class NotificationRecipientResource extends Resource
                     ->action(function (NotificationRecipient $record) {
                         try {
                             Mail::to($record->email, $record->name)->send(new TestMail(config('notifications.staff_locale', 'ar')));
-                            Notification::make()->success()->title(__('Test email sent to :email', ['email' => $record->email]))->send();
+                            Notification::make()->success()->title(__('Test email sent to :email', ['email' => e($record->email)]))->send();
                         } catch (Throwable $e) {
                             report($e);
-                            Notification::make()->danger()->title(__('Sending failed'))->body($e->getMessage())->send();
+                            Notification::make()->danger()->title(__('Sending failed'))->body(e($e->getMessage()))->send();
                         }
                     }),
                 EditAction::make(),

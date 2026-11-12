@@ -20,6 +20,7 @@ return [
         'client_subject' => 'استلمنا طلبك :ref',
         'client_kicker' => 'تأكيد الاستلام',
         'client_greeting' => 'مرحبًا :name،',
+        'client_greeting_plain' => 'مرحبًا،',
         'client_intro' => 'شكرًا لتواصلك مع بوابة تأسيس الشركات. استلمنا طلبك وسيتواصل معك أحد مستشارينا في أقرب وقت خلال أيام العمل.',
         'client_reference' => 'رقم طلبك',
         'client_summary' => 'ملخص ما أرسلته',
